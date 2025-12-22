@@ -1,0 +1,300 @@
+﻿
+    <style>
+
+        .card {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border: none;
+        }
+
+        .result-container {
+            min-height: 100px;
+        }
+
+        .copy-btn {
+            cursor: pointer;
+        }
+
+            .copy-btn:hover {
+                color: #0d6efd !important;
+            }
+    </style>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0"><i class="bi bi-key me-2"></i>License Key Generator</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="licenseForm">
+                            <div class="mb-3">
+                                <label for="customerName" class="form-label">User Name</label>
+                                <div class="form-group">
+                                    <select class="form-control" id="userSelect">
+                                        <option value="">Select User</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="fromDate" class="form-label">From Date</label>
+                                    <input type="date" class="form-control" id="fromDate" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="toDate" class="form-label">To Date</label>
+                                    <input type="date" class="form-control" id="toDate" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="product" class="form-label">Product</label>
+                                <select class="form-select" id="product" disabled>
+                                    <option value="">Select</option>
+                                    <option value="U">Standard</option>
+                                    <option value="A">Standard</option>
+                                    <option value="D">Standard</option>
+                                    <option value="T">Trial Edition</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="secretKey" class="form-label">Secret Key</label>
+                                <div class="input-group">
+                                <input type="text" class="form-control" id="secretKey" placeholder="Enter your secret key i.e mySecretKey123" value="">
+                                    <button class="btn btn-outline-secondary" type="button" id="generateRandomKey">
+                                        <i class="bi bi-dice-5"></i> Random
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="button" id="Genratelicence" class="btn btn-primary">
+                                    <i class="bi bi-gear me-1"></i> Generate License
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="mt-4" id="resultSection" style="display: none;">
+                            <h5 class="mb-3"><i class="bi bi-file-lock2 me-1"></i>Generated License</h5>
+                            <div class="mb-3">
+                                <label class="form-label">License Details:</label>
+                                <div class="card bg-light p-3 mb-2">
+                                    <pre id="licenseDetails" class="mb-0"></pre>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Encrypted License Key:</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="licenseKey" readonly>
+                                    <button class="btn btn-outline-secondary copy-btn" type="button" id="copyLicense" title="Copy to clipboard">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button class="btn btn-success" id="downloadLicense">
+                                    <i class="bi bi-download me-1"></i> Download License
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+<script src="~/js/crypto-js.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Load users
+        loadUsers();
+
+        function loadUsers() {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GETUSERS", "Auth")',
+                contentType: "application/json; charset=utf-8",
+                cache: true,
+                success: function (data) {
+                    if (data.length) {
+                        userData = data;
+                        populateUserDropdown();
+                    }
+                },
+                error: function (xhr) {
+                    const errorMessage = xhr.responseJSON?.error || 'Error loading users';
+                    Notify('error', 'Error', errorMessage);
+                }
+            });
+        }
+
+        // Populate user dropdown
+        function populateUserDropdown() {
+            const $select = $('#userSelect');
+            $select.empty();
+            $select.append('<option value="">Select User</option>');
+
+            userData.forEach(user => {
+                $select.append(`<option data-role="${user.Role}" value="${user.UserID}">${user.Username}</option>`);
+            });
+        }
+
+        // Handle dropdown change event
+        $('#userSelect').on('change', function () {
+            var role = $('#userSelect option:selected').data('role');
+            $("#product").val(role);
+        });
+
+        // Generate random secret key
+        document.getElementById('generateRandomKey').addEventListener('click', function() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < 15; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('secretKey').value = result;
+        });
+
+        // Generate License button click handler
+        $("#Genratelicence").click(function(){
+            var userid = $("#userSelect").val();
+            var secretKey = $("#secretKey").val().trim();
+            var fromDate = $("#fromDate").val().trim();
+            var toDate = $("#toDate").val().trim();
+
+            if(!userid) {
+                Notify('warning', 'Please Select User', "Then Try Again..!");
+                return;
+            }
+
+         
+            if(!fromDate) {
+                Notify('warning', 'From Date Required', "Please Select From Date!");
+                return;
+            }
+            if(!toDate) {
+                Notify('warning', 'To Date Required', "Please Select To Date!");
+                return;
+            }
+            if(!secretKey) {
+                Notify('warning', 'Secret Key Required', "Please enter or generate a secret key!");
+                return;
+            }
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("UPDATEKEY", "Auth")',
+                contentType: "application/json; charset=utf-8",
+                data:{Key:secretKey,UserId:userid},
+                success: function (data) {
+                    if(data.success){
+                            Notify('success', 'Success', data.message);
+                        var username = $('#userSelect option:selected').text();
+                        generateLicense(username);
+                    }else{
+                        Notify('error', 'Error', data.message); 
+                    }
+                },
+                error: function (xhr) {
+                    const errorMessage = xhr.responseJSON?.error || 'Error loading users';
+                    Notify('error', 'Error', data.message);
+                }
+    });
+            
+        });
+
+        // Modified generateLicense function
+        function generateLicense(customerName) {
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            const product = document.getElementById('product').value;
+            const secretKey = document.getElementById('secretKey').value;
+            const userid =$("#userSelect").val();
+
+            const licenseData = {
+                customer: customerName,
+                userid: userid,
+                product: product,
+                validFrom: fromDate,
+                validTo: toDate,
+                secretKey: secretKey,
+                generatedAt: new Date().toISOString()
+            };
+
+            const licenseJson = JSON.stringify(licenseData, null, 2);
+            document.getElementById('licenseDetails').textContent = licenseJson;
+
+            const encrypted = CryptoJS.AES.encrypt(licenseJson, secretKey).toString();
+            document.getElementById('licenseKey').value = encrypted;
+
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Function to decrypt license key and return original JSON
+        function decryptLicenseKey(encryptedKey, secretKey) {
+            try {
+                const bytes = CryptoJS.AES.decrypt(encryptedKey, secretKey);
+                const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+
+                if (!decryptedData) {
+                    throw new Error("Decryption failed - possibly wrong secret key");
+                }
+
+                return JSON.parse(decryptedData);
+            } catch (error) {
+                console.error("Decryption failed:", error);
+                return null;
+            }
+        }
+
+        // Add a button to view decrypted license details
+        document.getElementById('copyLicense').addEventListener('click', function() {
+            const licenseKey = document.getElementById('licenseKey').value;
+            licenseKey.select();
+            document.execCommand('copy');
+
+            // Show tooltip feedback
+            const tooltip = new bootstrap.Tooltip(this, {
+                title: 'Copied!',
+                trigger: 'manual'
+            });
+            tooltip.show();
+            setTimeout(() => tooltip.hide(), 1000);
+        });
+
+        // Add button to view decrypted license
+        document.getElementById('downloadLicense').addEventListener('click', function() {
+            const licenseKey = document.getElementById('licenseKey').value;
+            const secretKey = document.getElementById('secretKey').value;
+
+            if (!licenseKey || !secretKey) {
+                Notify('warning', 'Missing Data', 'Both license key and secret key are required');
+                return;
+            }
+
+            const licenseData = decryptLicenseKey(licenseKey, secretKey);
+
+            if (licenseData) {
+                // Get the selected username from dropdown
+                const selectedUser = document.getElementById('userSelect');
+                const customerName = selectedUser.options[selectedUser.selectedIndex].text || 'license';
+
+                const blob = new Blob([`License Details:\n${JSON.stringify(licenseData, null, 2)}\n\nLicense Key:\n${licenseKey}`],
+                                    { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${customerName.replace(/\s+/g, '_')}_license.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } else {
+                Notify('error', 'Decryption Failed', 'Invalid license key or secret key');
+            }
+        });
+
+        // Initialize Bootstrap tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>

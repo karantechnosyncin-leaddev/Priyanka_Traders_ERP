@@ -1,0 +1,383 @@
+﻿    <style>
+        .form-section {
+        background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .table-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .action-buttons .btn {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .selected-row {
+            background-color: #e9f7fe !important;
+        }
+    </style>
+    <div class="container py-4 ">
+        <div class="text-center">
+            <h1 class="mb-4">Warehouse Management</h1>
+        </div>
+
+        <!-- Warehouse Form Section -->
+        <div class="form-section card">
+            <h3><i class="bi bi-building"></i> Warehouse Details</h3>
+            <form id="warehouseForm">
+                <input type="hidden" id="warehouseId">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="code" class="form-label">Warehouse Code</label>
+                        <input type="text" class="form-control" id="code" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="name" class="form-label">Warehouse Name</label>
+                        <input type="text" class="form-control" id="name" required>
+                    </div>
+                  
+                </div>
+
+                <div class="action-buttons mt-4 text-end">
+                 
+                    @if (ViewBag.BtnAuth != null)
+                    {
+                        <!-- Button Rendering Logic -->
+                        @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                        {
+                            var btnName = item["BtnName"]?.ToString().Trim();
+                            var btnauth = item["Auth"]?.ToString();
+                            var icon = item["Icon"]?.ToString();
+                            var ColorClass = item["ColorClass"]?.ToString();
+
+                            if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                            {
+                                switch (btnName)
+                                {
+                                    case "Save":
+                                        <button type="button" id="btnSave" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2">
+                                            <i class="@icon"></i>@btnName
+                                        </button>
+                                        break;
+                                    case "Update":
+                                        <button id="btnUpdate" data-action="update" class="btn @ColorClass mb-1  me-2" disabled>
+                                            <i class="@icon"></i> @btnName
+                                        </button>
+                                        break;
+                                    case "Delete":
+                                        <button type="button" id="btnDelete" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2" disabled>
+                                            <i class="@icon"></i>@btnName
+                                        </button>
+                                        break;
+                                    case "Reset":
+                                        <button type="reset" id="btnReset" class="btn @ColorClass mb-1   me-2">
+                                            <i class="@icon"></i> Reset
+                                        </button>
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-primary" role="alert">
+
+                        </div>
+                    }
+                </div>
+            </form>
+        </div>
+
+        <!-- Warehouse Table Section -->
+        <div class="table-section">
+            <h3><i class="bi bi-list-ul"></i> Warehouse List</h3>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover" id="warehouseTable">
+                    <thead>
+                        <tr>
+                            <th>SR No</th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+<script>
+    $(document).ready(function () {
+        // Dynamic duplicate check
+        function checkDuplicate() {
+            const $codeInput = $('#code');
+            const $nameInput = $('#name');
+            const code = $codeInput.val().trim();
+            const name = $nameInput.val().trim();
+            if (!code && !name) return false;
+
+            let codeExists = false;
+            let nameExists = false;
+
+            $('#warehouseTable tbody tr').each(function () {
+                const rowCode = $(this).find('td:eq(1)').text().trim();
+                const rowName = $(this).find('td:eq(2)').text().trim();
+
+
+                if (rowCode === code) codeExists = true;
+                if (rowName === name) nameExists = true;
+
+                if (codeExists && nameExists) return false; // break loop if both found
+            });
+
+            if (codeExists && nameExists) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Duplicate Entry',
+                    text: 'Both Code  and Name already exist!',
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+                $codeInput.val('');
+                $nameInput.val('');
+            } else if (codeExists) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Duplicate Warehouse code ',
+                    text: 'This Code  already exists!',
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+                $codeInput.val('');
+            } else if (nameExists) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Duplicate Warehouse Name',
+                    text: 'This Name already exists!',
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+                $nameInput.val('');
+            }
+
+            return codeExists || nameExists;
+        }
+        // Bind live check
+        $(document).on('change', '#code , #name', checkDuplicate);
+        let warehouses = [];
+        let selectedWarehouse = null;
+        function LoadWhs(){
+            // Load warehouses from server
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GETWHS", "Master")',
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (data) {
+                        warehouses = data;
+                        renderTable();
+                    } else {
+                        Notify('error', 'Error', data.message);
+                    }
+                },
+                error: function (xhr) {
+                    const errorMessage = xhr.responseJSON?.error || 'Error';
+                    Notify('error', 'Error', errorMessage);
+                }
+            });
+
+        }
+        LoadWhs()
+        function renderTable() {
+            const $tableBody = $('#warehouseTable tbody');
+            $tableBody.empty();
+
+            $.each(warehouses, function(index, warehouse) {
+                const $row = $('<tr>').append(
+                    $('<td>').text(warehouse.ID),
+                    $('<td>').text(warehouse.WhsCode),
+                    $('<td>').text(warehouse.WhsName),
+                    $('<td>').append(
+                        $('<button>')
+                            .addClass('btn btn-sm btn-outline-primary select-btn')
+                            .attr('data-id', warehouse.ID)
+                            .append($('<i>').addClass('bi bi-check'), ' Select')
+                    )
+                );
+                if (selectedWarehouse && selectedWarehouse.ID === warehouse.ID) {
+                    $row.addClass('selected-row');
+                }
+                $tableBody.append($row);
+            });
+        }
+          // Save button
+            $('#btnSave').on('click', function() {
+                const warehouse = getFormData();
+
+                if (!warehouse.WhsName || !warehouse.WhsCode) {
+                    Notify('warning', 'Validation', 'Name and Code are required!');
+                    return;
+                }
+
+                // Optional: Assign new ID locally (ideally server assigns it)
+                warehouse.ID = warehouses.length > 0
+                    ? Math.max.apply(null, $.map(warehouses, function(w) { return w.ID; })) + 1
+                    : 1;
+                    warehouse.ID="";
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("Warehouses", "Master")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(warehouse),
+                    success: function (data) {
+                        if (data.success) {
+                            Notify('success', 'Saved', data.message);
+                            warehouses.push(warehouse);
+                            clearForm();
+                            LoadWhs()
+                        } else {
+                            Notify('error', 'Error', data.message);
+                        }
+                    },
+                    error: function (xhr) {
+                        const errorMessage = xhr.responseJSON?.message || "Unknown error";
+                        Notify('error', 'Error', errorMessage);
+                    }
+                });
+            });
+
+            // Update button
+            $('#btnUpdate').on('click', function() {
+                if (!selectedWarehouse) return;
+
+                const warehouse = getFormData();
+                warehouse.ID = selectedWarehouse.ID.toString();
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("Warehouses", "Master")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(warehouse),
+                    success: function (data) {
+                        if (data.success) {
+                            Notify('success', 'Updated', data.message);
+
+                            // Update local data
+                            const index = $.map(warehouses, function(w) { return w.ID; }).indexOf(selectedWarehouse.ID);
+                            if (index !== -1) {
+                                warehouses[index] = warehouse;
+                            }
+
+                             clearForm();
+                            LoadWhs()
+                            setButtonsState(false);
+                        } else {
+                            Notify('error', 'Error', data.message);
+                        }
+                    },
+                    error: function (xhr) {
+                        const errorMessage = xhr.responseJSON?.message || "Unknown error";
+                        Notify('error', 'Error', errorMessage);
+                    }
+                });
+            });
+
+            // Delete button
+            $('#btnDelete').on('click', function() {
+                if (!selectedWarehouse) return;
+
+                if (confirm('Are you sure you want to delete this warehouse?')) {
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("DeleteWarehouse", "Master")',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify({ ID: selectedWarehouse.ID }),
+                        success: function (data) {
+                            if (data.success) {
+                                Notify('success', 'Deleted', data.message);
+                                warehouses = $.grep(warehouses, function(w) {
+                                    return w.ID !== selectedWarehouse.ID;
+                                });
+                                 clearForm();
+                            LoadWhs()
+                                setButtonsState(false);
+                            } else {
+                                Notify('error', 'Error', data.message);
+                            }
+                        },
+                        error: function (xhr) {
+                            const errorMessage = xhr.responseJSON?.message || "Unknown error";
+                            Notify('error', 'Error', errorMessage);
+                        }
+                    });
+                }
+            });
+
+            // Clear button
+            $('#btnReset').on('click', function() {
+                clearForm();
+                setButtonsState(false);
+            });
+
+            // Select button in table (delegated event)
+            $('#warehouseTable').on('click', '.select-btn', function() {
+                const id = parseInt($(this).attr('data-id')); // Fixed: using attr() instead of data()
+                selectWarehouse(id);
+            });
+      
+
+        function getFormData() {
+            return {
+                WhsName: $('#name').val(),
+                WhsCode: $('#code').val()
+            };
+        }
+
+        function fillForm(warehouse) {
+            $('#warehouseId').val(warehouse.ID);
+            $('#name').val(warehouse.WhsName);
+            $('#code').val(warehouse.WhsCode);
+        }
+
+        function clearForm() {
+            $('#warehouseForm')[0].reset();
+            selectedWarehouse = null;
+            $('#warehouseTable tr').removeClass('selected-row');
+        }
+
+        function selectWarehouse(id) {
+            selectedWarehouse = $.grep(warehouses, function(w) {
+                return w.ID == id;
+            })[0];
+
+            if (selectedWarehouse) {
+                fillForm(selectedWarehouse);
+                setButtonsState(true);
+
+                $('#warehouseTable tr').removeClass('selected-row').filter(function() {
+                    return parseInt($(this).find('td:first').text()) === id;
+                }).addClass('selected-row');
+            } else {
+                console.error("No warehouse found with ID:", id);
+            }
+        }
+
+        function setButtonsState(editMode) {
+            $('#btnSave').prop('disabled', editMode);
+            $('#btnUpdate').prop('disabled', !editMode);
+            $('#btnDelete').prop('disabled', !editMode);
+        }
+    });
+</script>

@@ -1,0 +1,3480 @@
+﻿<style>
+</style>
+<div class="container-fluid">
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="card p-2 rounded shadow-sm">
+                <div class="row">
+                    <div class="col-md-6 d-flex align-items-center">
+                        <h3 id="doctitle"><b>Debit Note</b></h3>
+                    </div>
+                    <div class="col-md-6 d-flex justify-content-end align-items-center flex-wrap">
+                        @if (ViewBag.BtnAuth != null)
+                        {
+
+                            <!-- Button Rendering Logic -->
+                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                            {
+                                var btnName = item["BtnName"]?.ToString().Trim();
+                                var btnauth = item["Auth"]?.ToString();
+                                var icon = item["Icon"]?.ToString();
+                                var ColorClass = item["ColorClass"]?.ToString();
+                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                {
+                                    switch (btnName)
+                                    {
+                                        @*   case "Bulk Upload":
+                        <button id="btnBulkUpload" data-bs-toggle="modal" data-bs-target="#bulkUploadModal" class="btn @ColorClass mb-1  me-2 mb-1">
+                            <i class="@icon"></i> @btnName
+                        </button>
+                        break; *@
+                                        case "Find":
+                                            <button id="btnFind" data-bs-toggle="modal" data-bs-target="#receiptListModal" class="btn @ColorClass mb-1  me-2 mb-1">
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break;
+                                        case "Attachments":
+                                            <button id="Attachments" data-bs-toggle="modal" data-bs-target="#Attachment" class="btn @ColorClass mb-1   me-2 mb-1">
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break;
+                                        case "Export":
+                                            <button id="btnPdf" class="btn btn-outline-danger me-2 mb-1">
+                                                <i class="bi bi-file-pdf me-1"></i> PDF
+                                            </button>
+                                            <button id="btnExcel" class="btn btn-outline-success me-2 mb-1">
+                                                <i class="bi bi-file-earmark-excel me-1"></i> EXCEL
+                                            </button>
+                                            <button id="btnCSV" class="btn btn-outline-success me-2 mb-1">
+                                                <i class="bi bi-file-earmark-excel me-1"></i> CSV
+                                            </button>
+                                            break;
+                                        case "Copy From":
+                                            <div class="dropdown">
+                                                <button id="btnCopyFrom" class="btn @ColorClass mb-1  dropdown-toggle me-2 mb-1" type="button" disabled data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="@icon"></i> @btnName
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li class='copyfrombtn' data-flag="PGR" data-bs-toggle="modal"><a class="dropdown-item" href="#">Goods Return</a></li>
+                                                    <li class='copyfrombtn' data-flag="PI" data-bs-toggle="modal"><a class="dropdown-item" href="#">Purchase Tax Invoice</a></li>
+                                                </ul>
+                                            </div>
+                                            break;
+                                        @*case "Copy To":
+                        <div class="dropdown">
+                            <button id="btnCopyTo" class="btn @ColorClass mb-1  dropdown-toggle me-2 mb-1" type="button" disabled data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="@icon"></i> @btnName
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li class='copytobtn' data-flag="PDN"><a class="dropdown-item" href="#">Debit Note</a></li>
+                            </ul>
+                        </div>
+                        break;*@
+                                        default:
+
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-primary" role="alert">
+
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mt-3">
+            <div class="card p-3 rounded shadow-sm">
+                <!-- Action Buttons -->
+                <!-- Action Buttons -->
+                <div class="row mb-3">
+                    <!-- Left Section (Details) -->
+                    <div class="col-12 col-md-7 mb-3">
+                        <div class="d-flex flex-wrap align-items-center">
+                            <h6 data-bs-toggle="modal" data-bs-target="#createCustomerModal" class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
+                                style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301; cursor:pointer">
+                                <i class="bi bi-person-plus-fill me-1 fs-6"></i>
+                                <span class="addbtn">Add</span>
+                            </h6>
+                            <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
+                                style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
+                                <i class="bi bi-person-circle me-2 fs-6"></i>
+                                <span class="ledgername"></span>
+                            </h6>
+                            <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
+                                style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
+                                <i class="bi bi-telephone-fill me-1 fs-6"></i>
+                                <span class="ledger_mobileno"></span>
+                            </h6>
+                            <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
+                                style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
+                                <span class=" me-1 fs-6">Gst:</span>
+                                <span class="ledger_gstno"></span>
+                            </h6>
+                            <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
+                                style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
+                                <span class=" me-1 fs-6">Bal:</span>
+                                <span class="ledger_balance">0.00</span>
+                            </h6>
+                            <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
+                                style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
+                                <span class=" me-1 fs-6">Cr Limit:</span>
+                                <span class="ledger_creditLimit">0.00</span>
+                            </h6>
+                            <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
+                                style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
+                                <span class=" me-1 fs-6">Cr Days:</span>
+                                <span class="ledger_credit">0.00</span>
+                            </h6>
+                            <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
+                                style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
+                                <span class=" me-1 fs-6">Address:</span>
+                                <span class="ledger_add"></span>
+                            </h6>
+                        </div>
+                    </div>
+                    <!-- Right Section (Buttons) -->
+                    <div class="col-12 col-md-5 text-end justify-content-md-end justify-content-start flex-wrap">
+                        @if (ViewBag.BtnAuth != null)
+                        {
+                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                            {
+                                var btnName = item["BtnName"]?.ToString().Trim();
+                                var btnauth = item["Auth"]?.ToString();
+                                var icon = item["Icon"]?.ToString();
+                                var ColorClass = item["ColorClass"]?.ToString();
+
+                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                {
+                                    switch (btnName)
+                                    {
+                                        case "Save":
+                                            <button id="btnSave" data-action="create" class="btn @ColorClass mb-2 me-2">
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break;
+                                        case "Park":
+                                            <button id="btnPark" class="btn @ColorClass mb-2 me-2">
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break;
+                                        case "Resume":
+                                            <button id="btnResume" data-bs-toggle="modal" data-bs-target="#ResumeModal" class="btn @ColorClass mb-2 me-2">
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break;
+                                        case "Print":
+                                            <button id="btnPrint" data-bs-toggle="modal" data-bs-target="#PrintModal" class="btn @ColorClass mb-2 me-2" disabled>
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break;
+                                        case "Delete":
+                                            <button id="btnDelete" data-action="delete" class="btn @ColorClass mb-2 me-2" disabled>
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break;
+                                        case "Reset":
+                                            <button id="btnReset" class="btn @ColorClass mb-2 me-2">
+                                                <i class="@icon"></i> Reset
+                                            </button>
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-primary w-100" role="alert">
+                                No actions available
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Header Information -->
+                <div class="row">
+                    <div class="col-md-2 col-6 mb-2" hidden>
+                        <input id="DocumentEntry" hidden class="form-control" type="text" readonly />
+                        <input data-obj="PDN" id="BaseEntry" hidden class="form-control" type="text" readonly />
+
+                        <input id="doctype" type="text" hidden value="PDN" class="form-control" />
+                    </div>
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="Docnum" class="form-label">Document Number</label>
+                        <input id="Docnum" class="form-control" type="text" readonly />
+                    </div>
+
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="DocStatus" class="form-label">Status</label>
+                        <select id="DocStatus" class="form-select" disabled>
+                            <option value="O">Open</option>
+                            <option value="C">Close</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="PostingDate" class="form-label">Posting Date</label>
+                        <input id="PostingDate" class="form-control datepicker" type="date" />
+                    </div>
+
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="DocumentDate" class="form-label">Document Date</label>
+                        <input id="DocumentDate" class="form-control datepicker" type="date" />
+                    </div>
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="DueDate" class="form-label">Due Date</label>
+                        <input id="DueDate" class="form-control datepicker" type="date" />
+                    </div>
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="DeliveryDate" class="form-label">Delivery Date</label>
+                        <input id="DeliveryDate" class="form-control datepicker" type="date" />
+                    </div>
+
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="LedgerCode" class="form-label">Supplier</label>
+                        <div class="input-group">
+                            <input id="LedgerCode" class="form-control" type="text" data-id="" data-code="" />
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ledgerListModal">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="AddID" class="form-label">Ship From Address</label>
+                        <select id="AddID" class="form-select">
+                            <option value="">Select</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="RefNo" class="form-label">Reference No</label>
+                        <input id="RefNo" class="form-control" type="text" />
+                    </div>
+
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="Remarks" class="form-label">Remarks</label>
+                        <textarea id="Remarks" class="form-control" rows="1"></textarea>
+                    </div>
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="TotalWeight" class="form-label">Total Weight (kg)</label>
+                        <input id="TotalWeight" class="form-control" type="number" step="1" readonly />
+                    </div>
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="FYearId" class="form-label">Fiscal Year</label>
+                        <select id="FYearId" class="form-select">
+                            <option value="">Select Fiscal Year</option>
+                            <!-- Will be populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+                <!-- Line Items -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table  table-hover" id="mainitemtable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th nowrap>Sr No</th>
+                                        <th nowrap>Delete</th>
+                                        <th nowrap>Remark</th>
+                                        <th hidden nowrap>EAN Code</th>
+                                        <th nowrap>Item Code</th>
+                                        <th nowrap>Item Name</th>
+                                        <th nowrap>Quantity</th>
+                                        <th nowrap>Open Quantity</th>
+                                        <th nowrap hidden>Base Quantity</th>
+
+                                        <th nowrap>UOM</th>
+                                        <th hidden nowrap>Warehouse</th>
+                                        <th nowrap>In Stock</th>
+                                        <th nowrap>Price</th>
+                                        <th nowrap>Dis%</th>
+                                        <th nowrap>Dis Amt</th>
+                                        <th nowrap>Taxeble Amt</th>
+                                        <th hidden nowrap>After Bill Disc</th>
+                                        <th nowrap>GST%</th>
+                                        <th nowrap>GST Amt</th>
+
+                                        <th hidden nowrap>Status</th>
+                                        <th hidden nowrap>BaseLine</th>
+                                        <th hidden nowrap>BaseDocEntry</th>
+                                        <th hidden nowrap>BaseObjType</th>
+
+                                        <th hidden nowrap>LineStatus</th>
+                                        <th hidden nowrap>CGST%</th>
+                                        <th hidden nowrap>CGST Amt</th>
+                                        <th hidden nowrap>SGST%</th>
+                                        <th hidden nowrap>SGST Amt</th>
+                                        <th hidden nowrap>IGST%</th>
+                                        <th hidden nowrap>IGST Amt</th>
+                                        <th hidden nowrap>UTGST%</th>
+                                        <th hidden nowrap>UTGST Amt</th>
+
+                                        <th nowrap>Total Amt</th>
+                                        <th nowrap>Weight</th>
+                                        <th nowrap>HSN</th>
+                                        <th nowrap>ItemCost</th>
+                                        <th nowrap hidden>Account</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-id='' class="line-item">
+                                        <td>1</td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-outline-danger remove-line" disabled>
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                        <td><textarea style='width:150px!important; height:9px;' type="text" class="form-control form-control-sm text-end Remarks" value=""></textarea></td>
+                                        <td hidden><input style='width:100px!important;' type="text" class="form-control form-control-sm ItemEan"></td>
+                                        <td>
+                                            <div class="input-group" style='width:200px!important;'>
+                                                <input data-id='' type="text" class="form-control form-control-sm ItemCode" placeholder="Item Code">
+                                                <button class="btn btn-sm btn-outline-secondary openmodal" type="button" data-bs-toggle="modal" data-bs-target="#itemSearchModal">
+                                                    <i class="bi bi-search"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td><input style='width:250px!important;' type="text" class="form-control form-control-sm ItemName"></td>
+
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Quantity" min="0" value="1" step="1"></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end OpenQuantity" readonly min="0" value="" step="1"></td>
+                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end BaseQuantity" readonly min="0" value="" step="1"></td>
+                                        <td>
+                                            <select style='width:100px!important;' class="form-select form-select-sm ItemUOM">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </td>
+                                        <td hidden>
+                                            <select style='width:100px!important;' class="form-select form-select-sm WhsCode">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="number" style='width:100px!important;' class="text-info form-control form-control-sm text-end StockInWhs" readonly value=""></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Price" min="0" step="1"></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end DisPer" min="0" max="100" step="1" value=""></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end DisAmount" readonly></td>
+                                        <td> <input style='width:100px!important;' type="number" class="form-control form-control-sm text-end TaxableAmt" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end AftBillDisc" readonly></td>
+                                        <td>
+                                            <select style='width:100px!important;' class="form-select form-select-sm TaxCode">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="input-group" style='width:200px!important;'>
+                                                <input type="number" class="form-control form-control-sm text-end TaxAmount" readonly>
+                                                <button class="btn btn-sm btn-primary opentaxeblemodal"><i class="bi bi-eye"></i></button>
+                                            </div>
+                                        </td>
+                                        <td hidden><input style='width:100px!important;' type="text" value='O' class="form-control form-control-sm text-end Status" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="text" value='' class="form-control form-control-sm text-end BaseLine" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="text" value='' class="form-control form-control-sm text-end BaseDocEntry" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="text" value='' class="form-control form-control-sm text-end BaseObjType" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end CGSTRate" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end CGSTAmt" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end SGSTRate" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end SGSTAmt" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end IGSTRate" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end IGSTAmt" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end UTGSTRate" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end UTGSTAmt" readonly></td>
+
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end TotalAmount" readonly></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Weight1" min="0" step="1"></td>
+                                        <td><input style='width:100px!important;' data-id='' type="text" class="form-control form-control-sm ItemHSN" readonly></td>
+                                        <td><input style='width:100px!important;' data-id='' type="text" class="form-control form-control-sm ItemCost" readonly></td>
+                                        <td hidden>
+                                            <input type="text" style='width:80px!important;' class="form-control form-control-sm AcctCode">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-12 text-end mt-3">
+                        @if (ViewBag.BtnAuth != null)
+                        {
+                            <!-- Button Rendering Logic -->
+                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                            {
+                                var btnName = item["BtnName"]?.ToString().Trim();
+                                var btnauth = item["Auth"]?.ToString();
+                                var icon = item["Icon"]?.ToString();
+                                var ColorClass = item["ColorClass"]?.ToString();
+
+                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                {
+                                    switch (btnName)
+                                    {
+                                        case "Add New Line":
+                                            <button class="btn @ColorClass mb-1 " id="btnAddLine"><i class="@icon"></i> @btnName</button>
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-primary" role="alert">
+
+                            </div>
+                        }
+                    </div>
+                </div>
+                <!-- ERP-Style Footer Summary - Optimized -->
+                <div class="container-fluid mt-4 border-top pt-3 small">
+                    <div class="row g-2">
+                        <div class="col-md-2  col-lg-4 col-xl-7">
+
+                        </div>
+                        <!-- Tax Summary with Modal Trigger -->
+                        <div class="col-md-10 col-lg-8 col-xl-5">
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-dark small">
+                                        <i class="bi bi-calculator text-primary"></i> Gross
+                                    </label>
+                                    <input id="GrossTotal" class="form-control form-control-sm text-end  bg-info text-white" type="text" readonly value="0.00">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-dark small">
+                                        <i class="bi bi-percent text-warning"></i> <i class="bi bi-rup text-warning"></i> Discount
+                                    </label>
+                                    <style>
+                                        /* Change placeholder color for all inputs */
+                                        ::placeholder { /* Standard syntax */
+                                            color: white !important; /* Light gray color */
+                                            opacity: 1; /* Firefox reduces opacity by default */
+                                        }
+                                    </style>
+                                    <div class="input-group input-group-sm">
+                                        <input id="TotalDiscount" class="form-control form-control-sm text-end bg-success  text-white" placeholder="(%)" type="text" value="">
+                                        <input id="TotalDiscountAmt" class="form-control form-control-sm text-end bg-danger text-white" placeholder="(₹)" type="text" readonly value="">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-dark small">
+                                        <i class="bi bi-cash text-info"></i> After Bill Discount Amt
+                                    </label>
+                                    <input id="aftBillDisc" class="form-control form-control-sm text-end bg-warning" type="text" readonly value="0.00">
+                                </div>
+                            </div>
+                            <div class="row g-2">
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold text-dark small">
+                                        <i class="bi bi-calculator text-primary"></i> Freight
+                                    </label>
+                                    <div class="input-group input-group-sm">
+                                        <input id="FreightTotal" class="form-control form-control-sm text-end  bg-dark text-white" type="text" readonly value="0.00">
+                                        <button class="btn btn-primary" id="ResetFreightCalc" data-bs-target="#FreighModal" data-bs-toggle="modal"><i class="bi bi-plus"></i></button>
+                                    </div>
+                                    <input id="FreightTax" type="number" hidden value="0.00" />
+                                    <input id="FreightCGSTTax" type="number" hidden value="0.00" />
+                                    <input id="FreightSGSTTax" type="number" hidden value="0.00" />
+                                    <input id="FreightIGSTTax" type="number" hidden value="0.00" />
+                                    <input id="FreightUTGSTTax" type="number" hidden value="0.00" />
+
+
+
+
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold text-dark small">
+                                        <i class="bi bi-receipt text-danger"></i> GST
+                                    </label>
+                                    <div class="input-group input-group-sm">
+                                        <input id="GSTTotal" class="form-control form-control-sm text-end bg-secondary text-white" type="text" readonly value="0.00">
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#taxDetailsModal">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold text-dark small">
+                                        <i class="bi bi-arrow-repeat text-secondary"></i> Rounding
+                                    </label>
+                                    <input id="Rounding" class="form-control form-control-sm text-end bg-primary text-white" type="number" step="1" value="0.00">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold text-dark small">
+                                        <i class="bi bi-currency-rupee text-success"></i> Net Total
+                                    </label>
+                                    <input id="NETTotal" class="form-control form-control-sm fw-bold text-end bg-success bg-opacity-0 text-white" type="text" readonly value="0.00">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<!-- Freigh Details Modal -->
+<div class="modal fade" id="FreighModal" tabindex="-1" aria-labelledby="FreighModalLabel" aria-hidden="true" data-bs-backdrop="static"  data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-light py-3">
+                <h6 class="modal-title" id="FreighModalLable">
+                    <i class="bi bi-receipt text-danger"></i> Freight Charges
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body ">
+                <div class="row g-3">
+                    <div class="col-12 table-responsive">
+                        <table class="table table-bordered" id="FreightTable">
+                            <thead>
+                                <tr>
+                                    <th nowrap>Sr No</th>
+                                    <th nowrap>Freight</th>
+                                    <th nowrap>Net Amt</th>
+                                    <th nowrap>Tax Code</th>
+                                    <th nowrap>Tax Amt</th>
+                                    <th nowrap>Tax Total</th>
+                                    <th nowrap>Remark</th>
+
+                                    <th hidden nowrap>CGST</th>
+                                    <th hidden nowrap>CGSTRATE</th>
+                                    <th hidden nowrap>SGST</th>
+                                    <th hidden nowrap>SGSTRATE</th>
+                                    <th hidden nowrap>IGST</th>
+                                    <th hidden nowrap>IGSTRATE</th>
+                                    <th hidden nowrap>UTGST</th>
+                                    <th hidden nowrap>UTGSTRATE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                            <tfoot>
+
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer py-2">
+                    <button type="button" class="btn btn-sm btn-outline-dark" id="ResetFreight">Reset</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="AddFreight" >Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Tax Details Modal -->
+<div class="modal fade" id="taxDetailsModal" tabindex="-1" aria-labelledby="taxDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-light py-3">
+                <h6 class="modal-title" id="taxDetailsModalLabel">
+                    <i class="bi bi-receipt text-danger"></i> Tax Breakdown
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body small">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">CGST</label>
+                        <input id="CGSTTotal" class="form-control form-control-sm text-end bg-light" type="text" readonly value="0.00">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">SGST</label>
+                        <input id="SGSTTotal" class="form-control form-control-sm text-end bg-light" type="text" readonly value="0.00">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">IGST</label>
+                        <input id="IGSTTotal" class="form-control form-control-sm text-end bg-light" type="text" readonly value="0.00">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">UTGST</label>
+                        <input id="UTGSTTotal" class="form-control form-control-sm text-end bg-light" type="text" readonly value="0.00">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer py-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Tax Details Row -->
+<div class="modal fade" id="taxDetailsModalRow" tabindex="-1" aria-labelledby="taxDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-light py-3">
+                <h6 class="modal-title" id="taxDetailsModalLabel">
+                    <i class="bi bi-receipt text-danger"></i> Tax Breakdown
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body small">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Taxable Amount</label>
+                        <input id="rowtaxeble" class="form-control form-control-sm text-end bg-light" type="text" readonly value="0.00">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Tax Amount</label>
+                        <input id="rowtaxamount" class="form-control form-control-sm text-end bg-light" type="text" readonly value="0.00">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">CGST</label>
+                        <input id="rowCGSTTotal" class="form-control form-control-sm text-end bg-light" type="text" readonly value="0.00">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">SGST</label>
+                        <input id="rowSGSTTotal" class="form-control form-control-sm text-end bg-light" type="text" readonly value="0.00">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">IGST</label>
+                        <input id="rowIGSTTotal" class="form-control form-control-sm text-end bg-light" type="text" readonly value="0.00">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">UTGST</label>
+                        <input id="rowUTGSTTotal" class="form-control form-control-sm text-end bg-light" type="text" readonly value="0.00">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer py-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ledger Search Modal -->
+<div class="modal fade" id="ledgerListModal" tabindex="-1" aria-labelledby="ledgerListLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ledgerListModalLabel">Customer Search</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive ">
+                    <table class="table table-bordered table-striped table-hover w-100" id="ledegerSearchTable">
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Find Mode Modal -->
+<div class="modal fade" id="receiptListModal" tabindex="-1" aria-labelledby="receiptListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="receiptListModalLabel">Find </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-2">
+                    <div class="col-md-3  mb-2">
+                        <label for="fdocid" class="form-label">Document Number</label>
+                        <input id="fdocid" class="form-control" type="text" />
+                    </div>
+                    <div class="col-md-3  mb-2">
+                        <label for="frefno" class="form-label">Ref Number</label>
+                        <input id="frefno" class="form-control" type="text" />
+                    </div>
+                    <div class="col-md-3  mb-2">
+                        <label for="ffromdate" class="form-label ">From Date</label>
+                        <input id="ffromdate" class="form-control datepicker" type="date" />
+                    </div>
+                    <div class="col-md-3  mb-2">
+                        <label for="ftodate" class="form-label">To Date</label>
+                        <input id="ftodate" class="form-control datepicker" type="date" />
+                    </div>
+                    <div class="col-md-12  mb-2 text-end   mt-3 ">
+                        <button class="btn btn-outline-primary me-2" id="FindBtnSearch"><i class="bi bi-search me-2"></i>Find</button>
+                        <button class="btn btn-outline-secondary me-2" id="FindBtnReset"><i class="bi bi-arrow-counterclockwise me-2"></i>Reset</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped w-100 display nowrap" id="receiptListTable">
+                        <thead>
+                            <tr>
+                                <th>Doc Num</th>
+                                <th>Action</th>
+                                <th>Business Partner</th>
+                                <th>Posting Date</th>
+                                <th>Ref No</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                                <th>Created By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Item Search Modal -->
+<div class="modal fade" id="itemSearchModal" tabindex="-1" aria-labelledby="itemSearchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="itemSearchModalLabel">Item Search</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12 text-end mb-3">
+                    <button class="btn btn-primary refreshitems">Refresh Items</button>
+                </div>
+                <div class="table-responsive ">
+                    <table class="table table-bordered table-striped table-hover w-100" id="itemSearchTable">
+                        <thead>
+                            <tr>
+                                <th width="5%">Select</th>
+                                <th width="15%">Item Code</th>
+                                <th width="15%">EAN Code</th>
+                                <th width="30%">Item Name</th>
+                                <th width="15%">UOM</th>
+                                <th width="15%">HSN</th>
+                                <th width="20%">Group</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Copy From Modal -->
+<div class="modal fade" id="CopyFromModal" tabindex="-1" aria-labelledby="CopyFromModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CopyFromModalLabel">Copy From </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped w-100 display nowrap" id="copyfromtbl">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Doc Num</th>
+                                <th>Business Partner</th>
+                                <th>Posting Date</th>
+                                <th>Ref No</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                                <th>Created By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="SelectCopyFrom" data-bs-dismiss="modal">Select</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        // Initialize variables
+        let selectedRowIndex = null;
+        $('.datepicker').val(new Date().toISOString().split('T')[0]);
+        loadFiscalYears();
+        // Add new line item
+        $('#btnAddLine').click(function() {
+            addNewLineItem();
+        });
+        // Save document
+        $('#btnSave').click(function () {
+            savedocument("S");
+        });
+        // Save document
+        $('#btnPark').click(function () {
+            savedocument("P");
+        });
+        // Update document
+        $('#btnUpdate').click(function() {
+            savedocument();
+        });
+        // Reset form
+        $('#btnReset').click(function() {
+            resetForm();
+        });
+        $('#btnDelete').click(function() {
+            deleteDoc();
+        });
+        function deleteDoc(){
+          var id = $('#DocumentEntry').val();
+            if(!id){
+                Notify('error', 'Document Entry is required for deletion','');
+                return;
+            }
+             Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("DELETEDEBITNOTE", "Purchase")',
+                        type: 'POST',
+                        data: { id: $("#DocumentEntry").val() },
+                        beforeSend: function() {
+                            $('#btnDelete').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Deleting...');
+                        },
+                        success: function(response) {
+                            if (response && response.success) {
+                                Notify('success', 'Success', response.message || 'Document deleted successfully!');
+                                 resetForm();
+                            } else {
+                                Notify('warning', 'Warning', response.message || 'Document deleted successfully!');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error deleting Document';
+                            Notify('error', 'Error', errorMessage);
+                        },
+                        complete: function() {
+                            $('#btnDelete').prop('disabled', false).html('<i class="bi bi-trash"></i> Delete');
+                        }
+                    });
+                }
+            });
+        }
+        // Function to add new line item
+        function addNewLineItem() {
+        const table = $('#mainitemtable tbody');
+        const lastRow = table.find('tr').last();
+
+        // Check if there is at least one row and its ItemCode is empty
+        if (lastRow.length && !lastRow.find('.ItemCode').val().trim()) {
+            lastRow.find('.ItemCode').focus();
+            return; // Stop execution if the previous row's ItemCode is empty
+        }
+
+        const rowCount = table.find('tr').length;
+        const newRow = `
+         <tr data-id='' class="line-item">
+                                        <td>${rowCount + 1}</td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-outline-danger remove-line" disabled>
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                        <td><textarea style='width:150px!important; height:9px;' type="text" class="form-control form-control-sm text-end Remarks" value=""></textarea></td>
+                                        <td hidden><input style='width:100px!important;' type="text" class="form-control form-control-sm ItemEan"></td>
+                                        <td>
+                                            <div class="input-group" style='width:200px!important;'>
+                                                <input data-id='' type="text" class="form-control form-control-sm ItemCode" placeholder="Item Code">
+                                                <button class="btn btn-sm btn-outline-secondary openmodal" type="button" data-bs-toggle="modal" data-bs-target="#itemSearchModal">
+                                                    <i class="bi bi-search"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td><input style='width:250px!important;' type="text" class="form-control form-control-sm ItemName"></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Quantity" min="0" value="1" step="1"></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end OpenQuantity" readonly min="0" value="" step="1"></td>
+                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end BaseQuantity" readonly min="0" value="" step="1"></td>
+                                        <td>
+                                            <select style='width:100px!important;' class="form-select form-select-sm ItemUOM">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </td>
+                                        <td hidden>
+                                            <select style='width:100px!important;' class="form-select form-select-sm WhsCode">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="number" style='width:100px!important;' class="text-info form-control form-control-sm text-end StockInWhs" readonly value=""></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Price" min="0" step="1"></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end DisPer" min="0" max="100" step="1" value=""></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end DisAmount" readonly></td>
+                                        <td > <input style='width:100px!important;' type="number" class="form-control form-control-sm text-end TaxableAmt" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end AftBillDisc" readonly></td>
+                                        <td>
+                                            <select style='width:100px!important;' class="form-select form-select-sm TaxCode">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="input-group" style='width:200px!important;'>
+                                                <input  type="number" class="form-control form-control-sm text-end TaxAmount" readonly>
+                                                <button class="btn btn-sm btn-primary opentaxeblemodal"><i class="bi bi-eye"></i></button>
+                                            </div>
+                                        </td>
+                                        <td hidden><input style='width:100px!important;' type="text" value='O' class="form-control form-control-sm text-end Status" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="text" value='' class="form-control form-control-sm text-end BaseLine" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="text" value='' class="form-control form-control-sm text-end BaseDocEntry" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="text" value='' class="form-control form-control-sm text-end BaseObjType" readonly></td>
+
+
+                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end CGSTRate" readonly></td>
+                                        <td hidden ><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end CGSTAmt" readonly></td>
+                                        <td hidden ><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end SGSTRate" readonly></td>
+                                        <td hidden ><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end SGSTAmt" readonly></td>
+                                        <td hidden ><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end IGSTRate" readonly></td>
+                                        <td hidden ><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end IGSTAmt" readonly></td>
+                                        <td hidden ><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end UTGSTRate" readonly></td>
+                                        <td hidden ><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end UTGSTAmt" readonly></td>
+
+                                        <td ><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end TotalAmount" readonly></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Weight1" min="0" step="1"></td>
+                                        <td><input style='width:100px!important;' data-id='' type="text" class="form-control form-control-sm ItemHSN" readonly></td>
+                                        <td><input style='width:100px!important;' data-id='' type="text" class="form-control form-control-sm ItemCost" readonly></td>
+                                        <td hidden>
+                                            <input type="text" style='width:80px!important;' class="form-control form-control-sm AcctCode">
+                                        </td>
+                                    </tr>
+
+        `;
+        table.append(newRow);
+        const newRowElement = table.find('tr').last();
+        newRowElement.find('.ItemCode').focus();
+
+        if (rowCount > 0) {
+            table.find('tr').each(function() {
+                $(this).find('.remove-line').prop('disabled', false);
+            });
+        }
+        // Load tax codes for the new row
+        loadTaxCodes("",newRowElement,newRowElement.find('.TaxCode'));
+    }
+        // Function to load tax codes
+        function loadTaxCodes(id,row, dropdown) {
+            $.ajax({
+                url: '@Url.Action("GETTAXCODE", "Master")',
+                method: 'GET',
+                success: function(response) {
+                    dropdown.empty();
+                    response.forEach(function(tax) {
+                        dropdown.append(`<option value="${tax.TaxCodeId}"
+                            data-rate="${tax.TaxCalRate}"
+                            data-cgst="${tax.CGST}"
+                            data-sgst="${tax.SGST}"
+                            data-igst="${tax.IGST}"
+                            data-utgst="${tax.UTGST}">
+                            ${tax.TaxCode}
+                        </option>`);
+                    });
+                    if(id!==""){
+                      row.find('.TaxCode').val(id).trigger('change');
+                    }
+                },
+                error: function(xhr) {
+                    Notify('error', 'Error', xhr.responseText);
+                }
+            });
+        }
+        // Calculate row amounts when values change
+        $(document).on('input', '.Quantity, .Price, .DisPer', function() {
+            calculateRowAmounts($(this).closest('tr'));
+        });
+        $(document).on('change', '.TaxCode', function() {
+            calculateRowAmounts($(this).closest('tr'));
+        });
+        // Function to calculate row amounts
+        function calculateRowAmounts(row) {
+        const quantity = parseFloat(row.find('.Quantity').val()) || 0;
+        const price = parseFloat(row.find('.Price').val()) || 0;
+        let disPerInput = row.find('.DisPer'); // store jQuery object
+        let disPer = parseFloat(disPerInput.val()) || 0;
+        if (disPer > 100) {
+            disPer = 100;
+            disPerInput.val(disPer); // reset immediately
+        }
+        else if (disPer < 0) {
+            disPer = 0;
+            disPerInput.val(disPer); // reset immediately
+        }
+        const totalDiscountInput = parseFloat($('#TotalDiscount').val()) || 0;
+        const grossTotal = parseFloat($('#GrossTotal').val()) || 0;
+
+        // Calculate discount amount
+        const grossAmount = quantity * price;
+        const disAmount = grossAmount * (disPer / 100);
+        const taxableAmt = grossAmount - disAmount;
+
+        const totalDiscountAmount = grossTotal * (totalDiscountInput / 100);
+        $("#TotalDiscountAmt").val(totalDiscountAmount.toFixed(2));
+
+        var AftBillDisc = 0;
+        if (grossTotal > 0 && totalDiscountAmount > 0) {
+            AftBillDisc = taxableAmt - ((taxableAmt * totalDiscountAmount) / grossTotal);
+        } else {
+            AftBillDisc = taxableAmt;
+        }
+        AftBillDisc = isNaN(AftBillDisc) ? 0 : AftBillDisc;
+
+        // Update discount and taxable amount
+        row.find('.DisAmount').val(disAmount.toFixed(2));
+        row.find('.TaxableAmt').val(taxableAmt.toFixed(2));
+        row.find('.AftBillDisc').val(AftBillDisc.toFixed(2));
+
+           const taxCode = row.find('.TaxCode option:selected');
+            var TextTax = row.find('.TaxCode option:selected').text().trim();
+
+            if (taxCode.length > 0 && taxCode.val() !== "") {
+                // Initialize all rates to 0
+                let taxRate = 0;
+                let cgstRate = 0;
+                let sgstRate = 0;
+                let igstRate = 0;
+                let utgstRate = 0;
+
+
+                // Check for UTGST pattern (e.g., "UTGST5%", "UTGST", "UTGST@@5%")
+                const utgstMatch = TextTax.match(/^UTGST\D*(\d+)?%?$/i);
+                if (utgstMatch) {
+                    utgstRate = parseFloat(utgstMatch[1]) || 0;
+                    taxRate = utgstRate;
+                }
+                // Check for IGST pattern (e.g., "IGST5%", "IGST", "IGST 18%")
+                else if (/^IGST/i.test(TextTax)) {
+                    const igstMatch = TextTax.match(/^IGST\D*(\d+)?%?$/i);
+                    igstRate = parseFloat(igstMatch?.[1]) || 0;
+                    taxRate = igstRate;
+                }
+                // Check for GST pattern (e.g., "GST18%", "GST")
+                else if (/^GST/i.test(TextTax)) {
+                    const gstMatch = TextTax.match(/^GST\D*(\d+)?%?$/i);
+                    const gstRate = parseFloat(gstMatch?.[1]) || 0;
+                    cgstRate = gstRate / 2;  // Split GST rate equally between CGST and SGST
+                    sgstRate = gstRate / 2;
+                    taxRate = gstRate;
+                }
+                // Fallback for other cases
+                else {
+                    taxRate = parseFloat(taxCode.data('rate')) || 0;
+                    cgstRate = parseFloat(taxCode.data('cgst')) || 0;
+                    sgstRate = parseFloat(taxCode.data('sgst')) || 0;
+                    igstRate = parseFloat(taxCode.data('igst')) || 0;
+                    utgstRate = parseFloat(taxCode.data('utgst')) || 0;
+                }
+
+                // Calculate tax amounts
+                const taxAmount = AftBillDisc * (taxRate / 100);
+                const cgstAmt = AftBillDisc * (cgstRate / 100);
+                const sgstAmt = AftBillDisc * (sgstRate / 100);
+                const igstAmt = AftBillDisc * (igstRate / 100);
+                const utgstAmt = AftBillDisc * (utgstRate / 100);
+                const totalAmount = AftBillDisc + taxAmount;
+
+                // Update tax fields
+                row.find('.TaxAmount').val(taxAmount.toFixed(2));
+                row.find('.CGSTRate').val(cgstRate.toFixed(2));
+                row.find('.CGSTAmt').val(cgstAmt.toFixed(2));
+                row.find('.SGSTRate').val(sgstRate.toFixed(2));
+                row.find('.SGSTAmt').val(sgstAmt.toFixed(2));
+                row.find('.IGSTRate').val(igstRate.toFixed(2));
+                row.find('.IGSTAmt').val(igstAmt.toFixed(2));
+                row.find('.UTGSTRate').val(utgstRate.toFixed(2));
+                row.find('.UTGSTAmt').val(utgstAmt.toFixed(2));
+                row.find('.TotalAmount').val(totalAmount.toFixed(2));
+            } else {
+                // Reset tax fields if no tax code selected
+                row.find('.TaxAmount, .CGSTAmt, .SGSTAmt, .IGSTAmt, .UTGSTAmt, .AftBillDisc').val('0.00');
+                row.find('.CGSTRate, .SGSTRate, .IGSTRate, .UTGSTRate').val('0.00');
+                row.find('.TotalAmount').val(taxableAmt.toFixed(2));
+            }
+            calculateTotalWeight();
+            calculateHeaderTotals();
+        }
+        // Function to calculate total weight
+        function calculateTotalWeight() {
+        let totalWeight = 0;
+        $('#mainitemtable tbody tr').each(function() {
+            const weight = parseFloat($(this).find('.Weight1').val()) || 0;
+            const quantity = parseFloat($(this).find('.Quantity').val()) || 0;
+            totalWeight += weight * quantity;
+        });
+        $('#TotalWeight').val(totalWeight.toFixed(2));
+    }
+        // Function to apply total discount to all line items
+        function applyTotalDiscount() {
+            const totalDiscountInput = parseFloat($('#TotalDiscount').val()) || 0;
+            const grossTotal = parseFloat($('#GrossTotal').val()) || 0;
+
+            // Validate that discount doesn't exceed 100%
+            if (totalDiscountInput > 100) {
+                Notify('error', 'Error', 'Discount percentage cannot exceed 100%');
+                $('#TotalDiscount').val('0');
+                return;
+            }
+            // Calculate total discount amount
+            const totalDiscountAmount = grossTotal * (totalDiscountInput / 100);
+            $("#TotalDiscountAmt").val(totalDiscountAmount.toFixed(2))
+
+            const table = $('#mainitemtable tbody');
+            const rows = table.find('tr');
+            if (rows.length === 0) return;
+
+            // Calculate total taxable amount (before discount)
+            rows.each(function() {
+                var row =$(this);
+                const TaxableAmt = parseFloat($(this).find('.TaxableAmt').val()) || 0;
+                var AftBillDisc =TaxableAmt-((TaxableAmt *totalDiscountAmount)/grossTotal)
+                $(this).find('.AftBillDisc').val(AftBillDisc|| 0) ;
+                        // Update tax fields
+               const taxCode = row.find('.TaxCode option:selected');
+                var TextTax = row.find('.TaxCode option:selected').text().trim();
+
+                if (taxCode.length > 0 && taxCode.val() !== "") {
+                    // Initialize all rates to 0
+                    let taxRate = 0;
+                    let cgstRate = 0;
+                    let sgstRate = 0;
+                    let igstRate = 0;
+                    let utgstRate = 0;
+
+
+                    // Check for UTGST pattern (e.g., "UTGST5%", "UTGST", "UTGST@@5%")
+                    const utgstMatch = TextTax.match(/^UTGST\D*(\d+)?%?$/i);
+                    if (utgstMatch) {
+                        utgstRate = parseFloat(utgstMatch[1]) || 0;
+                        taxRate = utgstRate;
+                    }
+                    // Check for IGST pattern (e.g., "IGST5%", "IGST", "IGST 18%")
+                    else if (/^IGST/i.test(TextTax)) {
+                        const igstMatch = TextTax.match(/^IGST\D*(\d+)?%?$/i);
+                        igstRate = parseFloat(igstMatch?.[1]) || 0;
+                        taxRate = igstRate;
+                    }
+                    // Check for GST pattern (e.g., "GST18%", "GST")
+                    else if (/^GST/i.test(TextTax)) {
+                        const gstMatch = TextTax.match(/^GST\D*(\d+)?%?$/i);
+                        const gstRate = parseFloat(gstMatch?.[1]) || 0;
+                        cgstRate = gstRate / 2;  // Split GST rate equally between CGST and SGST
+                        sgstRate = gstRate / 2;
+                        taxRate = gstRate;
+                    }
+                    // Fallback for other cases
+                    else {
+                        taxRate = parseFloat(taxCode.data('rate')) || 0;
+                        cgstRate = parseFloat(taxCode.data('cgst')) || 0;
+                        sgstRate = parseFloat(taxCode.data('sgst')) || 0;
+                        igstRate = parseFloat(taxCode.data('igst')) || 0;
+                        utgstRate = parseFloat(taxCode.data('utgst')) || 0;
+                    }
+
+                    // Calculate tax amounts
+                    const taxAmount = AftBillDisc * (taxRate / 100);
+                    const cgstAmt = AftBillDisc * (cgstRate / 100);
+                    const sgstAmt = AftBillDisc * (sgstRate / 100);
+                    const igstAmt = AftBillDisc * (igstRate / 100);
+                    const utgstAmt = AftBillDisc * (utgstRate / 100);
+                    const totalAmount = AftBillDisc + taxAmount;
+
+                    // Update tax fields
+                    row.find('.TaxAmount').val(taxAmount.toFixed(2));
+                    row.find('.CGSTRate').val(cgstRate.toFixed(2));
+                    row.find('.CGSTAmt').val(cgstAmt.toFixed(2));
+                    row.find('.SGSTRate').val(sgstRate.toFixed(2));
+                    row.find('.SGSTAmt').val(sgstAmt.toFixed(2));
+                    row.find('.IGSTRate').val(igstRate.toFixed(2));
+                    row.find('.IGSTAmt').val(igstAmt.toFixed(2));
+                    row.find('.UTGSTRate').val(utgstRate.toFixed(2));
+                    row.find('.UTGSTAmt').val(utgstAmt.toFixed(2));
+                    row.find('.TotalAmount').val(totalAmount.toFixed(2));
+                } else {
+                    // Reset tax fields if no tax code selected
+                    row.find('.TaxAmount, .CGSTAmt, .SGSTAmt, .IGSTAmt, .UTGSTAmt, .AftBillDisc').val('0.00');
+                    row.find('.CGSTRate, .SGSTRate, .IGSTRate, .UTGSTRate').val('0.00');
+                    row.find('.TotalAmount').val(taxableAmt.toFixed(2));
+                }
+            });
+            calculateHeaderTotals();
+        }
+        // Add event handler for Total Discount field
+        $('#TotalDiscount').on('input', function() {
+            const discountValue = parseFloat($(this).val()) || 0;
+            // Validate discount percentage (0-100)
+            if (discountValue < 0 || discountValue > 100) {
+                Notify('error', 'Error', 'Discount must be between 0 and 100 percent');
+                $(this).val('0');
+                return;
+            }
+            applyTotalDiscount();
+        });
+        // Function to calculate header totals
+        // Function to calculate header totals
+        function calculateHeaderTotals() {
+            let grossTotal = 0;
+            let discountTotal = 0;
+            let aftBillDisc = 0;
+            let gstTotal = 0;
+            let cgstTotal = 0;
+            let sgstTotal = 0;
+            let igstTotal = 0;
+            let utgstTotal = 0;
+
+            $('#mainitemtable tbody tr').each(function () {
+                const quantity = parseFloat($(this).find('.Quantity').val()) || 0;
+                const price = parseFloat($(this).find('.Price').val()) || 0;
+                const disPer = parseFloat($(this).find('.DisPer').val()) || 0;
+
+                const rowGross = quantity * price;
+                const rowDiscount = rowGross * (disPer / 100);
+                // const rowTaxable = rowGross - rowDiscount;
+
+                const rowTaxAmt = parseFloat($(this).find('.TaxAmount').val()) || 0;
+                const rowCGST = parseFloat($(this).find('.CGSTAmt').val()) || 0;
+                const rowSGST = parseFloat($(this).find('.SGSTAmt').val()) || 0;
+                const rowIGST = parseFloat($(this).find('.IGSTAmt').val()) || 0;
+                const rowUTGST = parseFloat($(this).find('.UTGSTAmt').val()) || 0;
+                const aftBillDisco = parseFloat($(this).find('.AftBillDisc').val()) || 0;
+                const totalAmount = parseFloat($(this).find('.TotalAmount').val()) || 0;
+                const rowTaxable = parseFloat($(this).find('.TaxableAmt').val()) || 0;
+
+                grossTotal += rowTaxable;
+                discountTotal += rowDiscount;
+                aftBillDisc += aftBillDisco;
+                gstTotal += rowTaxAmt;
+                cgstTotal += rowCGST;
+                sgstTotal += rowSGST;
+                igstTotal += rowIGST;
+                utgstTotal += rowUTGST;
+            });
+            // Adding freight
+            var freight = parseFloat($("#FreightTotal").val()) || 0;
+            var freighttax = parseFloat($("#FreightTax").val()) || 0;
+            var freightcgst = parseFloat($("#FreightCGSTTax").val()) || 0;
+            var freightsgst = parseFloat($("#FreightSGSTTax").val()) || 0;
+            var freightigst = parseFloat($("#FreightIGSTTax").val()) || 0;
+            var freightutgst = parseFloat($("#FreightUTGSTTax").val()) || 0;
+
+
+
+            // Convert to fixed decimal places (but keep as numbers for calculation)
+            freight = parseFloat(freight.toFixed(2));
+            freighttax = parseFloat(freighttax.toFixed(2));
+
+
+
+            // Calculate unrounded total (prevent NaN)
+            const unroundedTotal = (aftBillDisc || 0) + (gstTotal || 0) + freighttax + freight;
+
+            // Round to nearest integer
+            const netTotal = Math.round(unroundedTotal);
+
+            // Calculate rounding adjustment
+            const roundingAmount = netTotal - unroundedTotal;
+
+            // Update header fields
+            $('#GrossTotal').val(grossTotal.toFixed(2));
+            $('#aftBillDisc').val(aftBillDisc.toFixed(2));
+            $('#GSTTotal').val((parseFloat(gstTotal) + parseFloat(freighttax)).toFixed(2));
+            $('#CGSTTotal').val((parseFloat(cgstTotal) + parseFloat(freightcgst)).toFixed(2));
+            $('#SGSTTotal').val((parseFloat(sgstTotal) + parseFloat(freightsgst)).toFixed(2));
+            $('#IGSTTotal').val((parseFloat(igstTotal) + parseFloat(freightigst)).toFixed(2));
+            $('#UTGSTTotal').val((parseFloat(utgstTotal) + parseFloat(freightutgst)).toFixed(2));
+            $('#NETTotal').val(netTotal.toFixed(2));
+            $('#Rounding').val(roundingAmount.toFixed(2));
+        }
+        // Call this function whenever line items change
+        $(document).on('input', '.Quantity, .Price, .DisPer, .TaxCode, #Rounding', function() {
+            calculateHeaderTotals();
+        });
+        function loadFiscalYears() {
+            $.ajax({
+                 url: '@Url.Action("GETOPENFYEAR", "Inventory")',
+                method: 'GET',
+                success: function(response) {
+                    const select = $('#FYearId');
+                    select.empty();
+
+                    response.forEach(function(year) {
+                        select.append(`<option value="${year.FYearId}">${year.FYear}</option>`);
+                    });
+                    loadDocNum($("#FYearId").val())
+                },
+                error: function(xhr) {
+                            Notify('error', 'Error', xhr.responseText );
+                }
+            });
+        }
+        $("#FYearId").change(function(){
+           loadDocNum($(this).val())
+        })
+        // Function to load warehouses
+        function loadDocNum(id) {
+            $.ajax({
+                url: '@Url.Action("GETPURCHASEDEBITDOCNUM", "Purchase")',
+                method: 'GET',
+                data:{id:id},
+                success: function(response) {
+                    if(response[0].Success=="true"){
+                        $("#Docnum").val(response[0].Message)
+                    }else{
+                           Notify('error', response[0].Message,'');
+                    }
+                },
+                error: function(xhr) {
+                            Notify('error', 'Error', xhr.responseText );
+                }
+            });
+        }
+        // Function to load warehouses
+        function loadWarehouses(id,row,flag) {
+            // AJAX call to get warehouses
+            $.ajax({
+                url: '@Url.Action("GETWHSUNLOKED", "Inventory")',
+                method: 'GET',
+                data:{id:id},
+                success: function(response) {
+                    window.warehouses = response;
+                    populateWarehouses(row.find('.WhsCode'),row,flag);
+                },
+                error: function(xhr) {
+                   Notify('error', 'Error', xhr.responseText );
+                }
+            });
+        }
+        function populateWarehouses(dropdown,row,flag) {
+            dropdown.empty();
+          //  dropdown.append('<option value="">Select Warehouse</option>');
+
+            if (window.warehouses) {
+                window.warehouses.forEach(function(whs) {
+                    dropdown.append(`<option data-code="${whs.WhsCode}"  data-stock="${parseFloat(whs.Stock).toFixed(2)}"  value="${whs.ID}">${whs.WhsCode} - ${whs.WhsName}</option>`);
+                });
+                if(flag!=="F"){
+                    row.find('.StockInWhs').val(parseFloat(row.find(".WhsCode option:selected").data("stock")).toFixed(2)||0);
+                }
+            }
+        }
+        $(document).on("change",".WhsCode",function(){
+               var row = $(this).closest("tr");
+               var stock = $(this).find("option:selected").data("stock");
+               row.find(".StockInWhs").val(stock|| 0)
+        })
+        // Function to load warehouses
+        function LoadUOM(id,row,flag) {
+            $.ajax({
+                url: '@Url.Action("GETALLUOMBYITEMPURCHASE", "Inventory")',
+                method: 'GET',
+                data:{id,id},
+                success: function(response) {
+                    window.uoms = response;
+                    populateUOM(row,row.find('.ItemUOM'),flag);
+                },
+                error: function(xhr) {
+                   Notify('error', 'Error', xhr.responseText );
+                }
+            });
+        }
+
+        // Function to populate warehouses dropdown
+        function populateUOM(row, dropdown, flag) {
+            dropdown.empty();
+            if (window.uoms) {
+                window.uoms.forEach(function (uom) {
+                    dropdown.append(`<option data-mrp="${uom.MRP}" data-discount="${uom.Discount}" data-netamt='${uom.NetAmount}' value="${uom.UomID}">${uom.UomCode}</option>`);
+                });
+                if (flag !== "F") {
+                    var selectedOption = row.find(".ItemUOM option:selected");
+                    if (selectedOption.length > 0) {
+                        var netamt = selectedOption.attr("data-netamt");
+                        var mrp = selectedOption.attr("data-mrp");
+                        var dis = selectedOption.attr("data-discount");
+                        row.find(".DisPer").val(dis);
+                        row.find(".Mrp").val(mrp);
+                        row.find(".Price").val(netamt).trigger("input");
+                    }
+                }
+            }
+        }
+        $(document).on("change",".ItemUOM",function(){
+            var row = $(this).closest("tr");
+            var netamt =  row.find(".ItemUOM option:selected").attr("data-netamt")
+            row.find(".Price").val(netamt).trigger("input")
+        })
+        function savedocument(flag) {
+            removeempty()
+            const headerData = getHeaderData();
+            const lineItems = getLineItems();
+            const freightItems = getfreight();
+
+            if (flag == "S") {
+                if (!validateForm(headerData, lineItems)) {
+                    return;
+                }
+            }
+            const data = {
+                header: headerData,
+                lines: lineItems,
+                freight: freightItems
+            };
+            // AJAX call to save
+            $.ajax({
+                url: '@Url.Action("CREATEDEBITNOTE", "Purchase")' + '?flag=' + flag + '&doctype=' + $("#doctype").val(),
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                beforeSend: function() {
+                    if (flag == "S") {
+                        $('#btnSave').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Processing...');
+                    } else {
+                        $('#btnPark').prop('disabled', true).html('<i class="bi bi-p-circle"></i> Processing...');
+                    }
+                },
+                success: function(response) {
+                    if(response.success){
+                       Notify('success', response.message,'');
+                       currentDocEntry = response.docEntry;
+                       //$('#btnUpdate').prop('disabled', false);
+                       $('#btnDelete').prop('disabled', false);
+                       $('#btnCancel').prop('disabled', false);
+                       $('#DocumentEntry').val(response.docEntry);
+                       $('#addFilesButton').click();
+                     //  $("#btnReset").click();
+                        if (flag == "S") {
+                            loadFindRow(currentDocEntry, $("#doctype").val(),"")
+                        } else {
+                            $("#btnReset").click();
+                        }
+                    }else{
+                       Notify('error','Faild To Create ', response.message);
+                    }
+                },
+                error: function(xhr) {
+                    const errorMessage = xhr.responseText || 'Error loading ITEM GROUP';
+                    Notify('error', 'Error', errorMessage);
+                    if (flag == "S") {
+                        $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
+                    } else {
+                        $('#btnPark').prop('disabled', false).html('<i class="bi bi-p-circle"></i> Park');
+                    }
+
+                },complete: function() {
+                    if (flag == "S") {
+                        $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
+                    } else {
+                        $('#btnPark').prop('disabled', false).html('<i class="bi bi-p-circle"></i> Park');
+                    }
+                }
+            });
+        }
+        function removeempty(){
+            var tablerow= $('#mainitemtable tbody tr').length;
+            if(tablerow >1){
+                $('#mainitemtable tbody tr').each(function(){
+                     var row = $(this).closest("tr");
+                    if (row.length && !row.find('.ItemCode').val().trim()) {
+                        row.remove();
+                        return; // Stop execution if the previous row's ItemCode is empty
+                    }
+                });
+            }
+        }
+        function getHeaderData() {
+            return {
+                DocEntry: $('#DocumentEntry').val() || null,
+                Docnum: $('#Docnum').val(),
+                DocStatus: $("#DocStatus").val(),
+                PostingDate: $('#PostingDate').val(),
+                DocumentDate: $('#DocumentDate').val(),
+                DeliveryDate: $('#DeliveryDate').val(),
+                DueDate: $('#DueDate').val(),
+                TotalWeight: parseFloat($('#TotalWeight').val()) || 0,
+                GrossTotal: parseFloat($('#GrossTotal').val()) || 0,
+                GSTTotal: parseFloat($('#GSTTotal').val()) || 0,
+                NETTotal: parseFloat($('#NETTotal').val()) || 0,
+                DisPer: parseFloat($('#TotalDiscount').val()) || 0,
+                DisAmount: parseFloat($('#TotalDiscountAmt').val()) || 0,
+                Rounding: parseFloat($('#Rounding').val()) || 0,
+                TotalAftBillDisc: parseFloat($('#aftBillDisc').val()) || 0,
+                FreightTotal: parseFloat($('#FreightTotal').val()) || 0,
+                FYearId: $('#FYearId').val(),
+                LedgerID: $('#LedgerCode').attr("data-id").toString() || null,
+                LedgerCode: $('#LedgerCode').val(),
+                LedgerName: $('#LedgerCode').attr("data-name"),
+                AddID: $('#AddID').val(),
+                AddressId: $('#AddID option:selected').text(),
+                RefNo: $('#RefNo').val(),
+                Remarks: $('#Remarks').val()
+            };
+        }
+        function getLineItems() {
+            const lineItems = [];
+            $('#mainitemtable tbody tr').each(function(index) {
+                const row = $(this);
+                lineItems.push({
+                    ID: row.data('id') || null,
+                    DocEntry: null,
+                    ItemID: row.find('.ItemCode').data('id').toString() || null,
+                    ItemCode: row.find('.ItemCode').val(),
+                    ItemName: row.find('.ItemName').val(),
+                    Quantity: parseFloat(row.find('.Quantity').val()) || 0,
+                    OpenQuantity: parseFloat(row.find('.Quantity').val()) || 0,
+                    BaseQuantity: parseFloat(row.find('.BaseQuantity').val()) || 0,
+
+                    Status: row.find('.Status').val(),
+                    BaseLine: row.find('.BaseLine').val(),
+                    BaseDocEntry: row.find('.BaseDocEntry').val(),
+                    BaseObjType: row.find('.BaseObjType').val(),
+
+                    UnitePrice: parseFloat(row.find('.Price').val()) || 0,
+                    DisPer: parseFloat(row.find('.DisPer').val()) || 0,
+                    DisAmount: parseFloat(row.find('.DisAmount').val()) || 0,
+                    TaxableAmt: parseFloat(row.find('.TaxableAmt').val()) || 0,
+                    TaxCodeId: row.find('.TaxCode').val() || null,
+                    TaxCode: row.find('.TaxCode option:selected').text().trim() || '',
+                    TaxRate: parseFloat(row.find('.TaxCode option:selected').data('rate')) || 0,
+                    TaxAmount: parseFloat(row.find('.TaxAmount').val()) || 0,
+                    CGSTRate: parseFloat(row.find('.CGSTRate').val()) || 0,
+                    CGSTAmt: parseFloat(row.find('.CGSTAmt').val()) || 0,
+                    SGSTRate: parseFloat(row.find('.SGSTRate').val()) || 0,
+                    SGSTAmt: parseFloat(row.find('.SGSTAmt').val()) || 0,
+                    IGSTRate: parseFloat(row.find('.IGSTRate').val()) || 0,
+                    IGSTAmt: parseFloat(row.find('.IGSTAmt').val()) || 0,
+                    UTGSTRate: parseFloat(row.find('.UTGSTRate').val()) || 0,
+                    UTGSTAmt: parseFloat(row.find('.UTGSTAmt').val()) || 0,
+                    AftBillDisc: parseFloat(row.find('.AftBillDisc').val()) || 0,
+                    UOMID: row.find('.ItemUOM').val().toString() || null,
+                    UOMCode: row.find('.ItemUOM option:selected').text(),
+                    HSNID: row.find('.ItemHSN').data('id').toString() || null,
+                    HSNCode: row.find('.ItemHSN').val(),
+                    ItemCost: row.find('.ItemCost').val() || 0,
+                    WHSID: row.find('.WhsCode').val(),
+                    WhsCode: row.find('.WhsCode option:selected').data("code"),
+                    StockInWhs: row.find('.StockInWhs').val() || "0",
+                    Weight1: parseFloat(row.find('.Weight1').val()) || 0,
+                    AcctCode: row.find('.AcctCode').val(),
+                    EanCode: row.find('.ItemEan').val(),
+                    Remarks: row.find('.Remarks').val()
+                });
+            });
+            return lineItems;
+        }
+        function getfreight() {
+            const lineItems = [];
+            $('#FreightTable tbody tr').each(function (index) {
+                const row = $(this);
+                if (parseFloat(row.find('.FNetAmt').val()) > 0) {
+                    lineItems.push({
+                        ID: row.data('id').toString() || null,
+                        DocEntry: null,
+                        FreID: row.find('.FreigthName').data('freid').toString() || null,
+                        Name: row.find('.FreigthName').text() || '',
+                        NetAmt: parseFloat(row.find('.FNetAmt').val()) || 0,
+                        TaxCodeId: row.find('.FTaxId').val() || null,
+                        TaxRate: parseFloat(row.find('.FTaxId option:selected').data('rate')) || 0,
+
+                        TaxAmount: parseFloat(row.find('.FTaxAmt').text()) || 0,
+                        TaxTotal: parseFloat(row.find('.FTaxtotal').text()) || 0,
+                        CGSTRate: parseFloat(row.find('.FCGSTRATE').text()) || 0,
+                        CGSTAmt: parseFloat(row.find('.FCGST').text()) || 0,
+                        SGSTRate: parseFloat(row.find('.FSGSTRATE').text()) || 0,
+                        SGSTAmt: parseFloat(row.find('.FSGST').text()) || 0,
+                        IGSTRate: parseFloat(row.find('.FIGSTRATE').text()) || 0,
+                        IGSTAmt: parseFloat(row.find('.FIGST').text()) || 0,
+                        UTGSTRate: parseFloat(row.find('.FUTGSTRATE').text()) || 0,
+                        UTGSTAmt: parseFloat(row.find('.FUTGST').text()) || 0,
+                        Remark: row.find('.FRemark').val(),
+                    });
+                }
+            });
+            return lineItems;
+        }
+        function validateForm(header, lines) {
+
+            if (!header.PostingDate) {
+                Notify('error', 'Posting date is required','');
+                return false;
+            }
+            if (!header.DocumentDate) {
+                Notify('error', 'Document date is required','');
+                return false;
+            }
+            if (!header.DueDate) {
+                Notify('error', 'Due Date is required','');
+                return false;
+            }
+            if (!header.FYearId) {
+                Notify('error', 'Fiscal year is required','');
+                return false;
+            }
+            if(!header.LedgerCode) {
+                Notify('error', 'Supplier is required','');
+                return false;
+            }
+            if (lines.length === 0) {
+                Notify('error', 'At least one item is required','');
+                return false;
+            }
+            var index= 1;
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+
+                if (!line.ItemCode) {
+                    Notify('error', `Item code is required for line ${index }`,'');
+                    return false;
+                }
+                if (!line.WhsCode) {
+                    Notify('error', `Warehouse is required for line ${index}`,'');
+                    return false;
+                }
+
+                if (!line.Quantity || line.Quantity <= 0 || line.Quantity == "NaN") {
+                    Notify('error', `Valid quantity is required for line ${index}`,'');
+                    return false;
+                }
+
+
+                if (!line.AcctCode) {
+                    Notify('error', `Account is required for line ${index}`,'');
+                    return false;
+                }
+                index++;
+            }
+            return true;
+        }
+        function resetForm() {
+                currentDocEntry = null;
+                isEditMode = false;
+
+                // Reset header fields
+                $('#DocumentEntry').val('');
+                $('#Docnum').val('');
+                $('#DocStatus').val('O');
+                $('#PostingDate').val(new Date().toISOString().split('T')[0]);
+                $('#DocumentDate').val(new Date().toISOString().split('T')[0]);
+                $('#DeliveryDate').val(new Date().toISOString().split('T')[0]);
+               $('#DueDate').val(new Date().toISOString().split('T')[0]);
+                $('#FYearId').val('');
+                $('#LedgerCode').val('');
+                $('#LedgerCode').attr('data-id', ' ');
+                $('#LedgerCode').attr('data-name', ' ');
+                $('#LedgerCode').attr('data-code', ' ');
+                $('#AddID').empty().append('<option value="">Select</option>');
+                $('#RefNo').val('');
+                $('#BaseEntry').val('');
+
+
+                $('#Remarks').val('');
+                $('#TotalWeight').val('0.00');
+
+                // Reset footer/total fields
+                $('#GrossTotal').val('0.00');
+                $('#TotalDiscount').val('0.00');
+                $('#TotalDiscountAmt').val('0.00');
+                $('#TaxableTotal').val('0.00');
+                $('#GSTTotal').val('0.00');
+                $('#CGSTTotal').val('0.00');
+                $('#SGSTTotal').val('0.00');
+                $('#IGSTTotal').val('0.00');
+                $('#UTGSTTotal').val('0.00');
+                $('#Rounding').val('0.00');
+                $('#NETTotal').val('0.00');
+                $("#FreightTax").val(0)
+                $("#FreightCGSTTax").val(0)
+                $("#FreightSGSTTax").val(0)
+                $("#FreightIGSTTax").val(0)
+                $("#FreightUTGSTTax").val(0)
+                $("#FreightTotal").val('0.00')
+
+                $('#aftBillDisc').val('0.00');
+                // Reset line items (keep one empty row)
+                $('#mainitemtable tbody').empty();
+                addNewLineItem();
+                ItemData = [];
+                loadItemMasterTable();
+                // Reset buttons
+               $('#btnSave').prop('disabled', false);
+               $('#btnPark').prop('disabled', false);
+               $('#btnPrint').prop('disabled', true);
+               $('#btnDelete').prop('disabled', true);
+               $('#btnCopyFrom').prop('disabled', true);
+               $('#btnCopyTo').prop('disabled', true);
+
+               $('#ResetFreight').click();
+                // Reload fiscal years and document number
+            loadFiscalYears();
+            $("#resetcustomerform").click()
+        }
+        function formatDateForInput(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toISOString().split('T')[0];
+        }
+        // Modify the remove-line click handler
+        $(document).on('click', '.remove-line', function() {
+            const row = $(this).closest('tr');
+            const table = $('#mainitemtable tbody');
+            const rowCount = table.find('tr').length;
+            if (rowCount > 1) {
+                row.remove();
+
+                // Update row numbers
+                table.find('tr').each(function(index) {
+                    $(this).find('td:first').text(index + 1);
+                });
+
+                // Disable remove button if only one row left
+                if (table.find('tr').length === 1) {
+                    table.find('tr').first().find('.remove-line').prop('disabled', true);
+                }
+
+                // Recalculate totals after deletion
+                calculateHeaderTotals();
+                calculateTotalWeight();
+            } else {
+                Notify('warning', 'At least one item is required');
+            }
+        });
+        $(document).on('click', '.openmodal', function() {
+            selectedRowIndex = null;
+            selectedItemId = null;
+            const row = $(this).closest('tr');
+            selectedRowIndex = row.index();
+        });
+        $(document).on('click', '.btnSelectItem', function() {
+            const row = $(this).closest('tr');
+            if (selectedRowIndex !== null) {
+                const targetRow = $('#mainitemtable tbody tr').eq(selectedRowIndex);
+                SetItem(row.data('item-id'), targetRow)
+                $('#itemSearchModal').modal('hide');
+            } else {
+                Notify('warning', 'No target row selected','');
+            }
+        });
+        $(document).on('click',".opentaxeblemodal",function(){
+            const row = $(this).closest('tr');
+            $("#rowtaxeble").val(row.find(".AftBillDisc").val())
+            $("#rowtaxamount").val(row.find(".TaxAmount").val())
+            $("#rowCGSTTotal").val(row.find(".CGSTAmt").val())
+            $("#rowSGSTTotal").val(row.find(".SGSTAmt").val())
+            $("#rowIGSTTotal").val(row.find(".IGSTAmt").val())
+            $("#rowUTGSTTotal").val(row.find(".UTGSTAmt").val())
+            $("#taxDetailsModalRow").modal("show")
+        })
+        //Busness Partner
+        {
+            var BPPartnerData=null;
+                function loadBPPartnerTable() {
+                    $.ajax({
+                        type: "GET",
+                        url: '@Url.Action("GETBPPARTNER", "Production")',
+                        contentType: "application/json; charset=utf-8",
+                        data:{type:"S"},
+                        cache: false,
+                        success: function(data) {
+                            BPPartnerData = [];
+                            BPPartnerData = data;
+                            applyBPPartnerDatatable(data);
+                        },
+                        error: function(xhr) {
+                            Notify('error', 'Error', xhr.responseText || 'Error loading BP Partners');
+                        }
+                    });
+                }
+                loadBPPartnerTable();
+
+                function applyBPPartnerDatatable(jsonData) {
+
+                    const tableId = '#ledegerSearchTable';
+                    if ($.fn.DataTable.isDataTable(tableId)) {
+                        $(tableId).DataTable().destroy();
+                        $(tableId).empty(); // Clear the table
+                    }
+                    $(tableId).DataTable({
+                        data: jsonData,
+                        responsive: {
+                            details: {
+                                display: $.fn.dataTable.Responsive.display.modal({
+                                    header: function(row) {
+                                        return 'Details for ' + row.data().GroupName;
+                                    }
+                                }),
+                                renderer: $.fn.dataTable.Responsive.renderer.tableAll({
+                                    tableClass: 'table'
+                                })
+                            }
+                        },
+                        dom: 'lrtip', // Simpler controls
+                        initComplete: function() {
+                            // Adjust modal height after table initialization
+                            $('.modal').css('max-height', $(window).height() * 0.9);
+                            $('.modal-body').css('overflow-y', 'auto');
+                        },
+                        columns: [
+                            {
+                                data: null,
+                                title: "Sr No",
+                                render: function(data, type, row, meta) {
+                                    return meta.row + 1;
+                                },
+                                className: "text-center",
+                                orderable: false
+                            },
+                            {
+                                data: null,
+                                title: "Action",
+                                className: "text-center nowrap",
+                                orderable: false,
+                                render: function(data, type, row) {
+                                    return `
+                                    <div class="d-flex justify-content-center gap-1">
+                                        <button class="btn btn-sm btn-primary bp-edit" title="Edit" data-id="${row.ID}" data-code="${row.Code}" data-name="${row.GroupName}">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </div>`;
+                                }
+                            },
+                            { data: "Code", title: "Ledger Code" },
+                            { data: "GroupName", title: "Group Name" },
+                        ],
+                        responsive: true,
+                        dom: '<"top"lf>rt<"bottom"ip><"clear">',
+                        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                        language: {
+                            lengthMenu: "Show _MENU_ entries",
+                            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                            infoEmpty: "Showing 0 to 0 of 0 entries",
+                            infoFiltered: "(filtered from _MAX_ total entries)"
+                        },
+                        createdRow: function(row, data, dataIndex) {
+                            $(row).attr('data-id', data.ID);
+                        }
+                    });
+                }
+                $(document).on("click", ".bp-edit", function () {
+                    var id = $(this).data("id");
+                    var code = $(this).data("code");
+                    var name = $(this).data("name");
+                    $("#ledgerListModal").modal("hide")
+                    Loadbp(id)
+                })
+                // LedgerCode Search
+                var $activeInput = null;
+                $(document).on('input', "#LedgerCode", function() {
+                    var $input = $(this);
+                    $activeInput = $(this);
+                    var value = $input.val().toLowerCase().replace(/_/g, ' ');
+                    var suggestions = [];
+
+                    // Check if the suggestion container already exists, if not, create it
+                    var suggestionContainerId = 'BPSuggestions-' + $input.closest('tr').index();
+                    if (!$('#' + suggestionContainerId).length) {
+                        $('<div id="' + suggestionContainerId + '" class="suggestions-container"></div>').appendTo('body');
+                    }
+
+                    // Get the container element
+                    var $suggestionContainer = $('#' + suggestionContainerId);
+                    $suggestionContainer.empty(); // Clear previous suggestions
+
+                    // Check if BPPartnerData exists and is an array
+                    if (Array.isArray(BPPartnerData) && BPPartnerData.length > 0) {
+                        if (value.length > 0) {
+                            var searchTokens = value.split(/\s+/);
+                            // Filter suggestions based on universal search (match all tokens)
+                            suggestions = BPPartnerData.filter(function(data) {
+                                if (data && typeof data === 'object') {
+                                    var code = (data.Code || '').toLowerCase();
+                                    var name = (data.GroupName || '').toLowerCase();
+                                    var allTokens = code.split(/\s+|[_-]+/).concat(name.split(/\s+|[_-]+/));
+                                    return searchTokens.every(function(token) {
+                                        return allTokens.some(function(itemToken) {
+                                            return itemToken.includes(token);
+                                        });
+                                    });
+                                }
+                                return false;
+                            }).sort(function(a, b) {
+                                return a.GroupName.localeCompare(b.GroupName);
+                            }).slice(0, 50); // Limit to 50 results
+                        }
+                        // Show suggestions if any
+                        if (suggestions.length > 0) {
+                            suggestions.forEach(function(data) {
+                                $suggestionContainer.append(
+                                    `<div class="suggestion-item bpset" data-code="${data.Code || ''}" data-id="${data.ID || ''}" data-name="${data.GroupName || ''}">
+                                        <span class="ledger-code"><b>${data.Code || ''}</b></span> -
+                                        <span class="group-name"><b>${data.GroupName || ''}</b></span>
+                                    </div>`
+                                );
+                            });
+
+                            // Calculate the offset of the input field and position the suggestion box below it
+                            var offset = $input.offset();
+                            $suggestionContainer.css({
+                                top: offset.top + $input.outerHeight(),
+                                left: offset.left,
+                                width: $input.outerWidth(),
+                                position: 'absolute',
+                                "z-index": 1000,
+                            }).show();
+                        } else {
+                            $suggestionContainer.hide();
+                        }
+                    } else {
+                        console.error("BP Partner Data is not defined or is empty");
+                        $suggestionContainer.hide();
+                    }
+                });
+                $(document).on('click', '.bpset', function () {
+                    var ledgerCode = $(this).data('code');
+                    var groupName = $(this).data('name');
+                    var id = $(this).data('id');
+                    $('.suggestions-container').hide();
+                    Loadbp(id)
+                });
+                function GETADDRESS(defaultValue,Ledgerid) {
+                        if (!Ledgerid) {
+                            Notify('error', 'Error', 'Ledger ID is missing.');
+                            return;
+                        }
+                        $.ajax({
+                            url: '@Url.Action("GETADDBYLEDGER", "Inventory")', // This must be in a Razor .cshtml view
+                            method: 'GET',
+                            data: { id: Ledgerid },
+                            success: function(response) {
+                                const select = $('#AddID');
+                                select.empty();
+
+                                if (Array.isArray(response) && response.length > 0) {
+                                    response.forEach(function(add) {
+                                        // Replace these keys with the correct ones from your response JSON
+                                        const addId = add.AddID || add.addID || add.id;
+                                        const addressName = add.AddressId || add.AddressName || add.name;
+                                        select.append(`<option value="${addId}">${addressName}</option>`);
+                                    });
+
+                                    if (defaultValue) {
+                                        const found = select.find(`option[value="${defaultValue}"]`).length > 0;
+                                        if (found) {
+                                            select.val(defaultValue);
+                                        } else {
+                                            console.warn("Default value not found in options.");
+                                        }
+                                    }
+                                } else {
+                                    select.append(`<option value=""></option>`);
+                                }
+                            },
+                            error: function(xhr) {
+                                Notify('error', 'Error', xhr.responseText || 'Failed to load addresses.');
+                            }
+                        });
+                    }
+
+        }
+         // Item Search
+        {
+            $('.refreshitems').click(function() {
+                loadItemMasterTable()
+            });
+            var ItemData = [];
+            var $activeInput = null;
+            function loadItemMasterTable() {
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("GETACTIVEITEMSPURCHASE", "Inventory")',
+                    contentType: "application/json; charset=utf-8",
+                    cache: false,
+                    success: function (data) {
+                        ItemData=[];
+                        ItemData = Array.isArray(data) ? data : [];
+                        bindtable(data)
+                    },
+                    error: function (xhr) {
+                        Notify('error', 'Error', xhr.responseText || 'Error loading items');
+                    }
+                });
+            }
+            loadItemMasterTable();
+            function bindtable(response){
+                            if ($.fn.DataTable.isDataTable('#itemSearchTable')) {
+                                $('#itemSearchTable').DataTable().destroy();
+                                $('#itemSearchTable thead th').not(':first').find('input').remove();
+                            }
+                            const table = $('#itemSearchTable tbody');
+                            table.empty();
+                            response.forEach(function(item) {
+                                const row = `
+                                    <tr data-item-id="${item.ItemID}"
+                                        data-item-code="${item.ItemCode}"
+                                        data-item-eancode="${item.EanCode}"
+                                        data-item-name="${item.ItemName}"
+                                        data-item-uom="${item.UomCode}"
+                                        data-item-hsn="${item.HSNCode}">
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-primary btnSelectItem">Select</button>
+                                        </td>
+                                        <td nowrap>${item.ItemCode}</td>
+                                        <td nowrap>${item.EanCode}</td>
+                                        <td nowrap>${item.ItemName}</td>
+                                        <td nowrap>${item.UomCode}</td>
+                                        <td nowrap>${item.HSNCode}</td>
+                                        <td nowrap>${item.ItmGrpNam}</td>
+                                    </tr>
+                                `;
+                                table.append(row);
+                            });
+
+                            $('#itemSearchTable').DataTable({
+                                // dom: '<"top"f>rt<"bottom"lip><"clear">',
+                                initComplete: function() {
+                                    this.api().columns().every(function() {
+                                        var column = this;
+                                        var header = $(column.header());
+                                        if (header.index() === 0) return;
+                                        if (header.find('input').length === 0) {
+                                            var input = $('<input type="text" class="form-control form-control-sm" placeholder="Search..."/>')
+                                                .appendTo(header)
+                                                .on('keyup change clear', function() {
+                                                    if (column.search() !== this.value) {
+                                                        column.search(this.value).draw();
+                                                    }
+                                                });
+                                        }
+                                    });
+                                },
+                                columnDefs: [
+                                    { orderable: false, targets: 0 }, // Disable sorting for select button column
+                                    { searchable: false, targets: 0 } // Disable searching for select button column
+                                ],
+                                language: {
+                                    search: "Global Search:",
+                                    searchPlaceholder: "Search all columns..."
+                                },
+                                responsive: true
+                            });
+                            $('.dataTables_filter input').focus();
+
+                    }
+                    function CreateItemList(inputClass) {
+                    $(document).on('input', "#mainitemtable tbody tr td ." + inputClass, function () {
+                        var $input = $(this);
+                        $activeInput = $input;
+                        var value = $input.val().toLowerCase().replace(/_/g, ' ');
+                        var suggestions = [];
+                        var suggestionContainerId = 'ItemNameSuggestions-' + $input.closest('tr').index();
+                        if (!$('#' + suggestionContainerId).length) {
+                            $('<div id="' + suggestionContainerId + '" class="suggestions-container"></div>').appendTo('body');
+                        }
+                        var $suggestionContainer = $('#' + suggestionContainerId);
+                        $suggestionContainer.empty();
+
+                        if (Array.isArray(ItemData) && ItemData.length > 0) {
+                            if (value.length > 0) {
+                                var searchTokens = value.split(/\s+/);
+                                suggestions = ItemData.filter(function (data) {
+                                    if (data && typeof data === 'object') {
+                                        var code = (data.ItemCode || '').toLowerCase();
+                                        var name = (data.ItemName || '').toLowerCase();
+                                        var allTokens = code.split(/\s+|[_-]+/).concat(name.split(/\s+|[_-]+/));
+                                        return searchTokens.every(function (token) {
+                                            return allTokens.some(function (itemToken) {
+                                                return itemToken.includes(token);
+                                            });
+                                        });
+                                    }
+                                    return false;
+                                }).sort(function (a, b) {
+                                    return a.ItemName.localeCompare(b.ItemName);
+                                }).slice(0, 20);
+                            }
+
+                            if (suggestions.length > 0) {
+                                suggestions.forEach(function (data) {
+                                    $suggestionContainer.append(
+                                        `<div class="suggestion-item MItemList" data-code="${data.ItemCode || ''}" data-id="${data.ItemID || ''}" data-name="${data.ItemName || ''}">
+                                            <span class="supplier-code">${data.ItemCode || ''}</span> -
+                                            <span class="supplier-name">${data.ItemName || ''}</span>
+                                            </div>`
+                                    );
+                                });
+
+                                var offset = $input.offset();
+                                $suggestionContainer.css({
+                                    top: offset.top + $input.outerHeight(),
+                                    left: offset.left,
+                                    width: $input.outerWidth(),
+                                    position: 'absolute',
+                                    "z-index": 1000
+                                }).show();
+                            } else {
+                                $suggestionContainer.hide();
+                            }
+                        } else {
+                            console.error("ItemData is empty or not defined");
+                            $suggestionContainer.hide();
+                        }
+                    });
+                }
+                    CreateItemList("ItemCode");
+                    CreateItemList("ItemName");
+                    $(document).on('click', function (e) {
+                    if (!$(e.target).closest('.suggestions-container, .ItemCode, .ItemName').length) {
+                        $('.suggestions-container').hide();
+                    }
+            });
+            // Handle EAN code changes - only search when value is meaningful
+            $(document).on("change", ".ItemEan", function () {
+            var row = $(this).closest("tr");
+            var eancode = row.find(".ItemEan").val();
+
+            // Only search if EAN code has sufficient length
+            if (eancode && eancode.length >= 4) {
+                SearchItemByCode(eancode.trim(), row, 'ean');
+            }
+        });
+            // Handle ItemCode changes - only search when value is meaningful
+            $(document).on("change", ".ItemCode", function () {
+            var row = $(this).closest("tr");
+            var ItemCode = row.find(".ItemCode").val();
+
+            // Only search if item code has sufficient length
+            if (ItemCode && ItemCode.length >= 4) {
+                SearchItemByCode(ItemCode.trim(), row, 'code');
+            }
+        });
+            // Handle mouse click on suggestions
+            $(document).on('click', '.MItemList', function () {
+                selectSuggestion($(this));
+            });
+            $(document).on('keydown', function (e) {
+            if (!$activeInput) return;
+            var $suggestionContainer = $('.suggestions-container:visible');
+            if (!$suggestionContainer.length) return;
+
+            var $items = $suggestionContainer.find('.suggestion-item');
+            var $current = $items.filter('.suggestion-item-active');
+            var idx = $items.index($current);
+
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                if (idx < $items.length - 1) {
+                    $current.removeClass('suggestion-item-active');
+                    $items.eq(idx + 1).addClass('suggestion-item-active');
+                }
+            } else if (e.key === "ArrowDown") {
+                e.preventDefault();
+                if (idx > 0) {
+                    $current.removeClass('suggestion-item-active');
+                    $items.eq(idx - 1).addClass('suggestion-item-active');
+                }
+            } else if (e.key === "Enter") {
+                e.preventDefault();
+                if ($current.length) {
+                    selectSuggestion($current);
+                }
+            }
+        });
+            function selectSuggestion($item) {
+            var id = $item.attr('data-id');
+            var name = $item.attr('data-name');
+            var code = $item.attr('data-code');
+
+            if ($activeInput) {
+                var $activeRow = $activeInput.closest('tr');
+                SetItem(id, $activeRow);
+            }
+            $('.suggestions-container').hide();
+        }
+            function SearchItemByCode(searchValue, row, searchType) {
+            if (!searchValue) return;
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GETACTIVEITEMSBYIDPURCHASE", "Inventory")',
+                data: {
+                    id: searchValue,
+                    searchType: searchType // 'code' or 'ean'
+                },
+                contentType: "application/json; charset=utf-8",
+                cache: false,
+                success: function (data) {
+                    if (data.length === 0) {
+                        Notify('warning', 'Not Found', 'Item not found with the provided code');
+                        return;
+                    }
+
+                    const item = data[0];
+                    LoadItemData(item, row);
+                },
+                error: function (xhr) {
+                    Notify('error', 'Error', xhr.responseText || 'Error loading item');
+                }
+            });
+        }
+        // Function to set item by ID (for suggestion clicks)
+        function SetItem(id, row) {
+                if (!id) return;
+
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("GETACTIVEITEMSBYIDPURCHASE", "Inventory")',
+                    data: { id: id },
+                    contentType: "application/json; charset=utf-8",
+                    cache: false,
+                    success: function (data) {
+                        if (data.length === 0) return;
+
+                        const item = data[0];
+                        LoadItemData(item, row);
+                    },
+                    error: function (xhr) {
+                        Notify('error', 'Error', xhr.responseText || 'Error loading item by ID');
+                    }
+                });
+            }
+        // Common function to load item data into row
+        function LoadItemData(item, row) {
+            LoadUOM(item.ItemID, row, "");
+            loadWarehouses(item.ItemID, row, "");
+            loadTaxCodes(item.TaxCodeId, row, row.find('.TaxCode'));
+
+            row.find('.Status').val("O");
+            row.find('.BaseLine, .BaseDocEntry, .BaseObjType').val("");
+            row.find('.ItemCode').val(item.ItemCode).attr("data-id", item.ItemID);
+            row.find('.ItemName').val(item.ItemName);
+            row.find('.ItemHSN').val(item.HSNCode).attr("data-id", item.HSNID);
+            row.find('.ItemUOM').val(item.UomCode);
+            row.find('.ItemEan').val(item.EanCode);
+            row.find('.AcctCode').val(item.AcctCode);
+            row.find('.Price').val(item.Price || "");
+            row.find('.Weight1').val(item.Weight1 || 0);
+            row.find('.ItemCost').val(item.ItemCost || 0);
+
+
+            let sqFeet = parseFloat(item.SQFeet || 0);
+            if (!isNaN(sqFeet) && sqFeet > 0) {
+                row.find('.Quantity').val(1);
+            } else {
+                row.find('.Quantity').val(1);
+            }
+
+            // Remove the automatic row addition - let user control this
+                $("#btnAddLine").click();
+        }
+        function validateduplicateitem(id) {
+                var index = 1;
+                var isDuplicate = false;
+                $('#mainitemtable tbody tr').each(function() {
+                    var row = $(this);
+                    // Corrected the data attribute access
+                    var tablid = row.find(".ItemCode").attr('data-id'); // or .attr('data-id') depending on your HTML
+                    if (id == tablid) {
+                        Notify('error', 'Item Already Selected In Line No ' + index, '');
+                        isDuplicate = true;
+                        return false; // This breaks the each loop
+                    }
+                    index++;
+                });
+                return !isDuplicate; // Return true if no duplicate found
+            }
+        }
+    
+        //Find Mode
+        {
+            $("#btnFind").click(function () {
+                $("#fdocid").val("")
+                $("#frefno,#rrefno").val("")
+                $('.datepicker').val(new Date().toISOString().split('T')[0]);
+                Findmode()
+            })
+            $("#FindBtnSearch").click(function () {
+                Findmode()
+            })
+            $("#FindBtnReset").click(function () {
+                $("#fdocid").val("")
+                $("#frefno,#rrefno").val("")
+                $("#ffromdate,#ftodate").val("")
+            })
+            function Findmode() {
+                var obj = {
+                    doctype: $("#doctype").val() || '',
+                    docid: $("#fdocid").val() || '',
+                    refno: $("#frefno").val() || '',
+                    fromdate: $("#ffromdate").val() || '',
+                    todate: $("#ftodate").val() || '',
+                    docEntry: '',
+                };
+                $.ajax({
+                    url: '@Url.Action("FINDMODE", "Purchase")',
+                    method: 'GET',
+                    data: obj,
+                    success: function (response) {
+                        const tableBody = $('#receiptListTable tbody');
+                        if ($.fn.DataTable.isDataTable('#receiptListTable')) {
+                            $('#receiptListTable').DataTable().destroy();
+                        }
+                        tableBody.empty();
+                        response.header.forEach(function (receipt) {
+                            const row = `
+                                <tr data-docentry='${receipt.DocEntry}'>
+                                    <td>${receipt.Docnum}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary select-findrow" data-docentry="${receipt.DocEntry}">
+                                            <i class="bi bi-check"></i> Select
+                                        </button>
+                                    </td>
+                                    <td>${receipt.LedgerName}</td>
+                                    <td>${receipt.For_PostingDate}</td>
+                                    <td>${receipt.RefNo || ''}</td>
+                                    <td>${receipt.For_DocStatus}</td>
+                                    <td>${receipt.Remarks || ''}</td>
+                                    <td>${receipt.CretedByUName}</td>
+                                </tr>
+                            `;
+                            tableBody.append(row);
+                        });
+
+                        // ✅ Reinitialize DataTable
+                        $('#receiptListTable').DataTable({
+                            dom: '<"top"lf>rt<"bottom"ip>',
+                            pageLength: 10,
+                            lengthMenu: [5, 10, 25, 50, 100],
+                            responsive: true,
+                            columnDefs: [
+                                { orderable: false, targets: [6] }
+                            ]
+                        });
+
+                        // ✅ Attach event handler (only once if possible, or inside a separate setup)
+                        $('#receiptListTable').off('click', '.select-findrow').on('click', '.select-findrow', function () {
+                            const docEntry = $(this).data('docentry');
+                            loadFindRow(docEntry, $("#doctype").val(), "");
+                            $('#receiptListModal').modal('hide');
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        Notify('error', 'Failed to load receipt list', '');
+                    }
+                });
+            }
+            function LoadCopyTo() {
+                var datastring = sessionStorage.getItem("CopyTodData")
+                if (datastring !== "" && datastring !== null && datastring !== undefined) {
+                    var json = JSON.parse(datastring);
+                    var ObjType = json.objtype.split("-")[0]
+                    $("#BaseEntry").val(json.docentry)
+                    $("#BaseEntry").attr('data-obj', json.objtype)
+                    loadFindRow(json.docentry, ObjType, "C")
+                } else {
+                    GETFREIGHT();
+                }
+            }
+            LoadCopyTo()
+        }
+           async function loadFindRow(docEntry, doctype, flag) {
+        try {
+            const response = await $.ajax({
+                url: '@Url.Action("FINDMODE", "Purchase")',
+                method: 'GET',
+                data: { doctype, docEntry }
+            });
+
+            if (!response || !response.header?.length) {
+                Notify('error', 'Document not found');
+                return;
+            }
+
+            const header = response.header[0];
+            let rows = response.row || [];
+            const freight = response.freight || [];
+            const today = new Date().toISOString().split('T')[0];
+            // ✅ safer date formatter
+            const formatDateForInput = (dateStr) => {
+                if (!dateStr) return today;
+                const parts = dateStr.split("-");
+                if (parts.length !== 3) return today;
+                const [day, month, year] = parts;
+                return `${year}-${month}-${day}`;
+            };
+            // ✅ safer number formatter
+            const fmtNum = (val, digits = 2) =>
+                isNaN(parseFloat(val)) ? "0.00" : parseFloat(val).toFixed(digits);
+
+            // ✅ bulk header mapping
+            const headerMapping = {
+                '#DocumentEntry': header.DocEntry,
+                '#Docnum': header.Docnum,
+                '#DocStatus': header.DocStatus,
+                '#PostingDate': formatDateForInput(header.For_PostingDate),
+                '#DocumentDate': formatDateForInput(header.For_DocumentDate),
+                '#DeliveryDate': formatDateForInput(header.For_DeliveryDate),
+                '#DueDate': formatDateForInput(header.For_DueDate),
+                '#FYearId': header.FYearId,
+                '#LedgerCode': header.LedgerCode,
+                '#RefNo': header.RefNo,
+                '#Remarks': header.Remarks,
+                '#PONo': header.PONo,
+                '#VehicleNo': header.VehicleNo,
+                '#VendorCode': header.VendorCode,
+                '#TransMode': header.TransMode,
+                '#TotalWeight': header.TotalWeight,
+                '#GrossTotal': header.GrossTotal,
+                '#TotalDiscount': fmtNum(header.DisPer),
+                '#TotalDiscountAmt': fmtNum(header.DisAmount),
+                '#FreightTotal': fmtNum(header.FreightTotal),
+                '#aftBillDisc': header.TotalAftBillDisc,
+                '#GSTTotal': header.GSTTotal,
+                '#NETTotal': header.NETTotal,
+                '#Rounding': header.Rounding
+            };
+
+            for (const [selector, value] of Object.entries(headerMapping)) {
+                $(selector).val(value ?? "");
+            }
+
+            let BaseObj = '';
+            if (flag === "C") {
+                $("#DocumentEntry, #Docnum").val("");
+                $("#DocStatus").val("O");
+                $("#DocumentDate, #PostingDate, #DeliveryDate, #DueDate").val(today);
+                $("#FYearId").trigger("change");
+                rows = rows.filter(row => row.Status === "O");
+                sessionStorage.removeItem("CopyTodData");
+                BaseObj = header.OBJType;
+            }
+
+            $('#LedgerCode')
+                .attr('data-id', header.LedgerID)
+                .attr('data-name', header.LedgerName)
+                .attr('data-code', header.LedgerCode);
+            Loadbp(header.LedgerID)
+            GETADDRESS(header.AddID, header.LedgerID);
+
+            // ✅ render freight rows
+            $('#FreightTable tbody').empty();
+            $("#FreightTable tfoot").empty();
+            var index = 1;
+            for (let i = 0; i < freight.length; i++) {
+                const item = freight[i];
+                const row = $(`
+                    <tr data-id='${item.ID}'>
+                        <td>${index}</td>
+                        <td nowrap data-freid='${item.FreID}' class='FreigthName'>${item.Name}</td>
+                        <td><input style="min-width:180px" value="${fmtNum(item.NetAmt)}" class="form-control form-control-sm FNetAmt"></td>
+                        <td>
+                            <select style="min-width:180px" class="form-control form-control-sm FTaxId">
+                                <option value="">Select</option>
+                            </select>
+                        </td>
+                        <td class="FTaxAmt">${fmtNum(item.TaxAmount)}</td>
+                        <td class="FTaxtotal">${fmtNum(+item.NetAmt + +item.TaxAmount)}</td>
+                        <td><textarea style="min-width:180px;height:30px;" class="form-control form-control-sm FRemark">${item.Remark ?? ''}</textarea></td>
+                        <td hidden class="FCGST">${fmtNum(item.CGSTAmt)}</td>
+                        <td hidden class="FCGSTRATE">${fmtNum(item.CGSTRate)}</td>
+                        <td hidden class="FSGST">${fmtNum(item.SGSTAmt)}</td>
+                        <td hidden class="FSGSTRATE">${fmtNum(item.SGSTRate)}</td>
+                        <td hidden class="FIGST">${fmtNum(item.IGSTAmt)}</td>
+                        <td hidden class="FIGSTRATE">${fmtNum(item.IGSTRate)}</td>
+                        <td hidden class="FUTGST">${fmtNum(item.UTGSTAmt)}</td>
+                        <td hidden class="FUTGSTRATE">${fmtNum(item.UTGSTRate)}</td>
+                    </tr>
+                `);
+                $("#FreightTable tbody").append(row);
+                await GETFREIGHTTAX(item.TaxCodeId, row, row.find(".FTaxId"));
+                   row.find(".FNetAmt, .FTaxId").on("input change", () => {
+                       calculatefreightRow(row);
+                       calculateTotal();
+                   });
+                index++;
+            }
+            // Append total footer once
+            $("#FreightTable tfoot").append(`
+                <tr>
+                    <td colspan="4">Total</td>
+                    <td nowrap class="FTaxTot">0.00</td>
+                    <td nowrap class="FNetTot">0.00</td>
+                    <td hidden nowrap class="FSGSTot">0.00</td>
+                    <td hidden nowrap class="FCGSTot">0.00</td>
+                    <td hidden nowrap class="FIGSTTot">0.00</td>
+                    <td hidden nowrap class="FUTGSTTot">0.00</td>
+                    <td colspan="13"></td>
+                </tr>
+            `);
+            calculateTotal();
+            // ✅ freight totals
+            $("#FreightTax").val(fmtNum($(".FTaxTot").text()));
+            $("#FreightCGSTTax").val(fmtNum($(".FCGSTot").text()));
+            $("#FreightSGSTTax").val(fmtNum($(".FSGSTot").text()));
+            $("#FreightIGSTTax").val(fmtNum($(".FIGSTTot").text()));
+            $("#FreightUTGSTTax").val(fmtNum($(".FUTGSTTot").text()));
+            // ✅ render item rows
+            $('#mainitemtable tbody').empty();
+            const rowPromises = rows.map(async (line) => {
+                addNewLineItem();
+                const $row = $('#mainitemtable tbody tr').last();
+
+                $row.find('.ItemCode').val(line.ItemCode).attr('data-id', line.ItemID);
+                $row.find('.ItemName').val(line.ItemName);
+                $row.find('.ItemHSN').val(line.HSNCode).attr('data-id', line.HSNID);
+                $row.find('.ItemEan').val(line.EanCode);
+                $row.find('.ItemCost').val(line.ItemCost);
+
+                if (flag === "C") {
+                    $row.find('.Quantity, .OpenQuantity').val(fmtNum(line.OpenQuantity));
+                    $row.find('.BaseQuantity').val(fmtNum(line.Quantity));
+                    $row.find('.BaseLine').val(line.ID);
+                    $row.find('.BaseDocEntry').val(line.DocEntry);
+                    $row.find('.BaseObjType').val(BaseObj);
+                } else {
+                    $row.find('.Quantity').val(fmtNum(line.Quantity));
+                    $row.find('.OpenQuantity').val(fmtNum(line.OpenQuantity));
+                    $row.find('.Status').val(line.Status);
+                    $row.find('.BaseQuantity').val(fmtNum(line.BaseQuantity));
+                    $row.find('.BaseLine').val(line.BaseLine);
+                    $row.find('.BaseDocEntry').val(line.BaseDocEntry);
+                    $row.find('.BaseObjType').val(line.BaseObjType);
+                }
+
+                $row.find('.Price').val(fmtNum(line.UnitePrice));
+                $row.find('.DisPer').val(fmtNum(line.DisPer));
+                $row.find('.Weight1').val(fmtNum(line.Weight1));
+                $row.find('.Remarks').val(line.Remarks ?? "");
+                $row.find('.AcctCode').val(line.AcctCode ?? "");
+
+                await LoadUOM(line.ItemID, $row, "F");
+                $row.find('.ItemUOM').val(line.UOMID);
+
+                await loadWarehouses(line.ItemID, $row, "F");
+                $row.find('.WhsCode').val(line.WHSID);
+                $row.find('.StockInWhs').val(parseFloat(line.StockInWhs).toFixed(2));
+
+                await loadTaxCodes(line.TaxCodeId, $row, $row.find('.TaxCode'));
+                $row.find('.TaxCode').val(line.TaxCodeId);
+
+                calculateRowAmounts($row);
+
+                if (header.DocStatus === "C" || line.Status === 'C') {
+                    $row.addClass("table-info").attr("data-doc-status", "closed");
+                    $row.find("input, textarea").prop('readonly', true);
+                    $row.find("select, .remove-line, .openmodal").prop('disabled', true);
+                }
+            });
+            await Promise.all(rowPromises);
+            if (header.DocStatus === "C") {
+                $('#mainitemtable .remove-line').prop('disabled', true).attr("title", "Cannot remove - Document is closed");
+            }
+            // ✅ buttons state
+            $('#btnSave').prop('disabled', header.DocStatus === "C");
+            $('#btnPark').prop('disabled', header.DocStatus === "C");
+            $('#btnPrint').prop('disabled', false);
+            $('#btnDelete').prop('disabled', false);
+            $('#btnCopyTo').prop('disabled', header.DocStatus === "C");
+            if (flag === "C") {
+                $('#btnSave, #btnPark').prop('disabled', false);
+            }
+            else {
+                $('#btnPark').prop('disabled', true);
+            }
+        } catch (error) {
+            console.error('Error loading receipt:', error);
+            Notify('error', 'Failed to load receipt', '');
+        }
+    }
+
+        //Resume
+        {
+           loadUsers()
+           function loadUsers() {
+               $.ajax({
+                   type: "GET",
+                   url: '@Url.Action("GETUSERS", "Auth")',
+                   contentType: "application/json; charset=utf-8",
+                   cache: true,
+                   success: function (data) {
+                       if(data.length) {
+                           const $select = $('#rUserid');
+                           $select.empty();
+                           $select.append('<option value="">Select User</option>');
+                           data.forEach(user => {
+                               $select.append(`<option value="${user.UserID}">${user.Username}</option>`);
+                           });
+                       }
+                   },
+                   error: function (xhr) {
+                       const errorMessage = xhr.responseJSON?.error || 'Error loading users';
+                       Notify('error', 'Error', errorMessage);
+                   }
+               });
+           }
+           $("#btnResume").click(function(){
+               $("#fdocid").val("")
+               $("#frefno,#rrefno").val("")
+               $('.datepicker').val(new Date().toISOString().split('T')[0]);
+               Resume()
+           })
+           $("#ResumeBtnSearch").click(function(){
+               Resume()
+           })
+           $("#ResumeBtnReset").click(function(){
+               $("#rrefno").val("")
+               $('.datepicker').val(new Date().toISOString().split('T')[0]);
+           })
+            function Resume() {
+               var obj = {
+                   doctype: $("#doctype").val() || '',
+                   refno: $("#rrefno").val() || '',
+                   fromdate: $("#rfromdate").val() || '',
+                   todate: $("#rtodate").val() || '',
+                   Userid: $("#rUserid").val() || '',
+                   docEntry:'',
+               };
+               $.ajax({
+                   url: '@Url.Action("RESUMEPARK", "Inventory")',
+                   method: 'GET',
+                   data: obj,
+                   success: function (response) {
+                       const tableBody = $('#ResumeModaltbl tbody');
+                       if ($.fn.DataTable.isDataTable('#ResumeModaltbl')) {
+                           $('#ResumeModaltbl').DataTable().destroy();
+                       }
+                       tableBody.empty();
+                       // ✅ Check if response is valid and has data
+                       if (!response || response.length === 0) {
+
+                           return;
+                       }
+                       var payload = JSON.parse(response[0].Payload);
+
+                       var index = 1;
+                       response.forEach(function(receipt) {
+                           const row = `
+                               <tr data-docentry='${receipt.DocEntry}'>
+                                   <td>${index}</td>
+                                   <td>
+                                       <button class="btn btn-sm btn-primary select-findrow" data-docentry="${receipt.DocEntry}">
+                                           <i class="bi bi-check"></i> Select
+                                       </button>
+                                   </td>
+                                   <td>${receipt.CreatedDate}</td>
+                                   <td>${receipt.RefNo || ''}</td>
+                                   <td>${receipt.CretedByUName}</td>
+                                   <td hidden class='Payload'>${receipt.Payload}</td>
+                               </tr>
+                           `;
+                           tableBody.append(row);
+                           index++;
+                       });
+
+                       // ✅ Reinitialize DataTable
+                       $('#ResumeModaltbl').DataTable({
+                           dom: '<"top"lf>rt<"bottom"ip>',
+                           pageLength: 10,
+                           lengthMenu: [5, 10, 25, 50, 100],
+                           responsive: true,
+                           columnDefs: [
+                               { orderable: false, targets: [] }
+                           ]
+                       });
+
+                       // ✅ Attach event handler (only once if possible, or inside a separate setup)
+                       $('#ResumeModaltbl').off('click', '.select-findrow').on('click', '.select-findrow', function () {
+                           const docEntry = $(this).data('docentry');
+                           const row = $(this).closest("tr");
+                           var data = row.find(".Payload").text();
+                           loadresume(JSON.parse(data), docEntry);
+                           $('#ResumeModal').modal('hide');
+                       });
+                   },
+                   error: function(xhr, status, error) {
+                       Notify('error', 'Failed to load receipt list', '');
+                   }
+               });
+                async  function loadresume(response, docEntry) {
+                   isEditMode = true;
+                   var item =response.header;
+                   const header = response.header;
+                    const rows = response.lines || [];
+                    const freight = response.freight || [];
+                   const headerMapping = {
+                       '#DocumentEntry': header.DocEntry,
+                       '#Docnum': header.Docnum,
+                       '#PostingDate': formatDateForInput(header.PostingDate),
+                       '#DocumentDate': formatDateForInput(header.DocumentDate),
+                       '#DeliveryDate': formatDateForInput(header.DeliveryDate),
+                       '#DueDate': formatDateForInput(header.DueDate),
+                       '#FYearId': header.FYearId,
+                       '#LedgerCode': header.LedgerCode,
+                       '#RefNo': header.RefNo,
+                       '#Remarks': header.Remarks,
+                       '#PONo': header.PONo,
+                       '#VehicleNo': header.VehicleNo,
+                       '#VendorCode': header.VendorCode,
+                       '#TransMode': header.TransMode,
+                       '#TotalWeight': header.TotalWeight,
+                       '#GrossTotal': header.GrossTotal,
+                       '#FreightTotal': parseFloat(header.FreightTotal).toFixed(2),
+                       '#TotalDiscount': parseFloat(header.DisPer).toFixed(2),
+                       '#TotalDiscountAmt': parseFloat(header.DisAmount).toFixed(2),
+                       '#aftBillDisc': header.TotalAftBillDisc,
+                       '#GSTTotal': header.GSTTotal,
+                       '#NETTotal': header.NETTotal,
+                       '#Rounding': header.Rounding
+                   };
+
+                   for (const [selector, value] of Object.entries(headerMapping)) {
+                       $(selector).val(value);
+                    }
+                    $("#FYearId").trigger("change")
+                   $('#LedgerCode')
+                       .attr('data-id', header.LedgerID)
+                       .attr('data-name', header.LedgerName)
+                       .attr('data-code', header.LedgerCode);
+                    Loadbp(header.LedgerID)
+                    GETADDRESS(header.AddID, header.LedgerID);
+                    const fmtNum = (val, digits = 2) =>
+                        isNaN(parseFloat(val)) ? "0.00" : parseFloat(val).toFixed(digits);
+                    // ✅ render freight rows
+                    $('#FreightTable tbody').empty();
+                    for (let i = 0; i < freight.length; i++) {
+                        const item = freight[i];
+                        const row = $(`
+                          <tr data-id=''>
+                              <td>${i + 1}</td>
+                              <td nowrap data-freid='${item.FreID}' class='FreigthName'>${item.Name}</td>
+                              <td><input style="min-width:180px" value="${fmtNum(item.NetAmt)}" class="form-control form-control-sm FNetAmt"></td>
+                              <td>
+                                  <select style="min-width:180px" class="form-control form-control-sm FTaxId">
+                                      <option value="">Select</option>
+                                  </select>
+                              </td>
+                              <td class="FTaxAmt">${fmtNum(item.TaxAmount)}</td>
+                              <td class="FTaxtotal">${fmtNum(+item.NetAmt + +item.TaxAmount)}</td>
+                              <td><textarea style="min-width:180px;height:30px;" class="form-control form-control-sm FRemark">${item.Remark ?? ''}</textarea></td>
+                              <td hidden class="FCGST">${fmtNum(item.CGSTAmt)}</td>
+                              <td hidden class="FCGSTRATE">${fmtNum(item.CGSTRate)}</td>
+                              <td hidden class="FSGST">${fmtNum(item.SGSTAmt)}</td>
+                              <td hidden class="FSGSTRATE">${fmtNum(item.SGSTRate)}</td>
+                              <td hidden class="FIGST">${fmtNum(item.IGSTAmt)}</td>
+                              <td hidden class="FIGSTRATE">${fmtNum(item.IGSTRate)}</td>
+                              <td hidden class="FUTGST">${fmtNum(item.UTGSTAmt)}</td>
+                              <td hidden class="FUTGSTRATE">${fmtNum(item.UTGSTRate)}</td>
+                          </tr>
+                      `);
+
+                        $("#FreightTable tbody").append(row);
+
+                        await GETFREIGHTTAX(item.TaxCodeId, row, row.find(".FTaxId"));
+
+                        row.find(".FNetAmt, .FTaxId").on("input change", () => {
+                            calculatefreightRow(row);
+                            calculateTotal();
+                        });
+                    }
+                    calculateTotal();
+                    // ✅ freight totals
+                    $("#FreightTax").val(fmtNum($(".FTaxTot").text()));
+                    $("#FreightCGSTTax").val(fmtNum($(".FCGSTot").text()));
+                    $("#FreightSGSTTax").val(fmtNum($(".FSGSTot").text()));
+                    $("#FreightIGSTTax").val(fmtNum($(".FIGSTTot").text()));
+                    $("#FreightUTGSTTax").val(fmtNum($(".FUTGSTTot").text()));
+
+                   // Clear rows
+                   $('#mainitemtable tbody').empty();
+                   // Process rows in parallel
+                   const rowPromises = rows.map(async (line, index) => {
+                       addNewLineItem();
+                       const $row = $('#mainitemtable tbody tr').last();
+
+                       // Pre-fill static fields (avoid multiple .find calls)
+                       $row.find('.ItemCode').val(line.ItemCode).attr('data-id', line.ItemID);
+                       $row.find('.ItemName').val(line.ItemName);
+                       $row.find('.ItemHSN').val(line.HSNCode).attr('data-id', line.HSNID);
+                       $row.find('.ItemEan').val(line.EanCode);
+                       $row.find('.ItemCost').val(line.ItemCost);
+                       $row.find('.Quantity').val(line.Quantity);
+                       //$row.find('.BaseQuantity').val(line.BaseQuantity);
+
+                       //$row.find('.OpenQuantity').val(line.OpenQuantity);
+                       $row.find('.Price').val(line.UnitePrice);
+                       $row.find('.DisPer').val(line.DisPer);
+                       $row.find('.Weight1').val(line.Weight1);
+                       $row.find('.Remarks').val(line.Remarks);
+                       $row.find('.AcctCode').val(line.AcctCode);
+                       $row.find('.Status').val(line.Status);
+                       // Load UOM, Warehouse, TaxCode in sequence but without arbitrary timeouts
+                       await LoadUOM(line.ItemID, $row, "F");
+                       $row.find('.ItemUOM').val(line.UOMID);
+
+                       await loadWarehouses(line.ItemID, $row, "F");
+                       $row.find('.WhsCode').val(line.WHSID);
+                       $row.find('.StockInWhs').val(parseFloat(line.StockInWhs).toFixed(2));
+
+                       await loadTaxCodes(line.TaxCodeId, $row, $row.find('.TaxCode'));
+                       $row.find('.TaxCode').val(line.TaxCodeId);
+
+                       calculateRowAmounts($row);
+                   });
+                   await Promise.all(rowPromises);
+                   // Disable all remove-line buttons
+                   //if (header.DocStatus == "C") {
+                   //    $('#mainitemtable .remove-line')
+                   //        .prop('disabled', true)
+                   //        .attr("title", "Cannot remove - Document is closed");
+                   //}
+
+                   // Final buttons state
+                   $('#btnSave').prop('disabled', false);
+                   $('#btnDelete').prop('disabled', false);
+                   $('#btnPark').prop('disabled', false)
+                   $('#btnPrint').prop('disabled', true)
+                   $.ajax({
+                       url: '@Url.Action("DELETEPARKDOC", "Inventory")',
+                       method: 'GET',
+                       data: { id: docEntry },
+                       success: function (response) {
+                           Resume()
+                       },
+                       error: function(xhr, status, error) {
+                           Notify('error', 'Failed to load receipt list', '');
+                       }
+                   });
+               }
+           }
+        }
+        async function GETFREIGHT() {
+              $.ajax({
+                  type: "GET",
+                  url: '@Url.Action("GETACTIVEFREIGHT", "Master")',
+                  contentType: "application/json; charset=utf-8",
+                  cache: false,
+                  success: async function (data) {
+                      if (Array.isArray(data) && data.length > 0) {
+                          let index = 1;
+                          $("#FreightTable tbody").empty();
+                          $("#FreightTable tfoot").empty();
+
+                          for (let i = 0; i < data.length; i++) {
+                              let item = data[i];
+                              let row = $(`
+                                  <tr data-id=''>
+                                      <td>${index}</td>
+                                      <td nowrap data-freid='${item.FreID}' class='FreigthName'>${item.Name}</td>
+                                      <td><input style="min-width:180px" value="0" class="form-control form-control-sm FNetAmt"></td>
+                                      <td>
+                                          <select style="min-width:180px"  class="form-control form-control-sm FTaxId">
+                                              <option value="">Select</option>
+                                          </select>
+                                      </td>
+                                      <td class="FTaxAmt">0.00</td>
+                                      <td class="FTaxtotal">0.00</td>
+                                      <td><textarea style="min-width:180px;height:30px;" class="form-control form-control-sm FRemark"></textarea></td>
+                                      <td hidden class="FCGST">0.00</td>
+                                      <td hidden class="FCGSTRATE">0</td>
+                                      <td hidden class="FSGST">0.00</td>
+                                      <td hidden class="FSGSTRATE">0</td>
+                                      <td hidden class="FIGST">0.00</td>
+                                      <td hidden class="FIGSTRATE">0</td>
+                                      <td hidden class="FUTGST">0.00</td>
+                                      <td hidden class="FUTGSTRATE">0</td>
+                                  </tr>
+                              `);
+
+                              $("#FreightTable tbody").append(row);
+                              // Load tax codes for this row
+                              await GETFREIGHTTAX("", row, row.find(".FTaxId"));
+                              // bind events
+                              row.find(".FNetAmt, .FTaxId").on("input change", function () {
+                                  calculatefreightRow(row);
+                                  calculateTotal();
+                              });
+                              index++;
+                          }
+                          // Append total footer once
+                          $("#FreightTable tfoot").append(`
+                              <tr>
+                                  <td colspan="4">Total</td>
+                                  <td nowrap class="FTaxTot">0.00</td>
+                                  <td nowrap class="FNetTot">0.00</td>
+                                  <td hidden nowrap class="FSGSTot">0.00</td>
+                                  <td hidden nowrap class="FCGSTot">0.00</td>
+                                  <td hidden nowrap class="FIGSTTot">0.00</td>
+                                  <td hidden nowrap class="FUTGSTTot">0.00</td>
+                                  <td colspan="13"></td>
+                              </tr>
+                          `);
+                      }
+                  },
+                  error: function (xhr) {
+                      Notify("error", "Error", xhr.responseText || "Error loading items");
+                  }
+              });
+          }
+        // FREIGHT
+        {
+
+              function GETFREIGHTTAX(id, row, dropdown) {
+                  return new Promise((resolve, reject) => {
+                      $.ajax({
+                          url: '@Url.Action("GETFREIGHTTAXCODE", "Master")',
+                          method: "GET",
+                          success: function (response) {
+                              response.forEach(function (tax) {
+                                  dropdown.append(`
+                                      <option value="${tax.TaxCodeId}"
+                                          data-rate="${tax.TaxCalRate}"
+                                          data-cgst="${tax.CGST}"
+                                          data-sgst="${tax.SGST}"
+                                          data-igst="${tax.IGST}"
+                                          data-utgst="${tax.UTGST}">
+                                          ${tax.TaxCode}
+                                      </option>
+                                  `);
+                              });
+                              if (id !== "") {
+                                  dropdown.val(id).trigger("change");
+                              }
+                              resolve();
+                          },
+                          error: function (xhr) {
+                              Notify("error", "Error", xhr.responseText);
+                              reject();
+                          }
+                      });
+                  });
+              }
+              function calculatefreightRow(row) {
+                  let netAmt = parseFloat(row.find(".FNetAmt").val()) || 0;   // base amount
+                  let ddl = row.find(".FTaxId option:selected");
+                  let TextTax = ddl.text().trim();
+                  let taxCodeVal = ddl.val();
+
+                  // Default rates
+                  let cgstRate = 0, sgstRate = 0, igstRate = 0, utgstRate = 0, taxRate = 0;
+
+                  if (taxCodeVal && taxCodeVal !== "") {
+
+                      // Check for UTGST pattern (e.g., "UTGST5%", "UTGST", "UTGST@@5%")
+                      const utgstMatch = TextTax.match(/^UTGST\D*(\d+)?%?$/i);
+                      if (utgstMatch) {
+                          utgstRate = parseFloat(utgstMatch[1]) || 0;
+                          taxRate = utgstRate;
+                      }
+                      // Check for IGST pattern (e.g., "IGST5%", "IGST", "IGST 18%")
+                      else if (/^IGST/i.test(TextTax)) {
+                          const igstMatch = TextTax.match(/^IGST\D*(\d+)?%?$/i);
+                          igstRate = parseFloat(igstMatch?.[1]) || 0;
+                          taxRate = igstRate;
+                      }
+                      // Check for GST pattern (e.g., "GST18%", "GST")
+                      else if (/^GST/i.test(TextTax)) {
+                          const gstMatch = TextTax.match(/^GST\D*(\d+)?%?$/i);
+                          const gstRate = parseFloat(gstMatch?.[1]) || 0;
+                          cgstRate = gstRate / 2;  // Split GST rate equally between CGST and SGST
+                          sgstRate = gstRate / 2;
+                          taxRate = gstRate;
+                      }
+                      // Fallback for other cases
+                      else {
+                          taxRate = parseFloat(taxCode.data('rate')) || 0;
+                          cgstRate = parseFloat(taxCode.data('cgst')) || 0;
+                          sgstRate = parseFloat(taxCode.data('sgst')) || 0;
+                          igstRate = parseFloat(taxCode.data('igst')) || 0;
+                          utgstRate = parseFloat(taxCode.data('utgst')) || 0;
+                      }
+                  }
+
+                  // Calculate tax amounts
+                  let cgstAmt = (netAmt * cgstRate) / 100;
+                  let sgstAmt = (netAmt * sgstRate) / 100;
+                  let igstAmt = (netAmt * igstRate) / 100;
+                  let utgstAmt = (netAmt * utgstRate) / 100;
+                  let taxAmt = cgstAmt + sgstAmt + igstAmt + utgstAmt;
+                  let totalAmt = netAmt + taxAmt;
+
+                  // Update row fields (text or input based on your HTML)
+                  row.find(".FCGST").text(cgstAmt.toFixed(2));
+                  row.find(".FCGSTRATE").text(cgstRate.toFixed(2));
+
+
+                  row.find(".FSGST").text(sgstAmt.toFixed(2));
+                  row.find(".FSGSTRATE").text(sgstRate.toFixed(2));
+
+                  row.find(".FIGST").text(igstAmt.toFixed(2));
+                  row.find(".FIGSTRATE").text(igstRate.toFixed(2));
+
+                  row.find(".FUTGST").text(utgstAmt.toFixed(2));
+                  row.find(".FUTGSTRATE").text(utgstRate.toFixed(2));
+
+                  row.find(".FTaxtotal").text(totalAmt.toFixed(2));
+                  row.find(".FTaxAmt").text(taxAmt.toFixed(2));
+              }
+              function calculateTotal() {
+                  let total = 0;
+                  let freataxtotal = 0;
+                  let cgsttot = 0;
+                  let sgsttot = 0;
+                  let igsttot = 0;
+                  let utgsttot = 0;
+
+                  $("#FreightTable tbody tr").each(function () {
+                      let rowTotal = parseFloat($(this).find(".FTaxtotal").text()) || 0;
+                      let taxtotal = parseFloat($(this).find(".FTaxAmt").text()) || 0;
+                      let cgst = parseFloat($(this).find(".FCGST").text()) || 0;
+                      let sgst = parseFloat($(this).find(".FSGST").text()) || 0;
+                      let igst = parseFloat($(this).find(".FIGST").text()) || 0;
+                      let utgst = parseFloat($(this).find(".FUTGST").text()) || 0;
+
+                      total += rowTotal;
+                      freataxtotal += taxtotal;
+                      cgsttot += cgst;
+                      sgsttot += sgst;
+                      igsttot += igst;
+                      utgsttot += utgst;
+                  });
+                  $(".FNetTot").text(total.toFixed(2));
+                  $(".FTaxTot").text(freataxtotal.toFixed(2));
+                  $(".FCGSTot").text(cgsttot.toFixed(2));
+                  $(".FSGSTot").text(sgsttot.toFixed(2));
+                  $(".FIGSTTot").text(igsttot.toFixed(2));
+                  $(".FUTGSTTot").text(utgsttot.toFixed(2));
+              }
+
+              $("#ResetFreight").click(function () {
+                  GETFREIGHT();
+              })
+            $("#AddFreight").click(function () {
+
+                var isvalid = true;
+
+                $('#FreightTable tbody tr').each(function (index) {
+                    const row = $(this);
+                    const netAmt = parseFloat(row.find('.FNetAmt').val()) || 0;
+                    const taxId = row.find('.FTaxId').val();
+
+                    if (netAmt > 0) {
+                        if (taxId == null || taxId === "" || taxId === undefined) {
+                            isvalid = false; // ✅ Fixed assignment
+                            return false; // Stop the loop once invalid found
+                        }
+                    }
+                });
+
+                if (!isvalid) { // ✅ Fixed condition (should trigger when invalid)
+                    Notify("error", "Please select tax code", "Then try again..!");
+                    return;
+                }
+
+                var Net_Total = parseFloat($(".FNetTot").text()) || 0;
+                var Freigh_Tax = parseFloat($(".FTaxTot").text()) || 0;
+                var FreighCGSTot_Tax = parseFloat($(".FCGSTot").text()) || 0;
+                var FreighSGSTot_Tax = parseFloat($(".FSGSTot").text()) || 0;
+                var FreighIGSTot_Tax = parseFloat($(".FIGSTTot").text()) || 0;
+                var FreighUTGSTot_Tax = parseFloat($(".FUTGSTTot").text()) || 0;
+                var Net_Amt = Net_Total - Freigh_Tax;
+
+                $("#FreightTotal").val(Net_Amt.toFixed(2));
+                $("#FreightTax").val(Freigh_Tax.toFixed(2));
+                $("#FreightCGSTTax").val(FreighCGSTot_Tax.toFixed(2));
+                $("#FreightSGSTTax").val(FreighSGSTot_Tax.toFixed(2));
+                $("#FreightIGSTTax").val(FreighIGSTot_Tax.toFixed(2));
+                $("#FreightUTGSTTax").val(FreighUTGSTot_Tax.toFixed(2));
+
+                calculateHeaderTotals();
+                $("#FreighModal").modal("hide")
+            });
+              $("#ResetFreightCalc").click(function () {
+                  $("#FreightTotal").val(0)
+                  $("#FreightTax").val(0)
+                  $("#FreightCGSTTax").val(0)
+                  $("#FreightSGSTTax").val(0)
+                  $("#FreightIGSTTax").val(0)
+                  $("#FreightUTGSTTax").val(0)
+                  calculateHeaderTotals();
+              })
+          }
+        //Copy To
+        {
+            $(".copytobtn").click(function () {
+                var objtype = $(this).attr("data-flag");
+                var docentry = $("#DocumentEntry").val();
+                if (docentry !== "" && objtype !== "") {
+                    sessionStorage.setItem("CopyTodData", `{"objtype":"${$("#doctype").val() }","docentry":"${docentry}"}`)
+                    switch (objtype) {
+                        case "PDN":
+                            window.location.href = '@Url.Action("DebitNote", "Purchase")';
+                            break;
+                        default:
+                    }
+                } else {
+                    Notify('error', 'Error To Copy','Please select the valid document.');
+                }
+            });
+        }
+        //Copy From
+        {
+              $(".copyfrombtn").click(function () {
+                  var objtype1 = $(this).attr('data-flag');
+                  var LedgerCode = $("#LedgerCode").attr('data-id');
+                  if (!LedgerCode) {
+                      Notify('error', 'Please Select Business Partner', '');
+                      return;
+                  }
+
+                  if (objtype1) {
+                      $("#CopyFromModal").modal("show");
+
+                      var obj = {
+                          doctype: objtype1,
+                          docid: '',
+                          refno: '',
+                          fromdate: '',
+                          todate: '',
+                          docEntry: '',
+                          status: "O",
+                          ledgercode: LedgerCode,
+                      };
+
+                      $.ajax({
+                          url: '@Url.Action("COPYFROM", "Purchase")',
+                          method: 'GET',
+                          data: obj,
+                          success: function (response) {
+                              // ✅ Destroy previous table
+                              if ($.fn.DataTable.isDataTable('#copyfromtbl')) {
+                                  $('#copyfromtbl').DataTable().destroy();
+                              }
+
+                              // ✅ Initialize DataTable with data
+                              var mainTable = $('#copyfromtbl').DataTable({
+                                  data: response.header,
+                                  className: "text-center",
+                                  columns: [
+                                      {
+                                          data: "DocEntry",
+                                          render: function (data, type, row) {
+                                              return `
+                                                  <button class="btn btn-sm btn-success toggle-rows rounded w-50 h-50" data-docentry="${data}">
+                                                      <i class="bi bi-plus"></i>
+                                                  </button>
+                                              `;
+                                          },
+                                          orderable: false
+                                      },
+                                      { data: "Docnum" },
+                                      { data: "LedgerName" },
+                                      { data: "For_PostingDate" },
+                                      { data: "RefNo", defaultContent: "" },
+                                      { data: "For_DocStatus" },
+                                      { data: "Remarks", defaultContent: "" },
+                                      { data: "CretedByUName" },
+                                  ],
+                                  dom: '<"top"lf>rt<"bottom"ip>',
+                                  pageLength: 10,
+                                  lengthMenu: [5, 10, 25, 50, 100],
+                                  responsive: true
+                              });
+
+                              // ✅ Handle expand/collapse for nested table
+                              $('#copyfromtbl tbody').off('click', '.toggle-rows').on('click', '.toggle-rows', function () {
+                                  var tr = $(this).closest('tr');
+                                  var row = mainTable.row(tr);
+                                  var docEntry = $(this).data('docentry');
+                                  if (row.child.isShown()) {
+                                      row.child.hide();
+                                      $(this).find('i').removeClass('bi-dash').addClass('bi-plus');
+                                  } else {
+                                       $.ajax({
+                                           url: '@Url.Action("COPYFROM", "Purchase")',
+                                           method: 'GET',
+                                           data: { doctype: objtype1, docEntry: docEntry },
+                                           success: async function (response) {
+                                               if (!response || !response.header?.length) {
+                                                   Notify('error', 'Document not found');
+                                                   return;
+                                               }
+                                               const header = response.header[0];
+                                               var rows = response.row || [];
+                                               var freight = response.freight || [];
+                                               var childRows = response.row.filter(r => r.DocEntry == docEntry);
+                                               if (childRows.length > 0) {
+                                                   var childTableHtml = `
+                                                          <table data-headobj='${JSON.stringify(header)}' data-freight='${JSON.stringify(freight)}' class="table  table-hover table-sm mb-0 nested-table">
+                                                              <thead>
+                                                                  <tr>
+                                                                      <th><input type="checkbox" class="seleccopyfromtall" /></th>
+                                                                      <th>ItemCode</th>
+                                                                      <th>ItemName</th>
+                                                                      <th>Qty</th>
+                                                                      <th>Price</th>
+                                                                      <th>Tax Code</th>
+                                                                      <th>Tax Amt</th>
+                                                                      <th hidden>rowobj</th>
+                                                                      <th hidden>headobj</th>
+
+                                                                  </tr>
+                                                              </thead>
+                                                              <tbody>
+                                                                  ${childRows.map(r => `
+                                                                      <tr>
+                                                                          <td>
+                                                                              <input type="checkbox" class="select-findrow"
+                                                                                  data-docentry="${r.DocEntry}"
+                                                                                  data-lineid="${r.LineId}" />
+                                                                          </td>
+                                                                          <td>${r.ItemCode}</td>
+                                                                          <td>${r.ItemName}</td>
+                                                                          <td>${parseFloat(r.Quantity).toFixed(2)}</td>
+                                                                          <td>${parseFloat(r.UnitePrice).toFixed(2)}</td>
+                                                                          <td>${r.TaxCode}</td>
+                                                                          <td>${parseFloat(r.TaxAmount).toFixed(2)}</td>
+                                                                          <td hidden class='rowobj'>${JSON.stringify(r)}</td>
+                                                                      </tr>
+                                                                  `).join("")}
+                                                              </tbody>
+                                                          </table>
+                                                      `;
+                                                   row.child(childTableHtml).show();
+                                                   $(this).find('i').removeClass('bi-plus').addClass('bi-dash');
+                                               }
+
+                                           },
+                                           error: function (xhr, status, error) {
+                                               console.error('Error loading receipt:', error);
+                                               Notify('error', 'Failed to load receipt', '');
+                                           }
+                                       });
+
+                                  }
+                              });
+                              // ✅ Select all checkbox (per nested table)
+                              $(document).on("click", ".seleccopyfromtall", function () {
+                                  var isChecked = $(this).is(":checked");
+                                  $(this).closest("table").find(".select-findrow").prop("checked", isChecked);
+                              });
+                          },
+                          error: function () {
+                              Notify('error', 'Failed to copy from ', '');
+                          }
+                      });
+                  }
+              });
+
+              // ✅ Select & Copy rows
+              $("#SelectCopyFrom").click(async function () {
+                  var rowdata = [];
+                  var head = JSON.parse($(".nested-table").attr("data-headobj"))
+                  var freightdata = JSON.parse($(".nested-table").attr("data-freight"))
+                  $(".nested-table tbody tr").each(function () {
+                      var row = $(this);
+
+                      var ischecked = row.find(".select-findrow").is(":checked");
+                      if (ischecked) {
+                          rowdata.push(JSON.parse(row.find(".rowobj").text()));
+                      }
+
+                  });
+                  if (rowdata.length === 0) {
+                      Notify('warning', 'Please select at least one row', '');
+                      return;
+                  }
+                  const header = head;
+                  var rows = rowdata || [];
+                  const freight = freightdata || [];
+                  const today = new Date().toISOString().split('T')[0];
+                  const fmtNum = (val, digits = 2) =>
+                      isNaN(parseFloat(val)) ? "0.00" : parseFloat(val).toFixed(digits);
+                  const formatDateForInput = (dateStr) => {
+                      if (!dateStr) return today;
+                      const parts = dateStr.split("-");
+                      if (parts.length !== 3) return today;
+                      const [day, month, year] = parts;
+                      return `${year}-${month}-${day}`;
+                  };
+                  // ✅ Populate header fields
+                  const headerMapping = {
+                      '#BaseEntry': header.DocEntry,
+                      '#Docnum': header.Docnum,
+                      '#DocStatus': header.DocStatus,
+                      '#PostingDate': formatDateForInput(header.For_PostingDate),
+                      '#DocumentDate': formatDateForInput(header.For_DocumentDate),
+                      '#DeliveryDate': formatDateForInput(header.For_DeliveryDate),
+                      '#DueDate': formatDateForInput(header.For_DueDate),
+                      '#FYearId': header.FYearId,
+                      '#LedgerCode': header.LedgerCode,
+                      '#RefNo': header.RefNo,
+                      '#Remarks': header.Remarks,
+                      '#PONo': header.PONo,
+                      '#VehicleNo': header.VehicleNo,
+                      '#VendorCode': header.VendorCode,
+                      '#TransMode': header.TransMode,
+                      '#TotalWeight': header.TotalWeight,
+                      '#GrossTotal': header.GrossTotal,
+                      '#TotalDiscount': parseFloat(header.DisPer).toFixed(2),
+                      '#TotalDiscountAmt': parseFloat(header.DisAmount).toFixed(2),
+                      '#FreightTotal': parseFloat(header.FreightTotal).toFixed(2),
+                      '#aftBillDisc': header.TotalAftBillDisc,
+                      '#GSTTotal': header.GSTTotal,
+                      '#NETTotal': header.NETTotal,
+                      '#Rounding': header.Rounding
+                  };
+
+                  for (const [selector, value] of Object.entries(headerMapping)) {
+                      $(selector).val(value);
+                  }
+
+
+                  var BaseObj = '';
+                  $("#DocumentEntry").val("")
+                  $("#Docnum").val("")
+                  $("#DocStatus").val("O")
+                  $("#DocumentDate").val(new Date().toISOString().split('T')[0])
+                  $("#PostingDate").val(new Date().toISOString().split('T')[0])
+                  $("#DeliveryDate").val(new Date().toISOString().split('T')[0])
+                  $("#DueDate").val(new Date().toISOString().split('T')[0])
+                  $("#FYearId").trigger("change")
+                  rows = rows.filter(row => row.Status === "O");
+                  sessionStorage.removeItem("CopyTodData");
+                  BaseObj = header.OBJType
+
+                  $('#LedgerCode')
+                      .attr('data-id', header.LedgerID)
+                      .attr('data-name', header.LedgerName)
+                      .attr('data-code', header.LedgerCode);
+                  Loadbp(header.LedgerID)
+                  GETADDRESS(header.AddID, header.LedgerID);
+
+                  // ✅ render freight rows
+                  $('#FreightTable tbody').empty();
+                  for (let i = 0; i < freight.length; i++) {
+                      const item = freight[i];
+                      const row = $(`
+                          <tr data-id='${item.ID}'>
+                              <td>${i + 1}</td>
+                              <td nowrap data-freid='${item.FreID}' class='FreigthName'>${item.Name}</td>
+                              <td><input style="min-width:180px" value="${fmtNum(item.NetAmt)}" class="form-control form-control-sm FNetAmt"></td>
+                              <td>
+                                  <select style="min-width:180px" class="form-control form-control-sm FTaxId">
+                                      <option value="">Select</option>
+                                  </select>
+                              </td>
+                              <td class="FTaxAmt">${fmtNum(item.TaxAmount)}</td>
+                              <td class="FTaxtotal">${fmtNum(+item.NetAmt + +item.TaxAmount)}</td>
+                              <td><textarea style="min-width:180px;height:30px;" class="form-control form-control-sm FRemark">${item.Remark ?? ''}</textarea></td>
+                              <td hidden class="FCGST">${fmtNum(item.CGSTAmt)}</td>
+                              <td hidden class="FCGSTRATE">${fmtNum(item.CGSTRate)}</td>
+                              <td hidden class="FSGST">${fmtNum(item.SGSTAmt)}</td>
+                              <td hidden class="FSGSTRATE">${fmtNum(item.SGSTRate)}</td>
+                              <td hidden class="FIGST">${fmtNum(item.IGSTAmt)}</td>
+                              <td hidden class="FIGSTRATE">${fmtNum(item.IGSTRate)}</td>
+                              <td hidden class="FUTGST">${fmtNum(item.UTGSTAmt)}</td>
+                              <td hidden class="FUTGSTRATE">${fmtNum(item.UTGSTRate)}</td>
+                          </tr>
+                      `);
+
+                      $("#FreightTable tbody").append(row);
+
+                      await GETFREIGHTTAX(item.TaxCodeId, row, row.find(".FTaxId"));
+
+                      row.find(".FNetAmt, .FTaxId").on("input change", () => {
+                          calculatefreightRow(row);
+                          calculateTotal();
+                      });
+                  }
+                  calculateTotal();
+                  // ✅ freight totals
+                  $("#FreightTax").val(fmtNum($(".FTaxTot").text()));
+                  $("#FreightCGSTTax").val(fmtNum($(".FCGSTot").text()));
+                  $("#FreightSGSTTax").val(fmtNum($(".FSGSTot").text()));
+                  $("#FreightIGSTTax").val(fmtNum($(".FIGSTTot").text()));
+                  $("#FreightUTGSTTax").val(fmtNum($(".FUTGSTTot").text()));
+                  // ✅ Clear rows
+                  $('#mainitemtable tbody').empty();
+                  // ✅ Process rows
+                  const rowPromises = rows.map(async (line, index) => {
+                      addNewLineItem();
+                      const $row = $('#mainitemtable tbody tr').last();
+
+                      $row.find('.ItemCode').val(line.ItemCode).attr('data-id', line.ItemID);
+                      $row.find('.ItemName').val(line.ItemName);
+                      $row.find('.ItemHSN').val(line.HSNCode).attr('data-id', line.HSNID);
+                      $row.find('.ItemEan').val(line.EanCode);
+                      $row.find('.ItemCost').val(line.ItemCost);
+
+                          $row.find('.Quantity').val(parseFloat(line.OpenQuantity).toFixed(2));
+                          $row.find('.OpenQuantity').val(parseFloat(line.OpenQuantity).toFixed(2));
+                          $row.find('.BaseQuantity').val(parseFloat(line.Quantity).toFixed(2));
+                          $row.find('.BaseLine').val(line.ID);
+                          $row.find('.BaseDocEntry').val(line.DocEntry);
+                          $row.find('.BaseObjType').val(BaseObj);
+
+
+                      $row.find('.Price').val(parseFloat(line.UnitePrice).toFixed(2));
+                      $row.find('.DisPer').val(parseFloat(line.DisPer).toFixed(2));
+                      $row.find('.Weight1').val(parseFloat(line.Weight1).toFixed(2));
+                      $row.find('.Remarks').val(line.Remarks);
+                      $row.find('.AcctCode').val(line.AcctCode);
+
+                      await LoadUOM(line.ItemID, $row, "F");
+                      $row.find('.ItemUOM').val(line.UOMID);
+
+                      await loadWarehouses(line.ItemID, $row, "F");
+                      $row.find('.WhsCode').val(line.WHSID);
+                      $row.find('.StockInWhs').val(parseFloat(line.StockInWhs).toFixed(2));
+
+                      await loadTaxCodes(line.TaxCodeId, $row, $row.find('.TaxCode'));
+                      $row.find('.TaxCode').val(line.TaxCodeId);
+
+                      calculateRowAmounts($row);
+
+                      if (header.DocStatus == "C" || line.Status == 'C') {
+                          $row.addClass("table-info")
+                              .attr("data-doc-status", "closed");
+                          $row.find(".remove-line").prop('disabled', true)
+                          $row.find(".openmodal").prop('disabled', true)
+                          $row.find("input,textarea").prop('readonly', true)
+                          $row.find("select").prop('disabled', true)
+                      }
+                  });
+                  await Promise.all(rowPromises);
+                  // ✅ Button state handling
+                  if (header.DocStatus == "C") {
+                      $('#mainitemtable .remove-line')
+                          .prop('disabled', true)
+                          .attr("title", "Cannot remove - Document is closed");
+                  }
+
+                  $('#btnPrint').prop('disabled', false);
+                  $('#btnDelete').prop('disabled', false);
+                  $('#btnCopyFrom').prop('disabled', false);
+                  $('#btnSave').prop('disabled', false);
+                  $('#btnPark').prop('disabled', false);
+                  if (header.DocStatus == "C") {
+                      $('#btnSave').prop('disabled', true);
+                      $('#btnPark').prop('disabled', true);
+                      $('#btnCopyFrom').prop('disabled', true);
+                  }
+              });
+        }
+
+    });
+
+</script>

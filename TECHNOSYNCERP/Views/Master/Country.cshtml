@@ -1,0 +1,364 @@
+﻿<!-- Country Master Form Section -->
+<section id="countryMasterSection">
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title">
+                    <i class="bi bi-globe"></i> Country Master
+                </h3>
+            </div>
+            <div class="card-body">
+                <form id="countryMasterForm">
+                    <input type="hidden" id="Coun_Id" name="Coun_Id">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="Code" class="form-label">Country Code <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-code-square"></i></span>
+                                <input type="text" class="form-control" id="Code" name="Code" required maxlength="10">
+                                <div class="invalid-feedback">Please provide a valid country code (2-10 characters).</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="Name" class="form-label">Country Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-flag"></i></span>
+                                <input type="text" class="form-control" id="Name" name="Name" required maxlength="100">
+                                <div class="invalid-feedback">Please provide a country name (2-100 characters).</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="IsActive" name="IsActive" checked>
+                                <label class="form-check-label" for="IsActive">Active</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3 text-end">
+                        <div class="col-md-12">
+                            @if (ViewBag.BtnAuth != null)
+                            {
+                                <!-- Button Rendering Logic -->
+                                @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                                {
+                                    var btnName = item["BtnName"]?.ToString().Trim();
+                                    var btnauth = item["Auth"]?.ToString();
+                                    var icon = item["Icon"]?.ToString();
+                                    var ColorClass = item["ColorClass"]?.ToString();
+
+                                    if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                    {
+                                        switch (btnName)
+                                        {
+                                            case "Save":
+                                                <button type="button" id="btnSave" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2">
+                                                    <i class="@icon"></i>@btnName
+                                                </button>
+                                                break;
+                                            case "Delete":
+                                                <button type="button" id="btnDelete" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2" disabled>
+                                                    <i class="@icon"></i>@btnName
+                                                </button>
+                                                break;
+                                            case "Reset":
+                                                <button type="reset" id="btnReset" class="btn @ColorClass mb-1   me-2">
+                                                    <i class="@icon"></i> Reset
+                                                </button>
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <div class="alert alert-primary" role="alert">
+
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </form>
+
+                <div class="table-responsive mt-4">
+                    <table id="countryMasterTable" class="table table-striped table-hover">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- jQuery CRUD Operations -->
+<script>
+    $(document).ready(function() {
+        // Initialize form validation
+        function validateForm() {
+            let isValid = true;
+            const code = $('#Code').val().trim();
+            const name = $('#Name').val().trim();
+
+            // Validate Code (2-10 characters)
+            if (code.length < 2 || code.length > 10) {
+                $('#Code').addClass('is-invalid');
+                isValid = false;
+            } else {
+                $('#Code').removeClass('is-invalid');
+            }
+
+            // Validate Name (2-100 characters)
+            if (name.length < 2 || name.length > 100) {
+                $('#Name').addClass('is-invalid');
+                isValid = false;
+            } else {
+                $('#Name').removeClass('is-invalid');
+            }
+
+            return isValid;
+        }
+        // Dynamic duplicate check
+        function checkDuplicate() {
+            const $codeInput = $('#Code');
+            const $nameInput = $('#Name');
+            const code = $codeInput.val().trim();
+            const name = $nameInput.val().trim();
+            if (!code && !name) return false;
+
+            let codeExists = false;
+            let nameExists = false;
+
+            $('#countryMasterTable tbody tr').each(function () {
+                const rowCode = $(this).find('td:eq(0)').text().trim();
+                const rowName = $(this).find('td:eq(1)').text().trim();
+
+                if (rowCode === code) codeExists = true;
+                if (rowName === name) nameExists = true;
+
+                if (codeExists && nameExists) return false; // break loop if both found
+            });
+
+            if (codeExists && nameExists) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Duplicate Entry',
+                    text: 'Both Code and Name already exist!',
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+                $codeInput.val('');
+                $nameInput.val('');
+            } else if (codeExists) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Duplicate Code',
+                    text: 'This Code already exists!',
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+                $codeInput.val('');
+            } else if (nameExists) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Duplicate Name',
+                    text: 'This Name already exists!',
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+                $nameInput.val('');
+            }
+
+            return codeExists || nameExists;
+        }
+        // Bind live check
+        $(document).on('change', '#Code, #Name', checkDuplicate);
+        // Load all countries
+        function loadCountries() {
+            $.ajax({
+                url: '@Url.Action("GETCOUNTRY", "Master")',
+                type: 'GET',
+                beforeSend: function() {
+                    // Show loading indicator if needed
+                },
+                success: function(response) {
+                    if (response && response.length > 0) {
+                        var tableBody = $('#countryMasterTable tbody');
+                        tableBody.empty();
+
+                        $.each(response, function(index, country) {
+                            var row = `<tr data-id="${country.Coun_Id}">
+                                <td>${country.Code || ''}</td>
+                                <td>${country.Name || ''}</td>
+                                <td>${country.IsActive =="A" ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>'}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary btn-edit" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </td>
+                            </tr>`;
+                            tableBody.append(row);
+                        });
+                    } else {
+                        Notify('warning', 'No Data', 'No country records found.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading countries';
+                    Notify('error', 'Error', errorMessage);
+                }
+            });
+        }
+        // Initial load
+        loadCountries();
+        // Save/Update country
+        $('#btnSave').click(function() {
+                if (!validateForm()) {
+                    Notify('warning', 'Validation Error', 'Please correct the form errors before saving.');
+                    return;
+                }
+
+                // Create a JavaScript object from the form data
+                var formData = {
+                    Coun_Id: $('#Coun_Id').val(),
+                    Code: $('#Code').val().trim(),
+                    Name: $('#Name').val().trim(),
+                    IsActive: $('#IsActive').is(':checked') ? "A" : "I"
+                    // Add other fields if needed
+                };
+
+                var isEdit = formData.Coun_Id !== '';
+                $.ajax({
+                    url: '@Url.Action("CREATECOUNTRY", "Master")',
+                    type: "POST",
+                    contentType: "application/json", // Set content type to JSON
+                    data: JSON.stringify(formData), // Convert object to JSON string
+                    beforeSend: function() {
+                        $('#btnSave').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Processing...');
+                    },
+                    success: function(response) {
+                        if (response && response.success) {
+                            Notify('success', 'Success', response.message || (isEdit ? 'Country updated successfully!' : 'Country created successfully!'));
+                            loadCountries();
+                            $('#countryMasterForm')[0].reset();
+                            $('#Coun_Id').val('');
+                            $('#btnDelete').prop('disabled', true);
+                        } else {
+                            Notify('warning', 'Warning', response.message || 'Operation completed but with warnings.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error saving country';
+                        Notify('error', 'Error', errorMessage);
+                    },
+                    complete: function() {
+                        $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
+                    }
+                });
+            });
+        // Delete country
+        $('#btnDelete').click(function() {
+            var countryId = $('#Coun_Id').val();
+            if (!countryId) {
+                Notify('warning', 'Warning', 'No country selected to delete.');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("DELETECOUNTRY", "Master")',
+                        type: 'POST',
+                        data: { id: countryId },
+                        beforeSend: function() {
+                            $('#btnDelete').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Deleting...');
+                        },
+                        success: function(response) {
+                            if (response && response.success) {
+                                Notify('success', 'Success', response.message || 'Country deleted successfully!');
+                                loadCountries();
+                                $('#countryMasterForm')[0].reset();
+                                $('#Coun_Id').val('');
+                            } else {
+                                Notify('warning', 'Warning', response.message || 'Country could not be deleted.');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error deleting country';
+                            Notify('error', 'Error', errorMessage);
+                        },
+                        complete: function() {
+                            $('#btnDelete').prop('disabled', false).html('<i class="bi bi-trash"></i> Delete');
+                        }
+                    });
+                }
+            });
+        });
+        // Edit country
+        $(document).on('click', '.btn-edit', function() {
+            var countryId = $(this).closest('tr').data('id');
+            if (!countryId) {
+                Notify('warning', 'Warning', 'No country ID found for editing.');
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("GETCOUNTRYBYID", "Master")',
+                data: { countryId: countryId },
+                type: 'GET',
+                beforeSend: function() {
+                    // Show loading indicator if needed
+                },
+                success: function(response) {
+                    if (response) {
+                        $('#Coun_Id').val(response[0].Coun_Id);
+                        $('#Code').val(response[0].Code);
+                        $('#Name').val(response[0].Name);
+                        $('#IsActive').prop('checked', response[0].IsActive);
+                        $('#btnDelete').prop('disabled', false);
+                        $('html, body').animate({ scrollTop: 0 }, 'slow');
+                    } else {
+                        Notify('warning', 'Warning', 'No data returned for this country.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading country data';
+                    Notify('error', 'Error', errorMessage);
+                }
+            });
+        });
+        // Reset form
+        $('#btnReset').click(function() {
+            $('#Coun_Id').val('');
+            $('#btnDelete').prop('disabled', true);
+            $('.is-invalid').removeClass('is-invalid');
+        });
+        // Real-time validation
+        $('#Code, #Name').on('input', function() {
+            $(this).removeClass('is-invalid');
+        });
+    });
+</script>

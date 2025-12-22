@@ -1,0 +1,1790 @@
+﻿<style>
+</style>
+<div class="container-fluid">
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="card p-2 rounded shadow-sm">
+                <div class="row">
+                    <div class="col-md-6 d-flex align-items-center">
+                        <h3 id="doctitle"><b>Contra</b></h3>
+                    </div>
+                    <div class="col-md-6 d-flex justify-content-end align-items-center flex-wrap">
+                        @if (ViewBag.BtnAuth != null)
+                        {
+
+                            <!-- Button Rendering Logic -->
+                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                            {
+                                var btnName = item["BtnName"]?.ToString().Trim();
+                                var btnauth = item["Auth"]?.ToString();
+                                var icon = item["Icon"]?.ToString();
+                                var ColorClass = item["ColorClass"]?.ToString();
+                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                {
+                                    switch (btnName)
+                                    {
+                                        case "Find":
+                                            <button id="btnFind" data-bs-toggle="modal" data-bs-target="#receiptListModal" class="btn @ColorClass mb-1  me-2 mb-1">
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break;
+                                        case "Attachments":
+                                            <button id="Attachments" data-bs-toggle="modal" data-bs-target="#Attachment" class="btn @ColorClass mb-1   me-2 mb-1">
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break;
+                                        case "Export":
+                                            <button id="btnPdf" class="btn btn-outline-danger me-2 mb-1">
+                                                <i class="bi bi-file-pdf me-1"></i> PDF
+                                            </button>
+                                            <button id="btnExcel" class="btn btn-outline-success me-2 mb-1">
+                                                <i class="bi bi-file-earmark-excel me-1"></i> EXCEL
+                                            </button>
+                                            <button id="btnCSV" class="btn btn-outline-success me-2 mb-1">
+                                                <i class="bi bi-file-earmark-excel me-1"></i> CSV
+                                            </button>
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-primary" role="alert">
+
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mt-3">
+            <div class="card p-3 rounded shadow-sm">
+                <!-- Action Buttons -->
+                <div class="row mb-3">
+                    <div class="col-12 d-flex justify-content-end flex-wrap">
+                        @if (ViewBag.BtnAuth != null)
+                        {
+                            <!-- Button Rendering Logic -->
+                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                            {
+                                var btnName = item["BtnName"]?.ToString().Trim();
+                                var btnauth = item["Auth"]?.ToString();
+                                var icon = item["Icon"]?.ToString();
+                                var ColorClass = item["ColorClass"]?.ToString();
+
+                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                {
+                                    switch (btnName)
+                                    {
+                                        case "Save":
+                                            <button id="btnSave" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2">
+                                                <i class="@icon"></i>Add
+                                            </button>
+                                            break;
+                                        @*    case "Update":
+                                            <button id="btnUpdate" data-action="update" class="btn @ColorClass mb-1  me-2" disabled>
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break; *@
+                                        case "Park":
+                                            <button id="btnPark" class="btn @ColorClass mb-1  me-2">
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break;
+                                        case "Resume":
+                                            <button id="btnResume" data-bs-toggle="modal" data-bs-target="#ResumeModal" class="btn @ColorClass mb-1  me-2">
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break;
+                                        case "Print":
+                                            <button id="btnPrint" data-bs-toggle="modal" data-bs-target="#PrintModal" class="btn @ColorClass mb-1   me-2" disabled>
+                                                <i class="@icon"></i>@btnName
+                                            </button>
+                                            break;
+                                        case "Delete":
+                                            <button id="btnDelete" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2" disabled>
+                                                <i class="@icon"></i>@btnName
+                                            </button>
+                                            break;
+                                        case "Reset":
+                                            <button id="btnReset" class="btn @ColorClass mb-1   me-2">
+                                                <i class="@icon"></i> Reset
+                                            </button>
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-primary" role="alert">
+
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Header Information -->
+                <div class="row g-3">
+                    <!-- Hidden Inputs -->
+                    <div class="col-12 d-none">
+                        <input id="DocumentEntry" hidden class="form-control" type="text" readonly />
+                        <input data-obj="" id="BaseEntry" hidden class="form-control" type="text" readonly />
+                        <input id="doctype" type="text" hidden value="ACON" class="form-control" />
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+                        <label for="Docnum" class="form-label">Document Number</label>
+                        <input id="Docnum" class="form-control" type="text" readonly />
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+                        <label for="DocumentDate" class="form-label">Document Date</label>
+                        <input id="DocumentDate" class="form-control datepicker" type="date" />
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+                        <label for="PostingDate" class="form-label">Posting Date</label>
+                        <input id="PostingDate" class="form-control datepicker" type="date" />
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+                        <label for="DueDate" class="form-label">Due Date</label>
+                        <input id="DueDate" class="form-control datepicker" type="date" />
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+                        <label for="FYearId" class="form-label">Fiscal Year</label>
+                        <select id="FYearId" class="form-select">
+                            <option value="">Select Fiscal Year</option>
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+                        <label for="Remarks" class="form-label">Remarks</label>
+                        <textarea id="Remarks" class="form-control" rows="1"></textarea>
+                    </div>
+                </div>
+
+                <!-- Line Items -->
+                <div class="row mt-4">
+                    <div class="col-12 col-md-3">
+                        <label>Search</label>
+                        <input type="text" id="tableSearch" class="form-control form-control-sm mb-2 " placeholder="Search...">
+                    </div>
+                    <div class="col-12 col-md-9">
+
+                    </div>
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table  table-hover" id="mainitemtable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th nowrap>Sr No</th>
+                                        <th nowrap>Delete</th>
+                                        <th nowrap>Remark</th>
+                                        <th nowrap>Legder Account</th>
+                                        <th nowrap>Debit</th>
+                                        <th nowrap>Credit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-id='' class="line-item">
+                                        <td>1</td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-outline-danger remove-line" disabled>
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                        <td><textarea style='important; height:9px;' type="text" class="form-control form-control-sm text-end Remarks" value=""></textarea></td>
+                                        <td><input type="text" data-id="" class="form-control form-control-sm LedgerID"></td>
+                                        <td><input type="number" class="form-control form-control-sm text-end Debit" min="0" value="" step="1"></td>
+                                        <td><input type="number" class="form-control form-control-sm text-end Credit" min="0" value="" step="1"></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td nowrap class="text-end fw-bold" colspan="4">Total:</td>
+                                        <td><input type="number" class="form-control form-control-sm text-end bg-info text-white fw-bold" readonly value='0.00' id="TotalDebit" min="0" step="1"></td>
+                                        <td><input type="number" class="form-control form-control-sm text-end bg-info text-white fw-bold" readonly value='0.00' id="TotalCredit" min="0" step="1"></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4"></td>
+                                        <td colspan="2">
+                                            <div style="display:none;" class="badge Balanced bg-success text-white">Balanced</div>
+                                            <div style="display:none;" class="badge NotMatched bg-danger text-white">Not Balanced</div>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-12 text-end mt-3">
+                        @if (ViewBag.BtnAuth != null)
+                        {
+                            <!-- Button Rendering Logic -->
+                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                            {
+                                var btnName = item["BtnName"]?.ToString().Trim();
+                                var btnauth = item["Auth"]?.ToString();
+                                var icon = item["Icon"]?.ToString();
+                                var ColorClass = item["ColorClass"]?.ToString();
+
+                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                {
+                                    switch (btnName)
+                                    {
+                                        case "Add New Line":
+                                            <button class="btn @ColorClass mb-1 " id="btnAddLine"><i class="@icon"></i> @btnName</button>
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-primary" role="alert">
+
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modals -->
+<!-- Ledger Search Modal -->
+<div class="modal fade" id="ledgerListModal" tabindex="-1" aria-labelledby="ledgerListLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ledgerListModalLabel">Customer Search</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive ">
+                    <table class="table table-bordered table-striped table-hover w-100" id="ledegerSearchTable">
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Find Mode Modal -->
+<div class="modal fade" id="receiptListModal" tabindex="-1" aria-labelledby="receiptListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="receiptListModalLabel">Find </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-2">
+                    <div class="col-md-3  mb-2">
+                        <label for="fdocid" class="form-label">Document Number</label>
+                        <input id="fdocid" class="form-control" type="text" />
+                    </div>
+                    <div class="col-md-3  mb-2">
+                        <label for="frefno" class="form-label">Ref Number</label>
+                        <input id="frefno" class="form-control" type="text" />
+                    </div>
+                    <div class="col-md-3  mb-2">
+                        <label for="ffromdate" class="form-label ">From Date</label>
+                        <input id="ffromdate" class="form-control datepicker" type="date" />
+                    </div>
+                    <div class="col-md-3  mb-2">
+                        <label for="ftodate" class="form-label">To Date</label>
+                        <input id="ftodate" class="form-control datepicker" type="date" />
+                    </div>
+                    <div class="col-md-12  mb-2 text-end   mt-3 ">
+                        <button class="btn btn-outline-primary me-2" id="FindBtnSearch"><i class="bi bi-search me-2"></i>Find</button>
+                        <button class="btn btn-outline-secondary me-2" id="FindBtnReset"><i class="bi bi-arrow-counterclockwise me-2"></i>Reset</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped w-100 display nowrap" id="receiptListTable">
+                        <thead>
+                            <tr>
+                                <th>Doc Num</th>
+                                <th>Action</th>
+                                <th>Posting Date</th>
+                                <th>Document Date</th>
+                                <th>Due Date</th>
+                                <th>Remarks</th>
+                                <th>Created By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        // Initialize variables
+        let selectedRowIndex = null;
+        $('.datepicker').val(new Date().toISOString().split('T')[0]);
+        loadFiscalYears();
+        // Add new line item
+        $('#btnAddLine').click(function() {
+            addNewLineItem();
+        });
+        $('#btnSave').click(function () {
+            savedocument("S");
+        });
+        // Save document
+        $('#btnPark').click(function () {
+            savedocument("P");
+        });
+        // Update document
+        $('#btnUpdate').click(function() {
+            savedocument();
+        });
+        // Reset form
+        $('#btnReset').click(function() {
+            resetForm();
+        });
+        $('#btnDelete').click(function() {
+            deleteDoc();
+        });
+        function deleteDoc(){
+          var id = $('#DocumentEntry').val();
+            if(!id){
+                Notify('error', 'Document Entry is required for deletion','');
+                return;
+            }
+             Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("DELETECONTRA", "Accounts")',
+                        type: 'POST',
+                        data: { id: $("#DocumentEntry").val() },
+                        beforeSend: function() {
+                            $('#btnDelete').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Deleting...');
+                        },
+                        success: function(response) {
+                            if (response && response.success) {
+                                Notify('success', 'Success', response.message || 'Document deleted successfully!');
+                                 resetForm();
+                            } else {
+                                Notify('warning', 'Warning', response.message || 'Document deleted successfully!');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error deleting Document';
+                            Notify('error', 'Error', errorMessage);
+                        },
+                        complete: function() {
+                            $('#btnDelete').prop('disabled', false).html('<i class="bi bi-trash"></i> Delete');
+                        }
+                    });
+                }
+            });
+        }
+        // Function to add new line item
+        function addNewLineItem() {
+
+            const table = $('#mainitemtable tbody');
+            const lastRow = table.find('tr').last();
+            // Check if there is at least one row and its ItemCode is empty
+            if (lastRow.length && !lastRow.find('.LedgerID').val().trim()) {
+                lastRow.find('.LedgerID').focus();
+                return; // Stop execution if the previous row's ItemCode is empty
+            }
+            const rowCount = table.find('tr').length;
+            const newRow = `
+                 <tr data-id='' class="line-item">
+                    <td>${rowCount + 1}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-danger remove-line" >
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                    <td><textarea style='important; height:9px;' type="text" class="form-control form-control-sm text-end Remarks" value=""></textarea></td>
+                    <td><input type="text" data-id="" class="form-control form-control-sm LedgerID"></td>
+                    <td><input type="number" class="form-control form-control-sm text-end Debit" min="0" value="" step="1"></td>
+                    <td><input type="number" class="form-control form-control-sm text-end Credit"  min="0" value="" step="1"></td>
+                </tr>
+            `;
+            table.append(newRow);
+            const newRowElement = table.find('tr').last();
+            newRowElement.find('.Remarks').focus();
+            calculateHeaderTotals()
+        }
+        $(document).on("input", ".Debit", function () {
+            var row = $(this).closest("tr");
+            row.find(".Credit").val("0.00");
+            calculateHeaderTotals()
+        })
+        $(document).on("input", ".Credit", function () {
+            var row = $(this).closest("tr");
+            row.find(".Debit").val("0.00");
+            calculateHeaderTotals()
+        })
+        // Function to calculate header totals
+        function calculateHeaderTotals() {
+            let TotalDebit = 0;
+            let TotalCredit = 0;
+            $('#mainitemtable tbody tr').each(function () {
+                let Debit = parseFloat($(this).find('.Debit').val()) || 0;
+                let Credit = parseFloat($(this).find('.Credit').val()) || 0;
+                TotalDebit += Debit;
+                TotalCredit += Credit;
+            });
+            $('#TotalDebit').val(TotalDebit.toFixed(2));
+            $('#TotalCredit').val(TotalCredit.toFixed(2));
+            if (TotalDebit.toFixed(2) == TotalCredit.toFixed(2)) {
+                $(".NotMatched").hide()
+                $(".Balanced").show()
+            } else {
+                $(".NotMatched").show()
+                $(".Balanced").hide()
+            }
+        }
+
+        function loadFiscalYears() {
+            $.ajax({
+                 url: '@Url.Action("GETOPENFYEAR", "Inventory")',
+                method: 'GET',
+                success: function(response) {
+                    const select = $('#FYearId');
+                    select.empty();
+
+                    response.forEach(function(year) {
+                        select.append(`<option value="${year.FYearId}">${year.FYear}</option>`);
+                    });
+                    loadDocNum($("#FYearId").val())
+                },
+                error: function(xhr) {
+                            Notify('error', 'Error', xhr.responseText );
+                }
+            });
+        }
+        $("#FYearId").change(function(){
+           loadDocNum($(this).val())
+        })
+        // Function to load warehouses
+        function loadDocNum(id) {
+            $.ajax({
+                url: '@Url.Action("GETCONTRADOCNUM", "Accounts")',
+                method: 'GET',
+                data:{id:id},
+                success: function(response) {
+                    if(response[0].Success=="true"){
+                        $("#Docnum").val(response[0].Message)
+                    }else{
+                           Notify('error', response[0].Message,'');
+                    }
+                },
+                error: function(xhr) {
+                    Notify('error', 'Error', xhr.responseText );
+                }
+            });
+        }
+        function savedocument(flag) {
+            removeempty()
+            const headerData = getHeaderData();
+            const lineItems = getLineItems();
+            if (flag == "S") {
+                if (!validateForm(headerData, lineItems)) {
+                    return;
+                }
+            }
+            const data = {
+                header: headerData,
+                lines: lineItems,
+            };
+            // AJAX call to save
+            $.ajax({
+                url: '@Url.Action("CREATECONTRA", "Accounts")' + '?flag=' + flag + '&doctype=' + $("#doctype").val(),
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                beforeSend: function() {
+                    if (flag == "S") {
+                        $('#btnSave').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Processing...');
+                    } else {
+                        $('#btnPark').prop('disabled', true).html('<i class="bi bi-p-circle"></i> Processing...');
+                    }
+                },
+                success: function(response) {
+                    if(response.success){
+                       Notify('success', response.message,'');
+                       currentDocEntry = response.docEntry;
+                       $('#btnDelete').prop('disabled', false);
+                       $('#btnCancel').prop('disabled', false);
+                       $('#DocumentEntry').val(response.docEntry);
+                       $('#addFilesButton').click();
+                        if (flag == "S") {
+                            loadFindRow(currentDocEntry, $("#doctype").val(),"")
+                        } else {
+                            $("#btnReset").click();
+                        }
+                    }else{
+                       Notify('error','Faild To Create ', response.message);
+                    }
+                },
+                error: function(xhr) {
+                    const errorMessage = xhr.responseText || 'Error loading ITEM GROUP';
+                    Notify('error', 'Error', errorMessage);
+                    if (flag == "S") {
+                        $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
+                    } else {
+                        $('#btnPark').prop('disabled', false).html('<i class="bi bi-p-circle"></i> Park');
+                    }
+
+                },complete: function() {
+                    if (flag == "S") {
+                        $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
+                    } else {
+                        $('#btnPark').prop('disabled', false).html('<i class="bi bi-p-circle"></i> Park');
+                    }
+                }
+            });
+        }
+        function removeempty(){
+            var tablerow= $('#mainitemtable tbody tr').length;
+            if(tablerow >1){
+                $('#mainitemtable tbody tr').each(function(){
+                     var row = $(this).closest("tr");
+                    if (row.length && !row.find('.LedgerID').val().trim() && !row.find('.Debit').val().trim() && !row.find('.Credit').val().trim()) {
+                        row.remove();
+                        return; // Stop execution if the previous row's ItemCode is empty
+                    }
+                });
+            }
+        }
+        function getHeaderData() {
+            return {
+                DocEntry: $('#DocumentEntry').val() || null,
+                Docnum: $('#Docnum').val(),
+                DocumentDate: $('#DocumentDate').val(),
+                DueDate: $('#DueDate').val(),
+                PostingDate: $('#PostingDate').val(),
+                FYearId: $('#FYearId').val(),
+                Remarks: $('#Remarks').val(),
+                BaseDocEntry: "",
+                BaseObjType: "",
+            };
+        }
+        function getLineItems() {
+            const lineItems = [];
+            $('#mainitemtable tbody tr').each(function (index) {
+                const row = $(this);
+                    lineItems.push({
+                        ID: row.data('id').toString() || null,
+                        DocEntry: null,
+                        LedgerID: row.find('.LedgerID').attr("data-id"),
+                        LedgerName: row.find('.LedgerID').val(),
+                        Debit: parseFloat(row.find('.Debit').val()) || 0,
+                        Credit: parseFloat(row.find('.Credit').val()) || 0,
+                        Remarks: row.find('.Remarks').val()
+                    });
+            });
+            return lineItems;
+        }
+        function validateForm(header, lines) {
+            if (!header.PostingDate) {
+                Notify('error', 'Posting date is required','');
+                return false;
+            }
+            if (!header.DocumentDate) {
+                Notify('error', 'Document date is required','');
+                return false;
+            }
+            if (!header.FYearId) {
+                Notify('error', 'Fiscal year is required','');
+                return false;
+            }
+            if ($("#TotalDebit").val() !== $("#TotalCredit").val()) {
+                Notify('error', 'Total Is  Unbalanced..!', 'Please Balance The Total.');
+                return false;
+            }
+            if ($("#TotalDebit").val() ==0 && $("#TotalCredit").val()==0) {
+                Notify('error', 'Please Check Payment Details.', 'Enter The Valid Debit Credit Feilds!');
+                return false;
+            }
+            if (lines.length === 0) {
+                Notify('error', 'At least one item is required','');
+                return false;
+            }
+            var index= 1;
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                if (!line.LedgerID || line.LedgerID == "" || line.LedgerID == null || line.LedgerID == undefined || !line.LedgerName || line.LedgerName == "" || line.LedgerName == null || line.LedgerName == undefined) {
+                    Notify('error', `Ledger is required for line ${index}`,'');
+                    return false;
+                }
+                index++;
+            }
+            return true;
+        }
+        function resetForm() {
+                currentDocEntry = null;
+                isEditMode = false;
+
+                // Reset header fields
+                $('#DocumentEntry').val('');
+                $('#Docnum').val('');
+
+                $('#PostingDate').val(new Date().toISOString().split('T')[0]);
+                $('#DocumentDate').val(new Date().toISOString().split('T')[0]);
+                $('#DeliveryDate').val(new Date().toISOString().split('T')[0]);
+                $('#FYearId').val('');
+                $('#RefNo').val('');
+                $('#BaseEntry').val('');
+                $('#Remarks').val('');
+                $('#mainitemtable tbody').html('');
+                $(".NotMatched").hide()
+                $(".Balanced").hide()
+
+                $('#btnSave').prop('disabled', false);
+                $('#btnPark').prop('disabled', false);
+                $('#btnPrint').prop('disabled', true);
+                $('#btnDelete').prop('disabled', true);
+                $('#btnCopyFrom').prop('disabled', true);
+                $('#btnCopyTo').prop('disabled', true);
+
+
+
+
+                $('#ResetFreight').click();
+                addNewLineItem()
+                loadFiscalYears();
+        }
+        function formatDateForInput(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toISOString().split('T')[0];
+        }
+        // Modify the remove-line click handler
+        $(document).on('click', '.remove-line', function() {
+            const row = $(this).closest('tr');
+            const table = $('#mainitemtable tbody');
+            const rowCount = table.find('tr').length;
+            if (rowCount > 1) {
+                row.remove();
+                // Update row numbers
+                table.find('tr').each(function(index) {
+                    $(this).find('td:first').text(index + 1);
+                });
+                // Disable remove button if only one row left
+                if (table.find('tr').length === 1) {
+                    table.find('tr').first().find('.remove-line').prop('disabled', true);
+                }
+                // Recalculate totals after deletion
+                calculateHeaderTotals();
+            } else {
+                Notify('warning', 'At least one item is required');
+            }
+        });
+           // Business Partner
+        {
+            var BPPartnerData = null;
+            function loadBPPartnerTable(type) {
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("GETCONTRALEDGER", "Accounts")',
+                    contentType: "application/json; charset=utf-8",
+                    data: { type: type },
+                    cache: false,
+                    success: function (data) {
+                        BPPartnerData = [];
+                        BPPartnerData = data;
+                    },
+                    error: function (xhr) {
+                        Notify('error', 'Error', xhr.responseText || 'Error loading BP Partners');
+                    }
+                });
+            }
+            loadBPPartnerTable("L");
+
+            var $activeInput = null;
+
+            // Function to create item suggestions based on input
+            function CreateItemList(inputClass) {
+                $(document).on('input', "#mainitemtable tbody tr td ." + inputClass, function () {
+                    var $input = $(this);
+                    $activeInput = $input;
+                    var value = $input.val().toLowerCase().replace(/_/g, ' ');
+                    var suggestions = [];
+                    var suggestionContainerId = 'ItemNameSuggestions-' + $input.closest('tr').index();
+
+                    if (!$('#' + suggestionContainerId).length) {
+                        $('<div id="' + suggestionContainerId + '" class="suggestions-container"></div>').appendTo('body');
+                    }
+                    var $suggestionContainer = $('#' + suggestionContainerId);
+                    $suggestionContainer.empty();
+
+                    if (Array.isArray(BPPartnerData) && BPPartnerData.length > 0) {
+                        if (value.length > 0) {
+                            var searchTokens = value.split(/\s+/);
+                            suggestions = BPPartnerData.filter(function (data) {
+                                if (data && typeof data === 'object') {
+                                    var code = (data.GroupName || '').toLowerCase();
+                                    var name = (data.GroupName || '').toLowerCase();
+                                    var allTokens = code.split(/\s+|[_-]+/).concat(name.split(/\s+|[_-]+/));
+                                    return searchTokens.every(function (token) {
+                                        return allTokens.some(function (itemToken) {
+                                            return itemToken.includes(token);
+                                        });
+                                    });
+                                }
+                                return false;
+                            }).sort(function (a, b) {
+                                return a.GroupName.localeCompare(b.GroupName);
+                            }).slice(0, 20);
+                        }
+
+                        if (suggestions.length > 0) {
+                            suggestions.forEach(function (data, idx) {
+                                $suggestionContainer.append(
+                                    `<div class="suggestion-item MItemList"
+                                          data-code="${data.Code || ''}"
+                                          data-id="${data.ID || ''}"
+                                          data-name="${data.GroupName || ''}"
+                                          data-index="${idx}">
+                                          <span class="supplier-name">${data.GroupName || ''}</span>
+                                     </div>`
+                                );
+                            });
+
+                            var offset = $input.offset();
+                            $suggestionContainer.css({
+                                top: offset.top + $input.outerHeight(),
+                                left: offset.left,
+                                width: $input.outerWidth(),
+                                position: 'absolute',
+                                "z-index": 1000
+                            }).show();
+
+                            // reset highlight
+                            $suggestionContainer.find('.suggestion-item').removeClass('active');
+                            $suggestionContainer.find('.suggestion-item:first').addClass('active');
+                        } else {
+                            $suggestionContainer.hide();
+                        }
+                    } else {
+                        console.error("ItemData is empty or not defined");
+                        $suggestionContainer.hide();
+                    }
+                });
+            }
+            CreateItemList("LedgerID");
+
+            // handle mouse click
+            $(document).on('click', '.MItemList', function () {
+                selectSuggestion($(this));
+            });
+            // handle keyboard navigation
+            $(document).on('keydown', function (e) {
+                if (!$activeInput) return;
+                var $suggestionContainer = $('.suggestions-container:visible');
+                if (!$suggestionContainer.length) return;
+
+                var $items = $suggestionContainer.find('.suggestion-item');
+                var $current = $items.filter('.suggestion-item-active');
+                var idx = $items.index($current);
+
+                if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    if (idx < $items.length - 1) {
+                        $current.removeClass('suggestion-item-active');
+                        $items.eq(idx + 1).addClass('suggestion-item-active');
+                    }
+                } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    if (idx > 0) {
+                        $current.removeClass('suggestion-item-active');
+                        $items.eq(idx - 1).addClass('suggestion-item-active');
+                    }
+                } else if (e.key === "Enter") {
+                    e.preventDefault();
+                    if ($current.length) {
+                        selectSuggestion($current);
+                    }
+                }
+            });
+            function selectSuggestion($item) {
+                var id = $item.data('id');
+                var name = $item.data('name');
+                var code = $item.data('code');
+                if ($activeInput) {
+                    $activeInput.val(name);
+                    $activeInput.attr("data-id", id);
+                    $activeInput.attr("data-code", code);
+                }
+                $('.suggestions-container').hide();
+            }
+            // close on outside click
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('.suggestions-container, .LedgerID').length) {
+                    $('.suggestions-container').hide();
+                }
+            });
+        }
+
+        //Find Mode
+        {
+            $("#btnFind").click(function () {
+                $("#fdocid").val("")
+                $("#frefno,#rrefno").val("")
+                $('.datepicker').val(new Date().toISOString().split('T')[0]);
+                Findmode()
+            })
+            $("#FindBtnSearch").click(function () {
+                Findmode()
+            })
+            $("#FindBtnReset").click(function () {
+                $("#fdocid").val("")
+                $("#frefno,#rrefno").val("")
+                $('.datepicker').val(new Date().toISOString().split('T')[0]);
+            })
+            function Findmode() {
+                var obj = {
+                    doctype: $("#doctype").val() || '',
+                    docid: $("#fdocid").val() || '',
+                    refno: $("#frefno").val() || '',
+                    fromdate: $("#ffromdate").val() || '',
+                    todate: $("#ftodate").val() || '',
+                    docEntry: '',
+                };
+                $.ajax({
+                    url: '@Url.Action("FINDMODE", "Sales")',
+                    method: 'GET',
+                    data: obj,
+                    success: function (response) {
+                        const tableBody = $('#receiptListTable tbody');
+                        if ($.fn.DataTable.isDataTable('#receiptListTable')) {
+                            $('#receiptListTable').DataTable().destroy();
+                        }
+                        tableBody.empty();
+                        response.header.forEach(function (receipt) {
+                            const row = `
+                                <tr data-docentry='${receipt.DocEntry}'>
+                                    <td>${receipt.Docnum}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary select-findrow" data-docentry="${receipt.DocEntry}">
+                                            <i class="bi bi-check"></i> Select
+                                        </button>
+                                    </td>
+                                    <td>${receipt.For_PostingDate}</td>
+                                    <td>${receipt.For_DocumentDate}</td>
+                                    <td>${receipt.For_DueDate}</td>
+                                    <td>${receipt.Remarks || ''}</td>
+                                    <td>${receipt.CretedByUName}</td>
+                                </tr>
+                            `;
+                            tableBody.append(row);
+                        });
+
+                        // ✅ Reinitialize DataTable
+                        $('#receiptListTable').DataTable({
+                            dom: '<"top"lf>rt<"bottom"ip>',
+                            pageLength: 10,
+                            lengthMenu: [5, 10, 25, 50, 100],
+                            responsive: true,
+                            columnDefs: [
+                                { orderable: false, targets: [6] }
+                            ]
+                        });
+
+                        // ✅ Attach event handler (only once if possible, or inside a separate setup)
+                        $('#receiptListTable').off('click', '.select-findrow').on('click', '.select-findrow', function () {
+                            const docEntry = $(this).data('docentry');
+                            loadFindRow(docEntry, $("#doctype").val(), "");
+                            $('#receiptListModal').modal('hide');
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        Notify('error', 'Failed to load receipt list', '');
+                    }
+                });
+            }
+        }
+        async function loadFindRow(docEntry, doctype, flag) {
+            try {
+                const response = await $.ajax({
+                    url: '@Url.Action("FINDMODE", "Sales")',
+                    method: 'GET',
+                    data: { doctype, docEntry }
+                });
+                if (!response || !response.header?.length) {
+                    Notify('error', 'Find Row Not found');
+                    return;
+                }
+                const header = response.header[0];
+                let rows = response.row || [];
+                const today = new Date().toISOString().split('T')[0];
+                // ✅ safer date formatter
+                const formatDateForInput = (dateStr) => {
+                    if (!dateStr) return today;
+                    const parts = dateStr.split("-");
+                    if (parts.length !== 3) return today;
+                    const [day, month, year] = parts;
+                    return `${year}-${month}-${day}`;
+                };
+                // ✅ safer number formatter
+                const fmtNum = (val, digits = 2) =>
+                    isNaN(parseFloat(val)) ? "0.00" : parseFloat(val).toFixed(digits);
+                // ✅ bulk header mapping
+                const headerMapping = {
+                    '#DocumentEntry': header.DocEntry,
+                    '#Docnum': header.Docnum,
+                    '#PostingDate': formatDateForInput(header.For_PostingDate),
+                    '#DocumentDate': formatDateForInput(header.For_DocumentDate),
+                    '#DueDate': formatDateForInput(header.For_DueDate),
+                    '#FYearId': header.FYearId,
+                    '#Remarks': header.Remarks,
+                };
+                for (const [selector, value] of Object.entries(headerMapping)) {
+                    $(selector).val(value ?? "");
+                }
+                $('#mainitemtable tbody').empty();
+                rows.forEach((line, idx) => {
+                    const row = `
+                         <tr data-id='${line.ID}' class="line-item">
+                             <td>${idx + 1}</td>
+                             <td class="text-center">
+                                 <button class="btn btn-sm btn-outline-danger remove-line" disabled>
+                                     <i class="bi bi-trash"></i>
+                                 </button>
+                             </td>
+                             <td><textarea style='important; height:9px;' type="text" class="form-control form-control-sm text-end Remarks" value=""></textarea></td>
+                             <td><input type="text" value="${line.LedgerName}" data-id="${line.LedgerID}" class="form-control form-control-sm LedgerID"></td>
+                             <td><input type="number" class="form-control form-control-sm text-end Debit" min="0"  value="${ parseFloat(line.Debit).toFixed(2)}" step="1"></td>
+                             <td><input type="number" class="form-control form-control-sm text-end Credit" min="0" value="${ parseFloat(line.Credit).toFixed(2)}" step="1"></td>
+                         </tr>
+                      `;
+                    $('#mainitemtable tbody').append(row);
+                });
+                calculateHeaderTotals()
+                // ✅ buttons state
+                $('#btnSave').prop('disabled', header.DocStatus === "C");
+                $('#btnPark').prop('disabled', true);
+                $('#btnPrint').prop('disabled', false);
+                $('#btnDelete').prop('disabled', false);
+                $('#btnCopyTo').prop('disabled', header.DocStatus === "C");
+                $('#btnCopyFrom').prop('disabled', header.DocStatus === "C");
+
+            } catch (error) {
+                console.error('Error loading receipt:', error);
+                Notify('error', 'Failed to load receipt', '');
+            }
+        }
+        //Resume
+        {
+           loadUsers()
+           function loadUsers() {
+               $.ajax({
+                   type: "GET",
+                   url: '@Url.Action("GETUSERS", "Auth")',
+                   contentType: "application/json; charset=utf-8",
+                   cache: true,
+                   success: function (data) {
+                       if(data.length) {
+                           const $select = $('#rUserid');
+                           $select.empty();
+                           $select.append('<option value="">Select User</option>');
+                           data.forEach(user => {
+                               $select.append(`<option value="${user.UserID}">${user.Username}</option>`);
+                           });
+                       }
+                   },
+                   error: function (xhr) {
+                       const errorMessage = xhr.responseJSON?.error || 'Error loading users';
+                       Notify('error', 'Error', errorMessage);
+                   }
+               });
+           }
+           $("#btnResume").click(function(){
+               $("#fdocid").val("")
+               $("#frefno,#rrefno").val("")
+               $('.datepicker').val(new Date().toISOString().split('T')[0]);
+               Resume()
+           })
+           $("#ResumeBtnSearch").click(function(){
+               Resume()
+           })
+           $("#ResumeBtnReset").click(function(){
+               $("#rrefno").val("")
+               $('.datepicker').val(new Date().toISOString().split('T')[0]);
+           })
+            function Resume() {
+               var obj = {
+                   doctype: $("#doctype").val() || '',
+                   refno: $("#rrefno").val() || '',
+                   fromdate: $("#rfromdate").val() || '',
+                   todate: $("#rtodate").val() || '',
+                   Userid: $("#rUserid").val() || '',
+                   docEntry:'',
+               };
+               $.ajax({
+                   url: '@Url.Action("RESUMEPARK", "Inventory")',
+                   method: 'GET',
+                   data: obj,
+                   success: function (response) {
+                       if (response.length >0) {
+                           const tableBody = $('#ResumeModaltbl tbody');
+                           if ($.fn.DataTable.isDataTable('#ResumeModaltbl')) {
+                               $('#ResumeModaltbl').DataTable().destroy();
+                           }
+                           var payload = JSON.parse(response[0].Payload);
+                           tableBody.empty();
+                           var index = 1;
+                           response.forEach(function (receipt) {
+                               const row = `
+                                   <tr data-docentry='${receipt.DocEntry}'>
+                                       <td>${index}</td>
+                                       <td>
+                                           <button class="btn btn-sm btn-primary select-findrow" data-docentry="${receipt.DocEntry}">
+                                               <i class="bi bi-check"></i> Select
+                                           </button>
+                                       </td>
+                                       <td>${receipt.CreatedDate}</td>
+                                       <td>${receipt.RefNo || ''}</td>
+                                       <td>${receipt.CretedByUName}</td>
+                                       <td hidden class='Payload'>${receipt.Payload}</td>
+                                   </tr>
+                               `;
+                               tableBody.append(row);
+                               index++;
+                           });
+
+                           // ✅ Reinitialize DataTable
+                           $('#ResumeModaltbl').DataTable({
+                               dom: '<"top"lf>rt<"bottom"ip>',
+                               pageLength: 10,
+                               lengthMenu: [5, 10, 25, 50, 100],
+                               responsive: true,
+                               columnDefs: [
+                                   { orderable: false, targets: [] }
+                               ]
+                           });
+
+                           // ✅ Attach event handler (only once if possible, or inside a separate setup)
+                           $('#ResumeModaltbl').off('click', '.select-findrow').on('click', '.select-findrow', function () {
+                               const docEntry = $(this).data('docentry');
+                               const row = $(this).closest("tr");
+                               var data = row.find(".Payload").text();
+                               loadresume(JSON.parse(data), docEntry);
+                               $('#ResumeModal').modal('hide');
+                           });
+                       }
+                   },
+                   error: function(xhr, status, error) {
+                       Notify('error', 'Failed to load receipt list', '');
+                   }
+               });
+                async  function loadresume(response, docEntry) {
+                    try {
+                          isEditMode = true;
+                          const header = response.header;
+                          const rows = response.lines || [];
+
+                        if (!response || !response.lines?.length) {
+                             Notify('error', 'Resume Row Not found');
+                             return;
+                         }
+                         const today = new Date().toISOString().split('T')[0];
+                         // ✅ safer date formatter
+                         const formatDateForInput = (dateStr) => {
+                             if (!dateStr) return today;
+                             const parts = dateStr.split("-");
+                             if (parts.length !== 3) return today;
+                             const [day, month, year] = parts;
+                             return `${year}-${month}-${day}`;
+                         };
+                         // ✅ safer number formatter
+                         const fmtNum = (val, digits = 2) =>
+                             isNaN(parseFloat(val)) ? "0.00" : parseFloat(val).toFixed(digits);
+
+                         // ✅ bulk header mapping
+                        const headerMapping = {
+                            '#DocumentEntry': header.DocEntry,
+                            '#Docnum': header.Docnum,
+                            '#PostingDate': formatDateForInput(header.For_PostingDate),
+                            '#DocumentDate': formatDateForInput(header.For_DocumentDate),
+                            '#DueDate': formatDateForInput(header.For_DueDate),
+                            '#FYearId': header.FYearId,
+                            '#Remarks': header.Remarks,
+                        };
+                        for (const [selector, value] of Object.entries(headerMapping)) {
+                            $(selector).val(value ?? "");
+                        }
+                        $('#mainitemtable tbody').empty();
+                        rows.forEach((line, idx) => {
+                            const row = `
+                               <tr data-id='' class="line-item">
+                                   <td>${idx + 1}</td>
+                                   <td class="text-center">
+                                       <button class="btn btn-sm btn-outline-danger remove-line" disabled>
+                                           <i class="bi bi-trash"></i>
+                                       </button>
+                                   </td>
+                                   <td><textarea style='important; height:9px;' type="text" class="form-control form-control-sm text-end Remarks" value=""></textarea></td>
+                                   <td><input type="text" value="${line.LedgerName}" data-id="${line.LedgerID}" class="form-control form-control-sm LedgerID"></td>
+                                   <td><input type="number" class="form-control form-control-sm text-end Debit" min="0"  value="${parseFloat(line.Debit).toFixed(2)}" step="1"></td>
+                                   <td><input type="number" class="form-control form-control-sm text-end Credit" min="0" value="${parseFloat(line.Credit).toFixed(2)}" step="1"></td>
+                               </tr>
+                            `;
+                            $('#mainitemtable tbody').append(row);
+                        });
+                        calculateHeaderTotals()
+                         // ✅ buttons state
+                         $('#btnSave').prop('disabled', false);
+                         $('#btnDelete').prop('disabled', false);
+                         $('#btnPark').prop('disabled', false)
+                         $('#btnPrint').prop('disabled', true)
+                          $.ajax({
+                                url: '@Url.Action("DELETEPARKDOC", "Inventory")',
+                                method: 'GET',
+                                data: { id: docEntry },
+                                success: function (response) {
+                                    Resume()
+                                },
+                                error: function(xhr, status, error) {
+                                    Notify('error', 'Failed to load receipt list', '');
+                                }
+                            });
+                     } catch (error) {
+                         console.error('Error loading receipt:', error);
+                         Notify('error', 'Failed to load receipt', '');
+                     }
+               }
+           }
+        }
+        async function GETFREIGHT() {
+              $.ajax({
+                  type: "GET",
+                  url: '@Url.Action("GETACTIVEFREIGHT", "Master")',
+                  contentType: "application/json; charset=utf-8",
+                  cache: false,
+                  success: async function (data) {
+                      if (Array.isArray(data) && data.length > 0) {
+                          let index = 1;
+                          $("#FreightTable tbody").empty();
+                          $("#FreightTable tfoot").empty();
+
+                          for (let i = 0; i < data.length; i++) {
+                              let item = data[i];
+                              let row = $(`
+                                  <tr data-id=''>
+                                      <td>${index}</td>
+                                      <td nowrap data-freid='${item.FreID}' class='FreigthName'>${item.Name}</td>
+                                      <td><input style="min-width:180px" value="0" class="form-control form-control-sm FNetAmt"></td>
+                                      <td hidden>
+                                          <select style="min-width:180px"  class="form-control form-control-sm FTaxId">
+                                              <option value="">Select</option>
+                                          </select>
+                                      </td>
+                                      <td hidden class="FTaxAmt">0.00</td>
+                                      <td hidden class="FTaxtotal">0.00</td>
+                                      <td><textarea style="min-width:180px;height:30px;" class="form-control form-control-sm FRemark"></textarea></td>
+                                      <td hidden class="FCGST">0.00</td>
+                                      <td hidden class="FCGSTRATE">0</td>
+                                      <td hidden class="FSGST">0.00</td>
+                                      <td hidden class="FSGSTRATE">0</td>
+                                      <td hidden class="FIGST">0.00</td>
+                                      <td hidden class="FIGSTRATE">0</td>
+                                      <td hidden class="FUTGST">0.00</td>
+                                      <td hidden class="FUTGSTRATE">0</td>
+                                  </tr>
+                              `);
+
+                              $("#FreightTable tbody").append(row);
+                              // Load tax codes for this row
+                              await GETFREIGHTTAX("", row, row.find(".FTaxId"));
+                              // bind events
+                              row.find(".FNetAmt, .FTaxId").on("input change", function () {
+                                  calculatefreightRow(row);
+                                  calculateTotal();
+                              });
+                              index++;
+                          }
+                          // Append total footer once
+                          $("#FreightTable tfoot").append(`
+                              <tr hidden>
+                                  <td hidden colspan="4">Total</td>
+                                  <td hidden nowrap class="FTaxTot">0.00</td>
+                                  <td hidden nowrap class="FNetTot">0.00</td>
+                                  <td hidden nowrap class="FSGSTot">0.00</td>
+                                  <td hidden nowrap class="FCGSTot">0.00</td>
+                                  <td hidden nowrap class="FIGSTTot">0.00</td>
+                                  <td hidden nowrap class="FUTGSTTot">0.00</td>
+                                  <td hidden colspan="13"></td>
+                              </tr>
+                          `);
+                      }
+                  },
+                  error: function (xhr) {
+                      Notify("error", "Error", xhr.responseText || "Error loading items");
+                  }
+              });
+          }
+        // FREIGHT
+        {
+
+              function GETFREIGHTTAX(id, row, dropdown) {
+                  return new Promise((resolve, reject) => {
+                      $.ajax({
+                          url: '@Url.Action("GETFREIGHTTAXCODE", "Master")',
+                          method: "GET",
+                          success: function (response) {
+                              response.forEach(function (tax) {
+                                  dropdown.append(`
+                                      <option value="${tax.TaxCodeId}"
+                                          data-rate="${tax.TaxCalRate}"
+                                          data-cgst="${tax.CGST}"
+                                          data-sgst="${tax.SGST}"
+                                          data-igst="${tax.IGST}"
+                                          data-utgst="${tax.UTGST}">
+                                          ${tax.TaxCode}
+                                      </option>
+                                  `);
+                              });
+                              if (id !== "") {
+                                  dropdown.val(id).trigger("change");
+                              }
+                              resolve();
+                          },
+                          error: function (xhr) {
+                              Notify("error", "Error", xhr.responseText);
+                              reject();
+                          }
+                      });
+                  });
+              }
+              function calculatefreightRow(row) {
+                  let netAmt = parseFloat(row.find(".FNetAmt").val()) || 0;   // base amount
+                  let ddl = row.find(".FTaxId option:selected");
+                  let TextTax = ddl.text().trim();
+                  let taxCodeVal = ddl.val();
+
+                  // Default rates
+                  let cgstRate = 0, sgstRate = 0, igstRate = 0, utgstRate = 0, taxRate = 0;
+
+                  if (taxCodeVal && taxCodeVal !== "") {
+                      // Check if text contains GST/IGST/UTGST pattern
+                      // Check for UTGST pattern (e.g., "UTGST5%", "UTGST", "UTGST@@5%")
+                      const utgstMatch = TextTax.match(/^UTGST\D*(\d+)?%?$/i);
+                      if (utgstMatch) {
+                          utgstRate = parseFloat(utgstMatch[1]) || 0;
+                          taxRate = utgstRate;
+                      }
+                      // Check for IGST pattern (e.g., "IGST5%", "IGST", "IGST 18%")
+                      else if (/^IGST/i.test(TextTax)) {
+                          const igstMatch = TextTax.match(/^IGST\D*(\d+)?%?$/i);
+                          igstRate = parseFloat(igstMatch?.[1]) || 0;
+                          taxRate = igstRate;
+                      }
+                      // Check for GST pattern (e.g., "GST18%", "GST")
+                      else if (/^GST/i.test(TextTax)) {
+                          const gstMatch = TextTax.match(/^GST\D*(\d+)?%?$/i);
+                          const gstRate = parseFloat(gstMatch?.[1]) || 0;
+                          cgstRate = gstRate / 2;  // Split GST rate equally between CGST and SGST
+                          sgstRate = gstRate / 2;
+                          taxRate = gstRate;
+                      }
+                      // Fallback for other cases
+                      else {
+                          taxRate = parseFloat(taxCode.data('rate')) || 0;
+                          cgstRate = parseFloat(taxCode.data('cgst')) || 0;
+                          sgstRate = parseFloat(taxCode.data('sgst')) || 0;
+                          igstRate = parseFloat(taxCode.data('igst')) || 0;
+                          utgstRate = parseFloat(taxCode.data('utgst')) || 0;
+                      }
+                  }
+
+                  // Calculate tax amounts
+                  let cgstAmt = (netAmt * cgstRate) / 100;
+                  let sgstAmt = (netAmt * sgstRate) / 100;
+                  let igstAmt = (netAmt * igstRate) / 100;
+                  let utgstAmt = (netAmt * utgstRate) / 100;
+                  let taxAmt = cgstAmt + sgstAmt + igstAmt + utgstAmt;
+                  let totalAmt = netAmt + taxAmt;
+
+                  // Update row fields (text or input based on your HTML)
+                  row.find(".FCGST").text(cgstAmt.toFixed(2));
+                  row.find(".FCGSTRATE").text(cgstRate.toFixed(2));
+
+
+                  row.find(".FSGST").text(sgstAmt.toFixed(2));
+                  row.find(".FSGSTRATE").text(sgstRate.toFixed(2));
+
+                  row.find(".FIGST").text(igstAmt.toFixed(2));
+                  row.find(".FIGSTRATE").text(igstRate.toFixed(2));
+
+                  row.find(".FUTGST").text(utgstAmt.toFixed(2));
+                  row.find(".FUTGSTRATE").text(utgstRate.toFixed(2));
+
+                  row.find(".FTaxtotal").text(totalAmt.toFixed(2));
+                  row.find(".FTaxAmt").text(taxAmt.toFixed(2));
+              }
+            function calculateTotal() {
+                  let total = 0;
+                  let freataxtotal = 0;
+                  let cgsttot = 0;
+                  let sgsttot = 0;
+                  let igsttot = 0;
+                  let utgsttot = 0;
+
+                  $("#FreightTable tbody tr").each(function () {
+                      let rowTotal = parseFloat($(this).find(".FTaxtotal").text()) || 0;
+                      let taxtotal = parseFloat($(this).find(".FTaxAmt").text()) || 0;
+                      let cgst = parseFloat($(this).find(".FCGST").text()) || 0;
+                      let sgst = parseFloat($(this).find(".FSGST").text()) || 0;
+                      let igst = parseFloat($(this).find(".FIGST").text()) || 0;
+                      let utgst = parseFloat($(this).find(".FUTGST").text()) || 0;
+
+                      total += rowTotal;
+                      freataxtotal += taxtotal;
+                      cgsttot += cgst;
+                      sgsttot += sgst;
+                      igsttot += igst;
+                      utgsttot += utgst;
+                  });
+                  $(".FNetTot").text(total.toFixed(2));
+                  $(".FTaxTot").text(freataxtotal.toFixed(2));
+                  $(".FCGSTot").text(cgsttot.toFixed(2));
+                  $(".FSGSTot").text(sgsttot.toFixed(2));
+                  $(".FIGSTTot").text(igsttot.toFixed(2));
+                  $(".FUTGSTTot").text(utgsttot.toFixed(2));
+              }
+
+              $("#ResetFreight").click(function () {
+                  GETFREIGHT();
+              })
+              $("#AddFreight").click(function () {
+                  var Net_Total = parseFloat($(".FNetTot").text()).toFixed(2)
+                  var Freigh_Tax = parseFloat($(".FTaxTot").text()).toFixed(2)
+                  var FreighCGSTot_Tax = parseFloat($(".FCGSTot").text()).toFixed(2)
+                  var FreighSGSTot_Tax = parseFloat($(".FSGSTot").text()).toFixed(2)
+                  var FreighIGSTot_Tax = parseFloat($(".FIGSTTot").text()).toFixed(2)
+                  var FreighUTGSTot_Tax = parseFloat($(".FUTGSTTot").text()).toFixed(2)
+                  var Net_Amt = Net_Total - Freigh_Tax
+
+                  $("#FreightTotal").val(parseFloat(Net_Amt).toFixed(2))
+                  $("#FreightTax").val(parseFloat(Freigh_Tax).toFixed(2))
+                  $("#FreightCGSTTax").val(parseFloat(FreighCGSTot_Tax).toFixed(2))
+                  $("#FreightSGSTTax").val(parseFloat(FreighSGSTot_Tax).toFixed(2))
+                  $("#FreightIGSTTax").val(parseFloat(FreighIGSTot_Tax).toFixed(2))
+                  $("#FreightUTGSTTax").val(parseFloat(FreighUTGSTot_Tax).toFixed(2))
+                  calculateHeaderTotals();
+              })
+              $("#ResetFreightCalc").click(function () {
+                  $("#FreightTotal").val(0)
+                  $("#FreightTax").val(0)
+                  $("#FreightCGSTTax").val(0)
+                  $("#FreightSGSTTax").val(0)
+                  $("#FreightIGSTTax").val(0)
+                  $("#FreightUTGSTTax").val(0)
+                  calculateHeaderTotals();
+              })
+          }
+        //Copy To
+        {
+            $(".copytobtn").click(function () {
+                var objtype = $(this).attr("data-flag");
+                var docentry = $("#DocumentEntry").val();
+                if (docentry !== "" && objtype !== "") {
+                    sessionStorage.setItem("CopyTodData", `{"objtype":"${$("#doctype").val()}","docentry":"${docentry}"}`)
+                    switch (objtype) {
+                        case "SD":
+                            window.location.href = '@Url.Action("DeliveryNote", "Sales")';
+                            break;
+                        case "SI":
+                             window.location.href = '@Url.Action("SalesInvoice", "Sales")';
+                            break;
+                        case "MI":
+                             window.location.href = '@Url.Action("MaterialIn", "Inventory")';
+                            break;
+                        case "MO":
+                             window.location.href = '@Url.Action("MaterialOut", "Inventory")';
+                          break;
+                        default:
+                    }
+                } else {
+                    Notify('error', 'Error To Copy','Please select the valid document.');
+                }
+            });
+        }
+        //Copy From
+        {
+              $(".copyfrombtn").click(function () {
+                  var objtype1 = $(this).attr('data-flag');
+                  var LedgerCode = $("#LedgerCode").attr('data-id');
+
+                  if (!LedgerCode) {
+                      Notify('error', 'Please Select Business Partner', '');
+                      return;
+                  }
+
+                  if (objtype1) {
+                      $("#CopyFromModal").modal("show");
+
+                      var obj = {
+                          doctype: objtype1,
+                          docid: '',
+                          refno: '',
+                          fromdate: '',
+                          todate: '',
+                          docEntry: '',
+                          status: "O",
+                          ledgercode: LedgerCode,
+                      };
+
+                      $.ajax({
+                          url: '@Url.Action("COPYFROM", "Purchase")',
+                          method: 'GET',
+                          data: obj,
+                          success: function (response) {
+                              // ✅ Destroy previous table
+                              if ($.fn.DataTable.isDataTable('#copyfromtbl')) {
+                                  $('#copyfromtbl').DataTable().destroy();
+                              }
+
+                              // ✅ Initialize DataTable with data
+                              var mainTable = $('#copyfromtbl').DataTable({
+                                  data: response.header,
+                                  className: "text-center",
+                                  columns: [
+                                      {
+                                          data: "DocEntry",
+                                          render: function (data, type, row) {
+                                              return `
+                                                  <button class="btn btn-sm btn-success toggle-rows rounded w-50 h-50" data-docentry="${data}">
+                                                      <i class="bi bi-plus"></i>
+                                                  </button>
+                                              `;
+                                          },
+                                          orderable: false
+                                      },
+                                      { data: "Docnum" },
+                                      { data: "LedgerName" },
+                                      { data: "For_PostingDate" },
+                                      { data: "RefNo", defaultContent: "" },
+                                      { data: "For_DocStatus" },
+                                      { data: "Remarks", defaultContent: "" },
+                                      { data: "CretedByUName" },
+                                  ],
+                                  dom: '<"top"lf>rt<"bottom"ip>',
+                                  pageLength: 10,
+                                  lengthMenu: [5, 10, 25, 50, 100],
+                                  responsive: true
+                              });
+
+                              // ✅ Handle expand/collapse for nested table
+                              $('#copyfromtbl tbody').off('click', '.toggle-rows').on('click', '.toggle-rows', function () {
+                                  var tr = $(this).closest('tr');
+                                  var row = mainTable.row(tr);
+                                  var docEntry = $(this).data('docentry');
+                                  if (row.child.isShown()) {
+                                      row.child.hide();
+                                      $(this).find('i').removeClass('bi-dash').addClass('bi-plus');
+                                  } else {
+                                       $.ajax({
+                                           url: '@Url.Action("COPYFROM", "Purchase")',
+                                           method: 'GET',
+                                           data: { doctype: objtype1, docEntry: docEntry },
+                                           success: async function (response) {
+                                               if (!response || !response.header?.length) {
+                                                   Notify('error', 'Document not found');
+                                                   return;
+                                               }
+                                               const header = response.header[0];
+                                               var rows = response.row || [];
+                                               var freight = response.freight || [];
+                                               var childRows = response.row.filter(r => r.DocEntry == docEntry);
+                                               if (childRows.length > 0) {
+                                                   var childTableHtml = `
+                                                          <table data-headobj='${JSON.stringify(header)}' data-freight='${JSON.stringify(freight)}' class="table  table-hover table-sm mb-0 nested-table">
+                                                              <thead>
+                                                                  <tr>
+                                                                      <th><input type="checkbox" class="seleccopyfromtall" /></th>
+                                                                      <th>ItemCode</th>
+                                                                      <th>ItemName</th>
+                                                                      <th>Qty</th>
+                                                                      <th>Price</th>
+                                                                      <th>Tax Code</th>
+                                                                      <th>Tax Amt</th>
+                                                                      <th hidden>rowobj</th>
+                                                                      <th hidden>headobj</th>
+
+                                                                  </tr>
+                                                              </thead>
+                                                              <tbody>
+                                                                  ${childRows.map(r => `
+                                                                      <tr>
+                                                                          <td>
+                                                                              <input type="checkbox" class="select-findrow"
+                                                                                  data-docentry="${r.DocEntry}"
+                                                                                  data-lineid="${r.LineId}" />
+                                                                          </td>
+                                                                          <td>${r.ItemCode}</td>
+                                                                          <td>${r.ItemName}</td>
+                                                                          <td>${parseFloat(r.Quantity).toFixed(2)}</td>
+                                                                          <td>${parseFloat(r.UnitePrice).toFixed(2)}</td>
+                                                                          <td>${r.TaxCode}</td>
+                                                                          <td>${parseFloat(r.TaxAmount).toFixed(2)}</td>
+                                                                          <td hidden class='rowobj'>${JSON.stringify(r)}</td>
+                                                                      </tr>
+                                                                  `).join("")}
+                                                              </tbody>
+                                                          </table>
+                                                      `;
+                                                   row.child(childTableHtml).show();
+                                                   $(this).find('i').removeClass('bi-plus').addClass('bi-dash');
+                                               }
+
+                                           },
+                                           error: function (xhr, status, error) {
+                                               console.error('Error loading receipt:', error);
+                                               Notify('error', 'Failed to load receipt', '');
+                                           }
+                                       });
+
+                                  }
+                              });
+                              // ✅ Select all checkbox (per nested table)
+                              $(document).on("click", ".seleccopyfromtall", function () {
+                                  var isChecked = $(this).is(":checked");
+                                  $(this).closest("table").find(".select-findrow").prop("checked", isChecked);
+                              });
+                          },
+                          error: function () {
+                              Notify('error', 'Failed to copy from ', '');
+                          }
+                      });
+
+                  }
+              });
+
+              // ✅ Select & Copy rows
+              $("#SelectCopyFrom").click(async function () {
+                  var rowdata = [];
+                  var head = JSON.parse($(".nested-table").attr("data-headobj"))
+                  var freightdata = JSON.parse($(".nested-table").attr("data-freight"))
+
+                  $(".nested-table tbody tr").each(function () {
+                      var row = $(this);
+
+                      var ischecked = row.find(".select-findrow").is(":checked");
+                      if (ischecked) {
+                          rowdata.push(JSON.parse(row.find(".rowobj").text()));
+                      }
+
+                  });
+
+
+                  if (rowdata.length === 0) {
+                      Notify('warning', 'Please select at least one row', '');
+                      return;
+                  }
+
+                  const header = head;
+                  var rows = rowdata || [];
+                  const freight = freightdata || [];
+                  const today = new Date().toISOString().split('T')[0];
+                  const fmtNum = (val, digits = 2) =>
+                      isNaN(parseFloat(val)) ? "0.00" : parseFloat(val).toFixed(digits);
+                  const formatDateForInput = (dateStr) => {
+                      if (!dateStr) return today;
+                      const parts = dateStr.split("-");
+                      if (parts.length !== 3) return today;
+                      const [day, month, year] = parts;
+                      return `${year}-${month}-${day}`;
+                  };
+                  // ✅ Populate header fields
+                  const headerMapping = {
+                      '#BaseEntry': header.DocEntry,
+                      '#Docnum': header.Docnum,
+                      '#DocStatus': header.DocStatus,
+                      '#PostingDate': formatDateForInput(header.For_PostingDate),
+                      '#DocumentDate': formatDateForInput(header.For_DocumentDate),
+                      '#DeliveryDate': formatDateForInput(header.For_DeliveryDate),
+                      '#FYearId': header.FYearId,
+                      '#LedgerCode': header.LedgerCode,
+                      '#RefNo': header.RefNo,
+                      '#Remarks': header.Remarks,
+                      '#PONo': header.PONo,
+                      '#VehicleNo': header.VehicleNo,
+                      '#VendorCode': header.VendorCode,
+                      '#TransMode': header.TransMode,
+                      '#TotalWeight': header.TotalWeight,
+                      '#GrossTotal': header.GrossTotal,
+                      '#TotalDiscount': parseFloat(header.DisPer).toFixed(2),
+                      '#TotalDiscountAmt': parseFloat(header.DisAmount).toFixed(2),
+                      '#FreightTotal': parseFloat(header.FreightTotal).toFixed(2),
+                      '#aftBillDisc': header.TotalAftBillDisc,
+                      '#GSTTotal': header.GSTTotal,
+                      '#NETTotal': header.NETTotal,
+                      '#Rounding': header.Rounding
+                  };
+
+                  for (const [selector, value] of Object.entries(headerMapping)) {
+                      $(selector).val(value);
+                  }
+
+
+                  var BaseObj = '';
+                  $("#DocumentEntry").val("")
+                  $("#Docnum").val("")
+                  $("#DocStatus").val("O")
+                  $("#DocumentDate").val(new Date().toISOString().split('T')[0])
+                  $("#PostingDate").val(new Date().toISOString().split('T')[0])
+                  $("#DeliveryDate").val(new Date().toISOString().split('T')[0])
+                  $("#FYearId").trigger("change")
+                  rows = rows.filter(row => row.Status === "O");
+                  sessionStorage.removeItem("CopyTodData");
+                  BaseObj = header.OBJType
+
+                  $('#LedgerCode')
+                      .attr('data-id', header.LedgerID)
+                      .attr('data-name', header.LedgerName)
+                      .attr('data-code', header.LedgerCode);
+
+
+                  // ✅ render freight rows
+                  $('#FreightTable tbody').empty();
+                  for (let i = 0; i < freight.length; i++) {
+                      const item = freight[i];
+                      const row = $(`
+                          <tr data-id='${item.ID}'>
+                              <td>${i + 1}</td>
+                              <td nowrap data-freid='${item.FreID}' class='FreigthName'>${item.Name}</td>
+                              <td><input style="min-width:180px" value="${fmtNum(item.NetAmt)}" class="form-control form-control-sm FNetAmt"></td>
+                              <td hidden>
+                                  <select style="min-width:180px" class="form-control form-control-sm FTaxId">
+                                      <option value="">Select</option>
+                                  </select>
+                              </td>
+                              <td hidden class="FTaxAmt">${fmtNum(item.TaxAmount)}</td>
+                              <td hidden class="FTaxtotal">${fmtNum(+item.NetAmt + +item.TaxAmount)}</td>
+                              <td><textarea style="min-width:180px;height:30px;" class="form-control form-control-sm FRemark">${item.Remark ?? ''}</textarea></td>
+                              <td hidden class="FCGST">${fmtNum(item.CGSTAmt)}</td>
+                              <td hidden class="FCGSTRATE">${fmtNum(item.CGSTRate)}</td>
+                              <td hidden class="FSGST">${fmtNum(item.SGSTAmt)}</td>
+                              <td hidden class="FSGSTRATE">${fmtNum(item.SGSTRate)}</td>
+                              <td hidden class="FIGST">${fmtNum(item.IGSTAmt)}</td>
+                              <td hidden class="FIGSTRATE">${fmtNum(item.IGSTRate)}</td>
+                              <td hidden class="FUTGST">${fmtNum(item.UTGSTAmt)}</td>
+                              <td hidden class="FUTGSTRATE">${fmtNum(item.UTGSTRate)}</td>
+                          </tr>
+                      `);
+
+                      $("#FreightTable tbody").append(row);
+
+                      await GETFREIGHTTAX("1", row, row.find(".FTaxId"));
+
+                      row.find(".FNetAmt, .FTaxId").on("input change", () => {
+                          calculatefreightRow(row);
+                          calculateTotal();
+                      });
+                  }
+                  calculateTotal();
+                  // ✅ freight totals
+                  $("#FreightTax").val(fmtNum($(".FTaxTot").text()));
+                  $("#FreightCGSTTax").val(fmtNum($(".FCGSTot").text()));
+                  $("#FreightSGSTTax").val(fmtNum($(".FSGSTot").text()));
+                  $("#FreightIGSTTax").val(fmtNum($(".FIGSTTot").text()));
+                  $("#FreightUTGSTTax").val(fmtNum($(".FUTGSTTot").text()));
+                  // ✅ Clear rows
+                  $('#mainitemtable tbody').empty();
+                  // ✅ Process rows
+                  const rowPromises = rows.map(async (line, index) => {
+                      addNewLineItem();
+                      const $row = $('#mainitemtable tbody tr').last();
+
+                      $row.find('.ItemCode').val(line.ItemCode).attr('data-id', line.ItemID);
+                      $row.find('.ItemName').val(line.ItemName);
+                      $row.find('.ItemHSN').val(line.HSNCode).attr('data-id', line.HSNID);
+                      $row.find('.ItemEan').val(line.EanCode);
+
+                          $row.find('.Quantity').val(parseFloat(line.OpenQuantity).toFixed(2));
+                          $row.find('.OpenQuantity').val(parseFloat(line.OpenQuantity).toFixed(2));
+                          $row.find('.BaseQuantity').val(parseFloat(line.Quantity).toFixed(2));
+                          $row.find('.BaseLine').val(line.ID);
+                          $row.find('.BaseDocEntry').val(line.DocEntry);
+                          $row.find('.BaseObjType').val(BaseObj);
+
+
+                      $row.find('.Price').val(parseFloat(line.UnitePrice).toFixed(2));
+                      $row.find('.DisPer').val(parseFloat(line.DisPer).toFixed(2));
+                      $row.find('.Weight1').val(parseFloat(line.Weight1).toFixed(2));
+                      $row.find('.Remarks').val(line.Remarks);
+                      $row.find('.AcctCode').val(line.AcctCode);
+
+                      await LoadUOM(line.ItemID, $row, "F");
+                      $row.find('.ItemUOM').val(line.UOMID);
+
+                      await loadWarehouses(line.ItemID, $row, "F");
+                      $row.find('.WhsCode').val(line.WHSID);
+                      $row.find('.StockInWhs').val(parseFloat(line.StockInWhs).toFixed(2));
+
+                      await loadTaxCodes("1", $row, $row.find('.TaxCode'));
+                      $row.find('.TaxCode').val("1");
+
+                      calculateRowAmounts($row);
+
+                      if (header.DocStatus == "C" || line.Status == 'C') {
+                          $row.addClass("table-info")
+                              .attr("data-doc-status", "closed");
+                          $row.find(".remove-line").prop('disabled', true)
+                          $row.find(".openmodal").prop('disabled', true)
+                          $row.find("input,textarea").prop('readonly', true)
+                          $row.find("select").prop('disabled', true)
+                      }
+                  });
+                  await Promise.all(rowPromises);
+                  // ✅ Button state handling
+                  if (header.DocStatus == "C") {
+                      $('#mainitemtable .remove-line')
+                          .prop('disabled', true)
+                          .attr("title", "Cannot remove - Document is closed");
+                  }
+
+                  $('#btnPrint').prop('disabled', false);
+                  $('#btnDelete').prop('disabled', false);
+                  $('#btnCopyFrom').prop('disabled', false);
+                  $('#btnSave').prop('disabled', false);
+                  $('#btnPark').prop('disabled', false);
+                  if (header.DocStatus == "C") {
+                      $('#btnSave').prop('disabled', true);
+                      $('#btnPark').prop('disabled', true);
+                      $('#btnCopyFrom').prop('disabled', true);
+                  }
+              });
+        }
+    });
+
+</script>

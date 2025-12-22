@@ -1,0 +1,771 @@
+﻿<div class="container-fluid p-2">
+    <div class="card shadow-lg m-2">
+        <!-- Card Header -->
+        <div class="card-header bg-white text-black">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h3 class="card-title mb-0">
+                        <i class="bi bi-cash"></i> Sales Register
+                    </h3>
+                </div>
+                <div class="col-md-6 d-flex justify-content-end gap-1">
+                    <button id="btnPdf1" class="btn btn-outline-danger rounded-2" data-title="Sales Register">
+                        <i class="bi bi-file-pdf me-1"></i> PDF
+                    </button>
+                    <button id="btnExcel1" class="btn btn-outline-success  rounded-2" data-title="Sales Register">
+                        <i class="bi bi-file-earmark-excel me-1"></i> EXCEL
+                    </button>
+                    <button id="btnCSV1" class="btn btn-outline-success  rounded-2" data-title="Sales Register">
+                        <i class="bi bi-file-earmark-excel me-1"></i> CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- Form -->
+            <!-- ===================== FORM ===================== -->
+            <form id="ReportForm">
+                <input id="ID" name="CustomerID" hidden />
+
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label for="LedgerCode" class="form-label">Customer</label>
+                        <div class="input-group">
+                            <input id="LedgerCode" class="form-control" type="text" data-id="" data-code="" placeholder="Type customer name/code" />
+                            @*  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ledgerListModal">
+                                    <i class="bi bi-search"></i>
+                                </button>*@
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="MobileNo" class="form-label">Mobile No</label>
+                        <input type="text" class="form-control" id="MobileNo" name="MobileNo" placeholder="Filter by Mobile">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="Username" class="form-label">User</label>
+                        <input type="text" class="form-control" id="Username" name="Username" placeholder="Filter by user">
+                        <input type="text" id="UserID" name="UserID" hidden>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="ItemName" class="form-label">Item Name</label>
+                        <input type="text" class="form-control" id="ItemName" name="ItemName" placeholder="Filter by item name">
+                        <input type="text" id="ItemID" name="ItemID" hidden>
+
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-2">
+                        <label for="Basedon" class="form-label">Based On </label>
+                        <select class="form-select" id="Basedon" name="Basedon">
+                            <option value="A">All</option>
+                            <option value="F">With Headers Only</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="DocNum" class="form-label">Doc Num</label>
+                        <input type="text" class="form-control" id="DocNum" name="DocNum" placeholder="Filter by doc number">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="DocStatus" class="form-label">Doc Status</label>
+                        <select class="form-select" id="DocStatus" name="DocStatus">
+                            <option value="">Filter by status</option>
+                            <option value="O">Open</option>
+                            <option value="C">Closed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="FromDate" class="form-label">From Date</label>
+                        <input type="date" class="form-control datepicker" id="FromDate" name="FromDate">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="ToDate" class="form-label">To Date</label>
+                        <input type="date" class="form-control datepicker" id="ToDate" name="ToDate">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12 text-end">
+                        <button id="btnFind" type="button" class="btn btn-primary me-2 mb-1">
+                            <i class="bi bi-search"></i> Find
+                        </button>
+                        <button id="btnReset" type="button" class="btn btn-secondary me-2 mb-1">
+                            <i class="bi bi-arrow-clockwise"></i> Reset
+                        </button>
+                        <button id="btnFormSettings" class="btn btn-primary me-2 mb-1" type="button" data-bs-toggle="modal" data-bs-target="#formSettingsModal" title="Form Settings">
+                            <i class="bi bi-gear-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="row mt-4">
+                <div class="col-12 ">
+                    <div class="table-responsive " style="height:650px; overflow-y:auto;">
+                        <table id="mainitemtable" class="table table-bordered table-hover m-0" style="table-layout:auto; width:auto; white-space:nowrap;">
+                            <thead class="table-info text-white sticky-top "></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="formSettingsModal" tabindex="-1" aria-labelledby="formSettingsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+        <!-- modal-fullscreen-sm-down makes modal full screen on small devices -->
+        <div class="modal-content shadow-sm border-0 rounded-3">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="formSettingsLabel">
+                    <i class="bi bi-gear-fill me-1"></i> Form Settings
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body p-2">
+                <div class="table-responsive" style="max-height: 60vh; overflow-y: auto;">
+                    <table class="table table-bordered table-hover table-sm" id="formSettingsTable">
+                        <thead class="table sticky-top bg-light">
+                            <tr>
+                                <th scope="col">SR No</th>
+                                <th scope="col">Name</th>
+                                <th hidden scope="col">dName</th>
+                                <th class="text-center" scope="col">Is Visible</th>
+                                <th hidden scope="col">ObjType</th>
+                                <th hidden scope="col">ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dynamic rows added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="saveFormSettings">Save</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+$(function () {
+    $('.datepicker').val(new Date().toISOString().split('T')[0]);
+    var BPPartnerData = [];
+    // Load BP Partners
+    function loadBPPartner() {
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GETBPPARTNER", "Reports")',
+            contentType: "application/json; charset=utf-8",
+            data: { type: "C" },
+            cache: false,
+            success: function (data) {
+                BPPartnerData = data || [];
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+                Notify('error', 'Error', xhr.responseText || 'Error loading BP Partners');
+            }
+        });
+    }
+    loadBPPartner();
+    // ---------------- Autocomplete for LedgerCode ----------------
+    $(document).on('input', "#LedgerCode", function () {
+        var $input = $(this);
+        var value = $input.val().toLowerCase().trim();
+        var suggestionContainerId = 'LedgerSuggestions';
+
+        if (!$('#' + suggestionContainerId).length) {
+            $('<div id="' + suggestionContainerId + '" class="suggestions-container"></div>').appendTo('body');
+        }
+        var $suggestionContainer = $('#' + suggestionContainerId).empty();
+
+        if (Array.isArray(BPPartnerData) && BPPartnerData.length > 0 && value.length > 0) {
+            var searchTokens = value.split(/\s+/);
+
+            var suggestions = BPPartnerData.filter(function (data) {
+                var code = (data.Code || '').toLowerCase();
+                var name = (data.GroupName || '').toLowerCase();
+                var allTokens = code.split(/\s+|[_-]+/).concat(name.split(/\s+|[_-]+/));
+                return searchTokens.every(function (token) {
+                    return allTokens.some(function (itemToken) {
+                        return itemToken.includes(token);
+                    });
+                });
+            }).slice(0, 30);
+
+            if (suggestions.length > 0) {
+                suggestions.forEach(function (data) {
+                    $suggestionContainer.append(`
+                        <div class="suggestion-item ledger-set"
+                            data-code="${data.Code || ''}"
+                            data-id="${data.ID || ''}"
+                            data-name="${data.GroupName || ''}"
+                            data-mobile="${data.MobileNo || ''}">
+                            <b>${data.Code || ''}</b> - ${data.GroupName || ''}-${data.MobileNo || ''}
+                        </div>
+                    `);
+                });
+
+                var offset = $input.offset();
+                $suggestionContainer.css({
+                    top: offset.top + $input.outerHeight(),
+                    left: offset.left,
+                    width: $input.outerWidth(),
+                    position: 'absolute',
+                    "z-index": 1000,
+                }).show();
+            } else {
+                $suggestionContainer.hide();
+            }
+        }
+    });
+    // ---------------- Autocomplete for MobileNo ----------------
+    $(document).on('input', "#MobileNo", function () {
+        var $input = $(this);
+        var value = $input.val().trim();
+        var suggestionContainerId = 'MobileSuggestions';
+
+        if (!$('#' + suggestionContainerId).length) {
+            $('<div id="' + suggestionContainerId + '" class="suggestions-container"></div>').appendTo('body');
+        }
+        var $suggestionContainer = $('#' + suggestionContainerId).empty();
+
+        if (Array.isArray(BPPartnerData) && BPPartnerData.length > 0 && value.length > 0) {
+            var suggestions = BPPartnerData.filter(c => (c.MobileNo || '').includes(value)).slice(0, 30);
+
+            if (suggestions.length > 0) {
+                suggestions.forEach(function (data) {
+                    $suggestionContainer.append(`
+                        <div class="suggestion-item ledger-set"
+                            data-code="${data.Code || ''}"
+                            data-id="${data.ID || ''}"
+                            data-name="${data.GroupName || ''}"
+                            data-mobile="${data.MobileNo || ''}">
+                            ${data.MobileNo || ''} - ${data.GroupName || ''}-${data.Code || ''}
+                        </div>
+                    `);
+                });
+
+                var offset = $input.offset();
+                $suggestionContainer.css({
+                    top: offset.top + $input.outerHeight(),
+                    left: offset.left,
+                    width: $input.outerWidth(),
+                    position: 'absolute',
+                    "z-index": 1000,
+                }).show();
+            } else {
+                $suggestionContainer.hide();
+            }
+        }
+    });
+    // ---------------- Handle selection (both LedgerCode & Mobile) ----------------
+     $(document).on('click', '.ledger-set', function () {
+            var ledgerCode = $(this).data('code');
+            var groupName = $(this).data('name');
+            var id = $(this).data('id');
+            var mobile = $(this).data('mobile');
+
+            // Sirf LedgerCode aur MobileNo update karna
+            $("#LedgerCode").val(groupName).attr("data-code", ledgerCode).attr("data-id", id);
+            $("#MobileNo").val(mobile || "");
+            $("#ID").val(id);
+             $("#ItemName").val("");
+            // **Item aur baki fields untouched** => ab kuch clear nahi hoga
+
+            $('.suggestions-container').hide();
+        });
+      // ---------------- Items Autocomplete ----------------
+     let ItemData = [];
+     let ItemMap = new Map();
+     function loadItemMasterTable() {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GETACTIVEITEMS", "Inventory")',
+                contentType: "application/json; charset=utf-8",
+                success: function(data) {
+                    ItemData = Array.isArray(data) ? data : [];
+                    // Fill Map for fast lookup
+                    ItemData.forEach(i => ItemMap.set(i.ItemName, i));
+                },
+                error: function(xhr) { alert("Error loading items"); }
+            });
+        }
+     loadItemMasterTable();
+     function setupItemAutocomplete() {
+            const $input = $("#ItemName");
+
+            $input.on('input', function() {
+                const term = $(this).val().toLowerCase();
+                const suggestions = ItemData
+                    .filter(i => (i.ItemCode + ' ' + i.ItemName).toLowerCase().includes(term))
+                    .slice(0, 20);
+
+                let $container = $('#ItemSuggestions');
+                if (!$container.length) {
+                    $container = $('<div id="ItemSuggestions" class="suggestions-container"></div>').appendTo('body');
+                }
+
+                $container.empty();
+
+                if (suggestions.length > 0) {
+                    suggestions.forEach(i => {
+                        $container.append(`<div class="suggestion-item" data-name="${i.ItemName}">${i.ItemCode} - ${i.ItemName}</div>`);
+                    });
+
+                    const offset = $input.offset();
+                    $container.css({
+                        top: offset.top + $input.outerHeight(),
+                        left: offset.left,
+                        width: $input.outerWidth(),
+                        position: 'absolute',
+                        zIndex: 1000,
+                        background: '#fff',
+                        border: '1px solid #ccc',
+                        maxHeight: '200px',
+                        overflowY: 'auto'
+                    }).show();
+                } else {
+                    $container.hide();
+                }
+            });
+
+            // Set ItemName in input and ItemID in hidden field on click
+            $(document).on('click', '.suggestion-item', function() {
+                const name = $(this).data('name');
+                const item = ItemMap.get(name);
+
+                if (item) {
+                    $("#ItemName").val(item.ItemName); // Display name
+                    $("#ItemID").val(item.ItemID);     // Hidden field
+                }
+                $('#ItemSuggestions').hide();
+            });
+
+            // Hide suggestions when clicking outside
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#ItemName, #ItemSuggestions').length) {
+                    $('#ItemSuggestions').hide();
+                }
+            });
+        }
+     setupItemAutocomplete();
+    // ---------------- Users Autocomplete ----------------
+    let UserData = [];
+    let UserMap = new Map();
+    function loadUserMasterTable() {
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GETUSERS", "Auth")', // Replace with actual controller
+            contentType: "application/json; charset=utf-8",
+            success: function(data) {
+                UserData = Array.isArray(data) ? data : [];
+                // Fill Map for fast lookup
+                UserData.forEach(u => UserMap.set(u.Username, u));
+            },
+            error: function(xhr) { alert("Error loading users"); }
+        });
+    }
+    loadUserMasterTable();
+    function setupUserAutocomplete() {
+        const $input = $("#Username");
+
+        $input.on('input', function() {
+            const term = $(this).val().toLowerCase();
+            const suggestions = UserData
+                .filter(u => (u.Username).toLowerCase().includes(term))
+                .slice(0, 20);
+
+            let $container = $('#UserSuggestions');
+            if (!$container.length) {
+                $container = $('<div id="UserSuggestions" class="suggestions-container"></div>').appendTo('body');
+            }
+
+            $container.empty();
+
+            if (suggestions.length > 0) {
+                suggestions.forEach(u => {
+                    $container.append(`<div class="suggestion-item" data-name="${u.Username}">${u.Username}</div>`);
+                });
+
+                const offset = $input.offset();
+                $container.css({
+                    top: offset.top + $input.outerHeight(),
+                    left: offset.left,
+                    width: $input.outerWidth(),
+                    position: 'absolute',
+                    zIndex: 1000,
+                    background: '#fff',
+                    border: '1px solid #ccc',
+                    maxHeight: '200px',
+                    overflowY: 'auto'
+                }).show();
+            } else {
+                $container.hide();
+            }
+        });
+
+        // Set Username in input and UserID in hidden field on click
+        $(document).on('click', '.suggestion-item', function() {
+            const name = $(this).data('name');
+            const user = UserMap.get(name);
+
+            if (user) {
+                $("#Username").val(user.Username);  // Display name
+                $("#UserID").val(user.UserID);      // Hidden field (create <input type="hidden" id="UserID" /> in form)
+            }
+            $('#UserSuggestions').hide();
+        });
+
+        // Hide suggestions when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('#Username, #UserSuggestions').length) {
+                $('#UserSuggestions').hide();
+            }
+        });
+    }
+    // Call the function
+    setupUserAutocomplete();
+       var FormData = [];
+    var BindData = {};
+    // 🔹 Get initial config
+    getConfigData("SR");
+    // 🔹 Button click: get filtered data
+    $("#btnReset").on("click", function () {
+        $("#ID").val("");
+        $("#LedgerCode").val("");
+        $("#MobileNo").val("");
+        $("#Username").val("");
+        $("#UserID").val("");
+        $("#ItemName").val("");
+        $("#ItemID").val("");
+
+        $("#Basedon").val("A");
+        $("#DocNum").val("");
+        $("#DocStatus").val("");
+        $('.datepicker').val(new Date().toISOString().split('T')[0]);
+        LoadReport()
+    });
+    $("#btnFind").on("click", function () {
+        LoadReport()
+    });
+    function LoadReport() {
+          const LedgerCode = $("#ID").val();
+          const CreatedUser = $("#UserID").val();
+          const ItemID = $("#ItemID").val();
+          const Docnum = $("#DocNum").val();
+          const Docstatus = $("#DocStatus").val();
+          const FromDate = $("#FromDate").val();
+          const ToDate = $("#ToDate").val();
+          const Basedon = $("#Basedon").val();
+          $.ajax({
+              url: '@Url.Action("GETSFILTERDATA","Reports")',
+              type: 'GET',
+              data: { LedgerCode, CreatedUser, Docnum, Docstatus, FromDate, ToDate, ItemID },
+              success: function (response) {
+                  BindData = response;
+                  if (response && response.success) {
+                      bindTable(response.data, FormData);
+                      FormSettingsTable(FormData, response.data[0] || response);
+                  } else if (response) {
+                      bindTable(response, FormData);
+                      FormSettingsTable(FormData, response[0] || response);
+                  } else {
+                      Notify('error', 'No records found', '');
+                  }
+              },
+              error: function (xhr) {
+                  console.error("Error fetching filtered data:", xhr.responseText);
+              }
+          });
+    }
+    LoadReport()
+        // 🔹 Dynamic main table binding
+        function bindTable(data, formData)  {
+            const $table = $('#mainitemtable');
+
+            // Destroy DataTable safely
+            if ($.fn.DataTable.isDataTable($table)) {
+                $table.DataTable().clear().destroy();
+            }
+
+            // Ensure thead/tbody exist
+            let $thead = $table.find('thead');
+            let $tbody = $table.find('tbody');
+            if ($thead.length === 0) $thead = $('<thead>').appendTo($table);
+            if ($tbody.length === 0) $tbody = $('<tbody>').appendTo($table);
+
+            $thead.empty();
+            $tbody.empty();
+
+            if (!data || data.length === 0) {
+                Notify('error', 'No records found', '');
+                return;
+            }
+
+            // Get all keys
+            let columns = [];
+            data.forEach(item =>
+                Object.keys(item).forEach(key => {
+                    if (!columns.includes(key)) columns.push(key);
+                })
+            );
+
+            // Header row
+            let headerRow = '<tr><th>SRNo</th><th>Action</th>';
+            columns.forEach(key => {
+                let formField = formData.find(f => f.DName === key);
+                if (formField && formField.IsVisible === 'N') {
+                    headerRow += `<th class="d-none col-${key}">${key}</th>`;
+                } else {
+                    headerRow += `<th class="col-${key}" style="white-space:nowrap;">${key}</th>`;
+                }
+            });
+            headerRow += '</tr>';
+            $thead.append(headerRow);
+
+            // Body rows
+            data.forEach((item, index) => {
+                let row = `<tr data-id="${item.DocID}"><td>${index + 1}</td>`;
+                row += `<td><button class="btn btn-sm btn-primary print-btn" data-index="${index}">Print</button></td>`;
+
+                columns.forEach(key => {
+                    let value = item[key] !== undefined && item[key] !== "" ? item[key] : '-';
+                    if (key === "DocumentDate" && value !== '-') {
+                        let d = new Date(value);
+                        if (!isNaN(d)) {
+                            value = `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+                        }
+                    }
+
+                    let formField = formData.find(f => f.DName === key);
+                    if (formField && formField.IsVisible === 'N') {
+                        row += `<td class="d-none col-${key}">${value}</td>`;
+                    } else {
+                        row += `<td class="col-${key}" style="white-space:nowrap;">${value}</td>`;
+                    }
+
+                });
+
+                row += '</tr>';
+                $tbody.append(row);
+            });
+
+            // Re-initialize DataTable
+            $table.DataTable({
+                paging: false,
+                dom: '<"top"i>rt<"bottom"lp><"clear">'
+            });
+
+            // Print button
+            $tbody.find('.print-btn').on('click', function () {
+                var this1 = $(this);
+                const row = $(this).closest('tr');
+                const docEntry = row.attr('data-id');
+                PrintLayout2("A4", "STI", docEntry, this1)
+            });
+            function PrintLayout2(Size, DocType, docentry, this1){
+                        if(docentry=="")
+                        {
+                            Notify('warning','Please Select Valid Document..!','');
+                            return;
+                        }
+                        // AJAX call to save
+                        $.ajax({
+                            url: '@Url.Action("GenerateLayout", "Layout")',
+                            method: 'GET',
+                            contentType: 'application/json',
+                            data:{DocType:DocType,DocEntry:docentry,Size:Size},
+                            beforeSend: function () {
+                                this1.html("<i class='bi bi-arrow-repeat me-1'><i>...Loding").prop("disabled",true)
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    if (response.message && response.fileName) {
+                                        // Extract the base64 part after the comma
+                                        const base64Data = response.message.split(',')[1];
+                                        // Decode the base64 string
+                                        const byteCharacters = atob(base64Data);
+                                        const byteNumbers = new Array(byteCharacters.length);
+                                        for (let i = 0; i < byteCharacters.length; i++) {
+                                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                                        }
+                                        const byteArray = new Uint8Array(byteNumbers);
+                                        const blob = new Blob([byteArray], { type: 'application/pdf' });
+                                        const pdfUrl = URL.createObjectURL(blob);
+
+                                        // Open PDF in a new tab
+                                        const newTab = window.open(pdfUrl, '_blank');
+                                        if (newTab) {
+                                            newTab.focus();
+                                        } else {
+                                            alert("Please allow popups to view the PDF.");
+                                        }
+
+                                        // Revoke the URL after some time (to free memory)
+                                        setTimeout(() => {
+                                            URL.revokeObjectURL(pdfUrl);
+                                        }, 5 * 60 * 1000); // keep alive for 5 minutes so PDF loads fine
+                                    }
+                                    $('#addFilesButton').click();
+                                } else {
+                                    Notify('error', 'Failed To Create', response.message);
+                                }
+                            },
+                            error: function (xhr) {
+                                console.error(xhr.responseText)
+                                const errorMessage = xhr.responseText || 'Error to print document ';
+                                Notify('error', 'Error', errorMessage);
+
+                            },complete: function() {
+                                this1.html("Print").prop("disabled", false)
+                            }
+                        });
+
+                    }
+        }
+
+        // 🔹 Fetch ReportConfiguration
+        function getConfigData(objType) {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GETCONDIGDATA", "Reports")',
+                data: { ObjType: objType },
+                contentType: "application/json; charset=utf-8",
+                success: function (response) {
+                    FormData = response || [];
+                    FormSettingsTable(response, null);
+                },
+                error: function (xhr, status, error) {
+                    console.error('AJAX error:', error);
+                }
+            });
+        }
+
+       // 🔹 Dynamic FormSettings table
+       function FormSettingsTable(response, BindDataRow) {
+        const $tbody = $('#formSettingsTable tbody');
+        $tbody.empty();
+
+        const isIdField = (fieldName) => {
+            // Match any field name containing 'id' case-insensitive
+            return /id$/i.test(fieldName) || /inlastid/i.test(fieldName)|| /inlastID/i.test(fieldName);
+        };
+
+        if (response && response.length > 0) {
+            // Use ReportConfiguration
+            response.forEach((item, index) => {
+                const srNo = index + 1;
+                const fieldName = item.DName || '';
+                const checked = item.IsVisible === "Y"; // Only visible fields checked
+                const disabled = isIdField(fieldName) ? "disabled" : "";
+
+                $tbody.append(`
+                    <tr>
+                        <td>${srNo}</td>
+                        <td>${item.Name || ''}</td>
+                        <td hidden>${fieldName}</td>
+                        <td class="text-center">
+                            <div class="form-check form-switch d-inline-block">
+                                <input class="form-check-input toggle-switch" type="checkbox"
+                                       data-dname="${fieldName}" ${checked ? "checked" : ""} ${disabled}>
+                            </div>
+                        </td>
+                        <td hidden>
+                            <input type="text" class="form-control form-control-sm objType-cell" value="${item.ObjType || ''}" readonly>
+                        </td>
+                        <td hidden>
+                            <input type="text" class="form-control form-control-sm ID-cell" value="${item.ID || ''}" readonly>
+                        </td>
+                    </tr>
+                `);
+            });
+        } else if (BindDataRow) {
+            // Generate dynamically from BindDataRow keys
+            Object.keys(BindDataRow).forEach((key, index) => {
+                const srNo = index + 1;
+                const displayName = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
+                const checked = !isIdField(key); // Only non-ID fields checked by default
+                const disabled = isIdField(key) ? "disabled" : "";
+
+                $tbody.append(`
+                    <tr>
+                        <td>${srNo}</td>
+                        <td>${displayName}</td>
+                        <td hidden>${key}</td>
+                        <td class="text-center">
+                            <div class="form-check form-switch d-inline-block">
+                                <input class="form-check-input toggle-switch" type="checkbox"
+                                       data-dname="${key}" ${checked ? "checked" : ""} ${disabled}>
+                            </div>
+                        </td>
+                        <td hidden>
+                            <input type="text" class="form-control form-control-sm objType-cell" value="SR" readonly>
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+
+        // 🔹 Toggle column visibility dynamically
+        $('.toggle-switch').off('change').on('change', function () {
+            const dname = $(this).data('dname');
+            const isChecked = $(this).is(':checked');
+            if (isChecked) {
+                $(`#mainitemtable .col-${dname}`).removeClass('d-none');
+            } else {
+                $(`#mainitemtable .col-${dname}`).addClass('d-none');
+            }
+        });
+    }
+       ///-----Post Setting----------------///
+       $('#saveFormSettings').on('click', function() {
+            const tableData = [];
+            $('#formSettingsTable tbody tr').each(function() {
+                const $row = $(this);
+                const srNo = $row.find('td:eq(0)').text().trim();
+                const name = $row.find('td:eq(1)').text().trim();
+                 const DName = $row.find('td:eq(2)').text().trim();
+                const isVisible = $row.find('.toggle-switch').is(':checked') ? 'Y' : 'N';
+                const objType = $row.find('.objType-cell').val();
+                  const ID = $row.find('.ID-cell').val();
+
+                tableData.push({
+                    SrNo: srNo,
+                    Name: name,
+                    DName: DName,
+                    IsVisible: isVisible,
+                    ObjType: objType,
+                    ID: ID
+                });
+            });
+            // Example AJAX POST
+            $.ajax({
+                 url: '@Url.Action("ADDCOLCONFIGURATION", "Reports")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(tableData),
+                success: function(response) {
+                    Notify('success', 'Success', 'Settings saved successfully!');
+                    $('#formSettingsModal').modal('hide'); // close modal
+                },
+                error: function (xhr) {
+                    Notify("error", "Error", xhr.responseText || "Error loading items");
+                }
+            });
+        });
+   });
+
+</script>
+
+

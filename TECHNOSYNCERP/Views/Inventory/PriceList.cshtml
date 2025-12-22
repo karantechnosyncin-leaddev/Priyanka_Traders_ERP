@@ -1,0 +1,951 @@
+﻿
+<div class="container-fluid">
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="card p-2 rounded shadow-sm">
+                <div class="row">
+                    <div class="col-md-6 d-flex align-items-center">
+                        <h3 id="doctitle"><b>Price List</b></h3>
+                    </div>
+                    <div class="col-md-6 d-flex justify-content-end align-items-center flex-wrap">
+                        @if (ViewBag.BtnAuth != null)
+                        {
+                            <!-- Button Rendering Logic -->
+                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                            {
+                                var btnName = item["BtnName"]?.ToString().Trim();
+                                var btnauth = item["Auth"]?.ToString();
+                                var icon = item["Icon"]?.ToString();
+                                var ColorClass = item["ColorClass"]?.ToString();
+                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                {
+                                    switch (btnName)
+                                    {
+                                        @*   case "Bulk Upload":
+                                            <button id="btnBulkUpload" data-bs-toggle="modal" data-bs-target="#bulkUploadModal" class="btn @ColorClass mb-1  me-2 mb-1">
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break; *@
+                                     
+                                        case "Export":
+                                            <button id="btnPdf" class="btn btn-outline-danger me-2 mb-1">
+                                                <i class="bi bi-file-pdf me-1"></i> PDF
+                                            </button>
+                                            <button id="btnExcel" class="btn btn-outline-success me-2 mb-1">
+                                                <i class="bi bi-file-earmark-excel me-1"></i> EXCEL
+                                            </button>
+                                            <button id="btnCSV" class="btn btn-outline-success me-2 mb-1">
+                                                <i class="bi bi-file-earmark-excel me-1"></i> CSV
+                                            </button>
+                                            break;
+                                        default:
+
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-primary" role="alert">
+
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mt-3">
+            <div class="card p-3 rounded shadow-sm">
+                <!-- Action Buttons -->
+                <div class="row mb-3">
+                    <div class="col-12 d-flex justify-content-end flex-wrap">
+                        @if (ViewBag.BtnAuth != null)
+                        {
+                            <!-- Button Rendering Logic -->
+                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                            {
+                                var btnName = item["BtnName"]?.ToString().Trim();
+                                var btnauth = item["Auth"]?.ToString();
+                                var icon = item["Icon"]?.ToString();
+                                var ColorClass = item["ColorClass"]?.ToString();
+
+                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                {
+                                    switch (btnName)
+                                    {
+                                        case "Save":
+                                            <button id="btnSave" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2">
+                                                <i class="@icon"></i>@btnName
+                                            </button>
+                                            break;
+                                        case "Reset":
+                                            <button id="btnReset" class="btn @ColorClass mb-1   me-2">
+                                                <i class="@icon"></i> Reset
+                                            </button>
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-primary" role="alert">
+
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Header Information -->
+                <div class="row">
+                    <div class="col-md-3 col-6 mb-2" hidden>
+                        <input id="DocumentEntry" hidden class="form-control" type="text" readonly />
+                        <input id="doctype" type="text" hidden value="GI" class="form-control" />
+                    </div>
+                    <div class="col-md-3 col-6 mb-2">
+                        <label for="SearchItem" class="form-label">Search Item</label>
+                        <input id="SearchItem" class="form-control" type="text"  />
+                    </div>
+                </div>
+
+                <!-- Line Items -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table  table-hover" id="mainitemtable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th nowrap>Sr No</th>
+                                        <th nowrap>Delete</th>
+                                        <th nowrap>Item Code</th>
+                                        <th nowrap>Item Name</th>
+                                        <th nowrap>Conversion Code</th>
+                                        <th nowrap>Conversion Qty</th>
+                                        <th nowrap>MRP</th>
+                                        <th nowrap>Discount</th>
+                                        <th nowrap>Rate</th>
+                                        <th hidden nowrap>BaseUomID</th>
+                                        <th nowrap>IsActive</th>
+                                        <th hidden nowrap>Flag</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-id='' class="line-item">
+                                        <td>1</td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-outline-danger remove-line" disabled>
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <div class="input-group" style='width:200px!important;'>
+                                                <input data-id='' type="text" class="form-control form-control-sm ItemCode" placeholder="Item Code">
+                                                <button class="btn btn-sm btn-outline-secondary openmodal" type="button" data-bs-toggle="modal" data-bs-target="#itemSearchModal">
+                                                    <i class="bi bi-search"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td nowrap><input style='width:300px!important;' type="text" class="form-control form-control-sm ItemName"></td>
+                                        <td nowrap><input style='width:200px!important;' type="text" class="form-control form-control-sm Code" data-id=''></td>
+                                        <td nowrap><input style='width:120px!important;' type="number" class="form-control   text-end form-control-sm ConveQTY" ></td>
+                                        <td nowrap><input style='width:120px!important;' class="form-control form-control-sm text-end Mrp" type="number" /></td>
+                                        <td nowrap><input style='width:120px!important;' class="form-control form-control-sm text-end Discount" type="number" /></td>
+                                        <td nowrap><input style='width:120px!important;' class="form-control form-control-sm text-end Rate" type="number" /></td>
+                                        <td nowrap hidden><input style='width:120px!important;' class="form-control form-control-sm text-end BaseUomID" type="number" /></td>
+                                        <td nowrap class="text-center ">
+                                            <select style='width:120px!important;' class='form-control form-control-sm text-center IsActive'>
+                                                <option value='A'>Active</option>
+                                                <option value='I'>In Active</option>
+                                            </select>
+                                        </td>
+                                        <td hidden nowrap><input style='width:120px!important;' class="form-control form-control-sm text-end flag" value="N" type="text" /></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-12 text-end mt-3">
+                            @if (ViewBag.BtnAuth != null)
+                            {
+                                <!-- Button Rendering Logic -->
+                                @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                                {
+                                    var btnName = item["BtnName"]?.ToString().Trim();
+                                    var btnauth = item["Auth"]?.ToString();
+                                    var icon = item["Icon"]?.ToString();
+                                    var ColorClass = item["ColorClass"]?.ToString();
+
+                                    if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                    {
+                                        switch (btnName)
+                                        {
+                                            case "Add New Line":
+                                                <button class="btn @ColorClass mb-1 " id="btnAddLine"><i class="@icon"></i> @btnName</button>
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <div class="alert alert-primary" role="alert">
+
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modals -->
+<!-- Item Search Modal -->
+<div class="modal fade" id="itemSearchModal" tabindex="-1" aria-labelledby="itemSearchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="itemSearchModalLabel">Item Search</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12 text-end mb-3">
+                    <button class="btn btn-primary refreshitems">Refresh Items</button>
+                </div>
+                <div class="table-responsive ">
+                    <table class="table table-bordered table-striped table-hover w-100" id="itemSearchTable">
+                        <thead>
+                            <tr>
+                                <th width="15%">Select</th>
+                                <th width="15%">Item Code</th>
+                                <th width="15%">EAN Code</th>
+                                <th width="40%">Item Name</th>
+                                <th width="15%">UOM</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Initialize variables
+        let currentDocEntry = null;
+        let isEditMode = false;
+        let selectedRowIndex = null;
+        let selectedItemId = null;
+        // Initialize date pickers
+        $('.datepicker').val(new Date().toISOString().split('T')[0]);
+        // Load fiscal years
+        $('#btnAddLine').click(function() {
+            addNewLineItem();
+        });
+        // Save document
+        $('#btnSave').click(function () {
+            savedocument("S");
+        });
+        // Save document
+        $('#btnPark').click(function () {
+            savedocument("P");
+        });
+        $('#btnUpdate').click(function() {
+            savedocument();
+        });
+        $('#btnDelete').click(function() {
+            deleteGoodsReceipt();
+        });
+        $('#btnReset').click(function() {
+            resetForm();
+        });
+        // Function to add new line item
+        function addNewLineItem() {
+            const table = $('#mainitemtable tbody');
+            const lastRow = table.find('tr').last();
+            // Check if there is at least one row and its ItemCode is empty
+            if (lastRow.length && !lastRow.find('.ItemCode').val().trim()) {
+                lastRow.find('.ItemCode').focus();
+                return; // Stop execution if the previous row's ItemCode is empty
+            }
+            const rowCount = table.find('tr').length;
+            const newRow = `
+             <tr data-id='' class="line-item">
+                 <td>${rowCount + 1}</td>
+                 <td class="text-center">
+                     <button class="btn btn-sm btn-outline-danger remove-line" disabled>
+                         <i class="bi bi-trash"></i>
+                     </button>
+                 </td>
+                 <td>
+                     <div class="input-group" style='width:200px!important;'>
+                         <input data-id='' type="text" class="form-control form-control-sm ItemCode" placeholder="Item Code">
+                         <button class="btn btn-sm btn-outline-secondary openmodal" type="button" data-bs-toggle="modal" data-bs-target="#itemSearchModal">
+                             <i class="bi bi-search"></i>
+                         </button>
+                     </div>
+                 </td>
+                 <td nowrap><input style='width:300px!important;' type="text" class="form-control form-control-sm ItemName"></td>
+                 <td nowrap><input style='width:200px!important;' type="text" class="form-control form-control-sm Code" data-id=''></td>
+                 <td nowrap><input style='width:120px!important;' type="number" class="form-control   text-end form-control-sm ConveQTY"></td>
+                 <td nowrap><input style='width:120px!important;' class="form-control form-control-sm text-end Mrp" type="number" /></td>
+                 <td nowrap><input style='width:120px!important;' class="form-control form-control-sm text-end Discount" type="number" /></td>
+                 <td nowrap><input style='width:120px!important;' class="form-control form-control-sm text-end Rate" type="number" /></td>
+                 <td nowrap hidden><input style='width:120px!important;' class="form-control form-control-sm text-end BaseUomID" type="number" /></td>
+                 <td nowrap class="text-center ">
+                     <select style='width:120px!important;' class='form-control form-control-sm text-center IsActive'>
+                         <option value='A'>Active</option>
+                         <option value='I'>In Active</option>
+                     </select>
+                 </td>
+                  <td nowrap hidden><input style='width:120px!important;' class="form-control form-control-sm text-end flag" value="N" type="text" /></td>
+             </tr>
+            `;
+            table.append(newRow);
+            const newRowElement = table.find('tr').last();
+           // populateWarehouses(newRowElement.find('.WhsCode'));
+            newRowElement.find('.ItemCode').focus();
+            if (rowCount > 0) {
+                table.find('tr').each(function () {
+                    $(this).find('.remove-line').prop('disabled', false);
+                });
+            }
+        }
+        function LoadUOM(id,row) {
+            $.ajax({
+                url: '@Url.Action("GETUOMBYITEM", "Inventory")',
+                method: 'GET',
+                data:{id,id},
+                success: function(response) {
+                    window.uoms = response;
+                    populateUOM(row.find('.ItemUOM'));
+                },
+                error: function(xhr) {
+                   Notify('error', 'Error', xhr.responseText );
+                }
+            });
+        }
+        function populateUOM(dropdown) {
+            dropdown.empty();
+
+            if (window.uoms) {
+                window.uoms.forEach(function(uom) {
+                    dropdown.append(`<option value="${uom.UomID}">${uom.UomCode}</option>`);
+                });
+            }
+        }
+        function savedocument(flag) {
+            removeempty()
+            const lineItems = getLineItems();
+            console.log(lineItems)
+            if (flag == "S") {
+                if (!validateForm(lineItems)) {
+                    return;
+                }
+            }
+            const data = {
+                lines: lineItems
+            };
+            // AJAX call to save
+            $.ajax({
+                url: '@Url.Action("BULKPRICELISTUPDATE", "Inventory")' + '?flag=' + flag + '&doctype=' + $("#doctype").val(),
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                beforeSend: function() {
+                    if (flag == "S") {
+                        $('#btnSave').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Processing...');
+                    } else {
+                        $('#btnPark').prop('disabled', true).html('<i class="bi bi-p-circle"></i> Processing...');
+                    }
+                },
+                success: function(response) {
+                    if(response.success){
+                       Notify('success', response.message,'');
+                       currentDocEntry = response.docEntry;
+                       //$('#btnUpdate').prop('disabled', false);
+                       $('#btnDelete').prop('disabled', false);
+                       $('#btnCancel').prop('disabled', false);
+                       $('#DocumentEntry').val(response.docEntry);
+                       $('#addFilesButton').click();
+                       $("#btnReset").click();
+
+                    }else{
+                       Notify('error','Faild To Create ', response.message);
+                    }
+                },
+                error: function(xhr) {
+                    const errorMessage = xhr.responseText || 'Save Document';
+                    Notify('error', 'Error', errorMessage);
+                    if (flag == "S") {
+                        $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
+                    } else {
+                        $('#btnPark').prop('disabled', false).html('<i class="bi bi-p-circle"></i> Park');
+                    }
+                },complete: function() {
+                    if (flag == "S") {
+                        $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
+                    } else {
+                        $('#btnPark').prop('disabled', false).html('<i class="bi bi-p-circle"></i> Park');
+                    }
+                }
+            });
+        }
+        function removeempty(){
+            var tablerow= $('#mainitemtable tbody tr').length;
+            if(tablerow >1){
+                $('#mainitemtable tbody tr').each(function(){
+                     var row = $(this).closest("tr");
+                    if (row.length && !row.find('.ItemCode').val().trim()) {
+                        row.remove();
+                        return; // Stop execution if the previous row's ItemCode is empty
+                    }
+                });
+            }
+        }
+        function getLineItems() {
+            const lineItems = [];
+            $('#mainitemtable tbody tr').each(function(index) {
+                const row = $(this);
+                if (row.find(".flag").val()=="Y") {
+                    lineItems.push({
+                        PriceSetID: row.data('id').toString() || null,
+                        ItemID: row.find('.ItemCode').data('id').toString() || null,
+                        ConveQTY: parseFloat(row.find('.ConveQTY').val()) || 0,
+                        UomID: row.find('.Code').attr("data-id").toString() || null,
+                        MRP: parseFloat(row.find('.Mrp').val()) || 0,
+                        Discount: parseFloat(row.find('.Discount').val()) || 0,
+                        NetAmount: parseFloat(row.find('.Rate').val()) || 0,
+                        BaseUomID: row.find('.BaseUomID').val().toString() || null,
+                        IsActive: row.find('.IsActive option:selected').val(),
+                    });
+                }
+            });
+            return lineItems;
+        }
+        function validateForm(lines) {
+            if (lines.length<=0) {
+                Notify('error', 'No changes found or no data to save.', '');
+                return false;
+            }
+            var index= 1;
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                if (!line.ItemID) {
+                    Notify('error', `Item code is required for line ${index }`,'');
+                    return false;
+                }
+                if (!line.ConveQTY || line.ConveQTY <= 0 || line.ConveQTY == "NaN") {
+                    Notify('error', `Valid quantity is required for Item ${index}`,'');
+                    return false;
+                }
+                if (!line.UomID || line.UomID == "NaN") {
+                    Notify('error', `Uom is required for line ${index}`,'');
+                    return false;
+                }
+                index++;
+            }
+            return true;
+        }
+        function resetForm() {
+            currentDocEntry = null;
+            isEditMode = false;
+            // Reset line items (keep one empty row)
+            $('#mainitemtable tbody').empty();
+            addNewLineItem();
+            loadItemMasterTable()
+            $("#SearchItem").val("");
+        }
+        $(document).on("change", ".IsActive", function () {
+            var row = $(this).closest("tr");
+            row.find(".flag").val("Y")
+        });
+        $(document).on("input", ".Code, .ConveQTY", function () {
+            var row = $(this).closest("tr");
+            row.find(".flag").val("Y")
+        });
+        $(document).on("input", ".Mrp, .Discount, .Rate", function () {
+            var row = $(this).closest("tr");
+            row.find(".flag").val("Y")
+            rowcalculation(row);
+        });
+        function rowcalculation(row) {
+            var Mrp = parseFloat(row.find(".Mrp").val()) || 0;
+            var Discount = parseFloat(row.find(".Discount").val()) || 0;
+            var Rate = parseFloat(row.find(".Rate").val()) || 0;
+            // If Discount is changed → calculate Rate
+            if ($(document.activeElement).hasClass("Discount")) {
+                var newrate = Mrp - (Mrp * Discount / 100);
+                row.find(".Rate").val(newrate.toFixed(2));
+            }
+            // If Rate is changed → calculate Discount
+            if ($(document.activeElement).hasClass("Rate")) {
+                var newdiscount = ((Mrp - Rate) / Mrp) * 100;
+                row.find(".Discount").val(newdiscount.toFixed(2));
+            }
+            // If MRP changes → update Rate based on Discount
+            if ($(document.activeElement).hasClass("Mrp")) {
+                var updatedRate = Mrp - (Mrp * Discount / 100);
+                row.find(".Rate").val(updatedRate.toFixed(2));
+            }
+        }
+        $(document).on('click', '.remove-line', function() {
+            const row = $(this).closest('tr');
+            const table = $('#mainitemtable tbody');
+            const rowCount = table.find('tr').length;
+
+            if (rowCount > 1) {
+                row.remove();
+
+                // Update row numbers
+                table.find('tr').each(function(index) {
+                    $(this).find('td:first').text(index + 1);
+                });
+
+                // Disable remove button if only one row left
+                if (table.find('tr').length === 1) {
+                    table.find('tr').first().find('.remove-line').prop('disabled', true);
+                }
+            } else {
+                Notify('warning', 'At least one item is required');
+            }
+        });
+        $(document).on('click', '.openmodal', function() {
+            selectedRowIndex = null;
+            selectedItemId = null;
+            const row = $(this).closest('tr');
+            selectedRowIndex = row.index();
+        });
+        $(document).on('click', '.btnSelectItem', function() {
+            const row = $(this).closest('tr');
+            if (selectedRowIndex !== null) {
+                const targetRow = $('#mainitemtable tbody tr').eq(selectedRowIndex);
+                SetItem(row.data('item-id'), targetRow)
+                $('#itemSearchModal').modal('hide');
+            } else {
+                Notify('warning', 'No target row selected','');
+            }
+        });
+        // UOM Search
+        {
+            GETUOM();
+            var UomData = [];
+            var $activeInput = null;
+            function GETUOM() {
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("GETUOM", "Master")',
+                    contentType: "application/json; charset=utf-8",
+                    cache: true,
+                    success: function (data) {
+                        if (data && data.length) {
+                            UomData = data;
+                        }
+                    },
+                    error: function (xhr) {
+                        const errorMessage = xhr.responseText || 'Error loading UOM';
+                        Notify('error', 'Error', errorMessage);
+                    }
+                });
+            }
+            function CreateUomList(inputClass) {
+                if (!$('#UomSuggestions').length) {
+                    $('body').append('<div id="UomSuggestions" class="suggestions-container"></div>');
+                }
+                var $suggestionContainer = $('#UomSuggestions');
+                $(document).on('input', "#mainitemtable tbody tr td ." + inputClass, function () {
+                    var $input = $(this);
+                    $activeInput = $input;
+                    var value = $input.val().toLowerCase().replace(/_/g, ' ');
+                    $suggestionContainer.empty();
+                    if (Array.isArray(UomData) && UomData.length > 0 && value.length > 0) {
+                        var searchTokens = value.split(/\s+/);
+                        var suggestions = UomData.filter(function (data) {
+                            if (data && typeof data === 'object') {
+                                var code = (data.Code || '').toLowerCase();
+                                var name = (data.Name || '').toLowerCase();
+                                var allTokens = code.split(/\s+|[_-]+/).concat(name.split(/\s+|[_-]+/));
+                                return searchTokens.every(function (token) {
+                                    return allTokens.some(function (itemToken) {
+                                        return itemToken.includes(token);
+                                    });
+                                });
+                            }
+                            return false;
+                        }).sort(function (a, b) {
+                            return a.Name.localeCompare(b.Name);
+                        }).slice(0, 20);
+                        if (suggestions.length > 0) {
+                            suggestions.forEach(function (data) {
+                                $suggestionContainer.append(
+                                    `<div class="suggestion-item uomlist" data-code="${data.Code || ''}" data-id="${data.UomID || ''}" data-name="${data.Name || ''}">
+                                        <span class="supplier-code">${data.Code || ''}</span> 
+                                    </div>`
+                                );
+                            });
+                            // Position under the active input
+                            var offset = $input.offset();
+                            $suggestionContainer.css({
+                                top: offset.top + $input.outerHeight(),
+                                left: offset.left,
+                                width: $input.outerWidth(),
+                                position: 'absolute',
+                                "z-index": 1000,
+                            }).show();
+                        } else {
+                           $suggestionContainer.hide();
+                        }
+                    } else {
+                        $suggestionContainer.hide();
+                    }
+                });
+                $(document).on('mousedown', '.uomlist', function (e) {
+                    e.preventDefault();
+                    var selectedCode = $(this).data('code');
+                    var id = $(this).data('id');
+                    if ($activeInput) {
+                        var $activeRow = $activeInput.closest('tr');
+                        var itemid = $activeRow.find(".ItemCode").attr("data-id");
+                        loaduomdetails($activeRow, itemid,id)
+                        $activeRow.find(".Code").val(selectedCode).attr("data-id", id);
+                        $suggestionContainer.hide();
+
+                    }
+                });
+                function loaduomdetails(row, id, uomid) {
+                     $.ajax({
+                         type: "GET",
+                         url: '@Url.Action("GETUOMDETEAILS", "Inventory")',
+                         contentType: "application/json; charset=utf-8",
+                         data: { id: id, uomid: uomid },
+                         cache: false,
+                         success: function (data) {
+                             if (data.length > 0) {
+                                 var item = data[0];
+                                 row.attr("data-id", item.PriceSetID);
+                                 row.find('.ConveQTY').val(parseFloat(item.ConveQTY).toFixed(2) || 0);
+                                 row.find('.Mrp').val(parseFloat(item.MRP).toFixed(2) || 0);
+                                 row.find('.Discount').val(parseFloat(item.Discount).toFixed(2) || 0);
+                                 row.find('.Rate').val(parseFloat(item.NetAmount).toFixed(2) || 0);
+                             } else {
+                                 row.attr("data-id","");
+                                 row.find('.ConveQTY').val(0);
+                                // row.find('.Mrp').val( 0);
+                               //  row.find('.Discount').val(0);
+                                // row.find('.Mrp').val(0);
+                               //  row.find('.Rate').val(0);
+                             }
+                             row.find("").find("").val();
+                         },
+                         error: function (xhr) {
+                             Notify('error', 'Error', xhr.responseText || 'Error loading items');
+                         }
+                     });
+                }
+                // Hide when clicking outside
+                $(document).on('click', function (e) {
+                    if (!$(e.target).closest('#UomSuggestions, .' + inputClass).length) {
+                        $suggestionContainer.hide();
+                    }
+                });
+            }
+            CreateUomList("Code");
+        }
+        // Item Search
+        {
+            $('.refreshitems').click(function() {
+                loadItemMasterTable()
+            });
+            var ItemData = [];
+            var $activeInput = null;
+            function loadItemMasterTable() {
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("GETPRICELISTITEMS", "Inventory")',
+                    contentType: "application/json; charset=utf-8",
+                    cache: false,
+                    success: function (data) {
+                        ItemData = [];
+                        ItemData = Array.isArray(data) ? data : [];
+                        bindtable(data)
+                    },
+                    error: function (xhr) {
+                        Notify('error', 'Error', xhr.responseText || 'Error loading items');
+                    }
+                });
+            }
+            loadItemMasterTable();
+            function bindtable(response){
+                                if ($.fn.DataTable.isDataTable('#itemSearchTable')) {
+                        $('#itemSearchTable').DataTable().destroy();
+                        $('#itemSearchTable thead th').not(':first').find('input').remove();
+                    }
+                    const table = $('#itemSearchTable tbody');
+                    table.empty();
+                    response.forEach(function(item) {
+                        const row = `
+                            <tr data-item-id="${item.ItemID}"
+                                data-item-code="${item.ItemCode}"
+                                data-item-eancode="${item.EanCode}"
+                                data-item-name="${item.ItemName}"
+                                data-item-uom="${item.BaseUomCode}">
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-primary btnSelectItem">Select</button>
+                                </td>
+                                <td nowrap>${item.ItemCode}</td>
+                                <td nowrap>${item.EanCode}</td>
+                                <td nowrap>${item.ItemName}</td>
+                                <td nowrap>${item.BaseUomCode}</td>
+                            </tr>
+                        `;
+                        table.append(row);
+                    });
+
+                    $('#itemSearchTable').DataTable({
+                       // dom: '<"top"f>rt<"bottom"lip><"clear">',
+                        initComplete: function() {
+                            this.api().columns().every(function() {
+                                var column = this;
+                                var header = $(column.header());
+                                if (header.index() === 0) return;
+                                if (header.find('input').length === 0) {
+                                    var input = $('<input type="text" class="form-control form-control-sm" placeholder="Search..."/>')
+                                        .appendTo(header)
+                                        .on('keyup change clear', function() {
+                                            if (column.search() !== this.value) {
+                                                column.search(this.value).draw();
+                                            }
+                                        });
+                                }
+                            });
+                        },
+                        columnDefs: [
+                            { orderable: false, targets: 0 }, // Disable sorting for select button column
+                            { searchable: false, targets: 0 } // Disable searching for select button column
+                        ],
+                        language: {
+                            search: "Global Search:",
+                            searchPlaceholder: "Search all columns..."
+                        },
+                        responsive: true
+                    });
+                    $('.dataTables_filter input').focus();
+
+            }
+            // Function to create item suggestions based on input
+            function CreateItemList(inputClass) {
+                $(document).on('input', "#mainitemtable tbody tr td ." + inputClass, function () {
+                    var $input = $(this);
+                    $activeInput = $input;
+                    var value = $input.val().toLowerCase().replace(/_/g, ' ');
+                    var suggestions = [];
+                    var suggestionContainerId = 'ItemNameSuggestions-' + $input.closest('tr').index();
+                    if (!$('#' + suggestionContainerId).length) {
+                        $('<div id="' + suggestionContainerId + '" class="suggestions-container"></div>').appendTo('body');
+                    }
+                    var $suggestionContainer = $('#' + suggestionContainerId);
+                    $suggestionContainer.empty();
+
+                    if (Array.isArray(ItemData) && ItemData.length > 0) {
+                        if (value.length > 0) {
+                            var searchTokens = value.split(/\s+/);
+                            suggestions = ItemData.filter(function (data) {
+                                if (data && typeof data === 'object') {
+                                    var code = (data.ItemCode || '').toLowerCase();
+                                    var name = (data.ItemName || '').toLowerCase();
+                                    var allTokens = code.split(/\s+|[_-]+/).concat(name.split(/\s+|[_-]+/));
+                                    return searchTokens.every(function (token) {
+                                        return allTokens.some(function (itemToken) {
+                                            return itemToken.includes(token);
+                                        });
+                                    });
+                                }
+                                return false;
+                            }).sort(function (a, b) {
+                                return a.ItemName.localeCompare(b.ItemName);
+                            }).slice(0, 20);
+                        }
+
+                        if (suggestions.length > 0) {
+                            suggestions.forEach(function (data) {
+                                $suggestionContainer.append(
+                                    `<div class="suggestion-item MItemList" data-code="${data.ItemCode || ''}" data-id="${data.ItemID || ''}" data-name="${data.ItemName || ''}">
+                                        <span class="supplier-code">${data.ItemCode || ''}</span> -
+                                        <span class="supplier-name">${data.ItemName || ''}</span>
+                                     </div>`
+                                );
+                            });
+
+                            var offset = $input.offset();
+                            $suggestionContainer.css({
+                                top: offset.top + $input.outerHeight(),
+                                left: offset.left,
+                                width: $input.outerWidth(),
+                                position: 'absolute',
+                                "z-index": 1000
+                            }).show();
+                        } else {
+                            $suggestionContainer.hide();
+                        }
+                    } else {
+                        console.error("ItemData is empty or not defined");
+                        $suggestionContainer.hide();
+                    }
+                });
+            }
+            CreateItemList("ItemCode");
+            CreateItemList("ItemName");
+            $(document).on('click', '.MItemList', function () {
+                var selectedCode = $(this).data('code');
+                var id = $(this).data('id');
+                if ($activeInput) {
+                    var $activeRow = $activeInput.closest('tr');
+                    SetItem(id, $activeRow);
+                }
+                $('.suggestions-container').hide();
+            });
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('.suggestions-container, .ItemCode').length) {
+                    $('.suggestions-container').hide();
+                }
+            });
+            $(document).on("change",".ItemEan",function(){
+              var row =$(this).closest("tr");
+              var eancode =row.find(".ItemEan").val();
+              SetItem(eancode,row)
+            })
+            $(document).on("change",".ItemCode",function(){
+                var row = $(this).closest("tr");
+                var ItemCode = row.find(".ItemCode").attr("data-id");
+                if(ItemCode !=="" && ItemCode !==null){
+                   SetItem(ItemCode.trim(),row)
+                }
+            })
+            function SetItem(id, row) {
+                if (id) {
+                    $.ajax({
+                        type: "GET",
+                        url: '@Url.Action("GETPRICELISTITEMS", "Inventory")',
+                        data: { id: id },
+                        contentType: "application/json; charset=utf-8",
+                        cache: false,
+                        success: function (data) {
+                            if (data.length > 0) {
+                                    var item = data[0];
+                                    row.attr("data-id", item.PriceSetID);
+                                    row.find('.ItemCode').val(item.ItemCode);
+                                    row.find('.ItemCode').attr("data-id",item.ItemID);
+                                    row.find('.ItemName').val(item.ItemName);
+                                    row.find('.Code').val(item.Code);
+                                    row.find('.Code').attr("data-id", item.UomID);
+                                    row.find('.ConveQTY').val(parseFloat(item.ConveQTY).toFixed(2) || 0);
+                                    row.find('.Mrp').val(parseFloat(item.Mrp).toFixed(2) ||0);
+                                    row.find('.Discount').val(parseFloat(item.Discount).toFixed(2) ||0);
+                                    row.find('.Rate').val(parseFloat(item.NetAmount).toFixed(2) ||0);
+                                    row.find('.BaseUomID').val(item.BaseUomId);
+                                    row.find('.IsActive').val(item.IsActive);
+                                    $("#btnAddLine").click();
+                            }
+                        },
+                        error: function (xhr) {
+                            Notify('error', 'Error', xhr.responseText || 'Error loading item by ID');
+                        }
+                    });
+                }
+            }
+            $(document).on('input', "#SearchItem", function () {
+                var $input = $(this);
+                var value = $input.val().toLowerCase().replace(/_/g, ' ');
+                var suggestions = [];
+                var $suggetiontable = $("#mainitemtable tbody");
+                $suggetiontable.empty(); // Clear previous suggestions
+
+                // Check if ItemData exists and is an array
+                if (Array.isArray(ItemData) && ItemData.length > 0) {
+                    if (value.length > 0) {
+                        var searchTokens = value.split(/\s+/);
+
+                        // Filter suggestions based on universal search (match all tokens)
+                        suggestions = ItemData.filter(function (data) {
+                            if (data && typeof data === 'object') {
+                                var code = (data.ItemCode || '').toLowerCase();
+                                var name = (data.ItemName || '').toLowerCase();
+                                var allTokens = code.split(/\s+|[_-]+/).concat(name.split(/\s+|[_-]+/));
+
+                                return searchTokens.every(function (token) {
+                                    return allTokens.some(function (itemToken) {
+                                        return itemToken.includes(token);
+                                    });
+                                });
+                            }
+                            return false;
+                        }).sort(function (a, b) {
+                            return a.Code.localeCompare(b.Code);
+                        }).slice(0, 20); // Limit to 20 results
+                    }
+
+                    // Show suggestions if any
+                    if (suggestions.length > 0) {
+                        suggestions.forEach(function (data, index) {
+                            $suggetiontable.append(
+                                `
+                        <tr data-id='${data.PriceSetID}' class="line-item">
+                            <td>${index + 1}</td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-outline-danger remove-line" disabled>
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <div class="input-group" style='width:200px!important;'>
+                                    <input data-id='${data.ItemID}' type="text" class="form-control form-control-sm ItemCode" value="${data.ItemCode}" placeholder="Item Code">
+                                    <button class="btn btn-sm btn-outline-secondary openmodal" type="button" data-bs-toggle="modal" data-bs-target="#itemSearchModal">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td nowrap><input style='width:300px!important;' value="${data.ItemName}" type="text" class="form-control form-control-sm ItemName"></td>
+                            <td nowrap><input style='width:200px!important;' value="${data.Code}" type="text" data-id="${data.UomID}" class="form-control form-control-sm Code"></td>
+                            <td nowrap><input style='width:120px!important;' value="${data.ConveQTY}" type="number" class="form-control  text-end form-control-sm ConveQTY"></td>
+                            <td nowrap><input style='width:120px!important;' value="${data.Mrp}" class="form-control form-control-sm text-end Mrp" type="number" /></td>
+                            <td nowrap><input style='width:120px!important;' value="${data.Discount}" class="form-control form-control-sm text-end Discount" type="number" /></td>
+                            <td nowrap><input style='width:120px!important;' value="${data.NetAmount}" class="form-control form-control-sm text-end Rate" type="number" /></td>
+                            <td nowrap hidden><input style='width:120px!important;' value="${data.BaseUomId}" class="form-control form-control-sm text-end BaseUomID" type="number" /></td>
+                            <td nowrap class="text-center">
+                                <select style='width:120px!important;' class='form-control form-control-sm text-center IsActive'>
+                                    ${data.IsActive === "A"
+                                    ? "<option value='A' selected>Active</option><option value='I'>In Active</option>"
+                                    : "<option value='A'>Active</option><option value='I' selected>In Active</option>"
+                                }
+                                </select>
+                            </td>
+                             <td nowrap hidden><input style='width:120px!important;' class="form-control form-control-sm text-end flag" value="N" type="text" /></td>
+                        </tr>
+                    `
+                            );
+                        });
+                    } else {
+                        addNewLineItem();
+                        $("#SearchItem").focus();
+                    }
+                } else {
+
+                    console.error("ItemData is not defined or is empty");
+                }
+            });
+        }
+    });
+</script>

@@ -1,0 +1,2754 @@
+﻿@using System.Text.Json
+@using TECHNOSYNCERP.Models
+@{
+
+    var userName = Context.Session.GetString("UserName");
+    var userId = Context.Session.GetString("UserID");
+    var role = Context.Session.GetString("Role");
+    var Mobile = Context.Session.GetString("Mobile");
+    var Email = Context.Session.GetString("Email");
+    var CompName = Context.Session.GetString("CompName");
+    var AuthData = Context.Session.GetString("Auth");
+    var authJson = Context.Session.GetString("Auth");
+    var auth = authJson != null
+        ? JsonSerializer.Deserialize<AuthModel>(authJson)
+        : null;
+
+}
+<!doctype html>
+<html lang="en">
+<!--begin::Head-->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Technosync - RetailSync</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+    <meta name="supported-color-schemes" content="light dark" />
+    <link rel="preload" href="~/css/adminlte.css" as="style" />
+    <link href="~/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="~/bootstrap-icons/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="~/css/alert.css" rel="stylesheet" />
+    <link href="~/sweetalert/sweetalert2.min.css" rel="stylesheet" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@@fontsource/source-sans-3@5.0.12/index.css"
+          integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q="
+          crossorigin="anonymous"
+          media="print"
+          onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/adminlte.css" />
+    <link href="~/css/shimmer.css" rel="stylesheet" />
+    <script src="~/js/jquery-3.6.0.min.js"></script>
+    <script src="~/js/overlayscrollbars.browser.es6.min.js"></script>
+    <script src="~/js/overlaypopper.min.js"></script>
+    <script src="~/js/bootstrap.min.js"></script>
+    <script src="~/js/adminlte.js"></script>
+    <script src="~/js/jquery-3.6.0.min.js"></script>
+    <script src="~/sweetalert/sweetalert2@11.js"></script>
+
+    <!-- DataTables CSS -->
+    <link href="~/jqdatatable/jquery.datatables.min.css" rel="stylesheet" />
+    <link href="~/jqdatatable/buttons.datatables.min.css" rel="stylesheet" />
+    <link href="~/jqdatatable/responsive.datatables.min.css" rel="stylesheet" />
+    <link rel="icon" href="~/favicon.ico" type="image/x-icon" />
+    <!-- DataTables JS -->
+    <script src="~/jqdatatable/jquery.datatables.min.js"></script>
+
+    <!-- DataTables Buttons -->
+    <script src="~/jqdatatable/datatables.buttons.min.js"></script>
+    <script src="~/jqdatatable/buttons.html5.min.js"></script>
+    <script src="~/jqdatatable/buttons.print.min.js"></script>
+    <!-- DataTables Responsive -->
+    <script src="~/jqdatatable/datatables.responsive.min.js"></script>
+    <!-- Excel Export Support -->
+    <script src="~/jqdatatable/jszip.min.js"></script>
+    <script src="~/jqdatatable/pdfmake.min.js"></script>
+    <script src="~/jqdatatable/vfs_fonts.js"></script>
+
+    <!-- Excel JS PDF AND EXCEL-->
+    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> *@
+    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script> *@
+    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script> *@
+    <script src="~/js/jspdf.umd.min.js"></script>
+    <script src="~/js/jspdf.plugin.autotable.min.js"></script>
+    <script src="~/js/xlsx.full.min.js"></script>
+
+
+    <style>
+        #mainitemtable td {
+            outline: none; /* no outline if browser tries */
+        }
+
+            #mainitemtable td[tabindex] {
+                tabindex: -1; /* prevent being tabbable */
+            }
+
+        .suggestions-container {
+            position: absolute;
+            width: 70%;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            background-color: white;
+            z-index: 1000;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .nav-treeview {
+            background-color: var(--lte-sidebar-hover-bg) !important;
+        }
+        /* For horizontal scrollbar */
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px; /* Adjust this value to change scrollbar height */
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 8px;
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+      
+
+        #itemSearchTable thead th {
+            position: relative;
+        }
+
+        #itemSearchTable thead input {
+            width: 100%;
+            padding: 3px;
+            box-sizing: border-box;
+            margin-top: 5px;
+        }
+
+        .dataTables_filter input {
+            margin-bottom: 10px;
+        }
+
+        .drop-zone {
+            max-width: 100%;
+            height: 200px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: "Quicksand", sans-serif;
+            font-weight: 500;
+            font-size: 20px;
+            cursor: pointer;
+            color: #cccccc;
+            border: 4px dashed aqua;
+            border-radius: 10px;
+        }
+
+        .drop-zone--over {
+            border-style: solid;
+        }
+
+        .drop-zone__input {
+            display: none;
+        }
+
+        .file-tiles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .file-tile {
+            width: 120px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+            position: relative;
+        }
+
+            .file-tile img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 5px;
+            }
+
+            .file-tile .file-name {
+                font-size: 12px;
+                margin-top: 5px;
+                word-break: break-all;
+            }
+
+            .file-tile .remove-btn {
+                position: absolute;
+                top: -10px;
+                right: -10px;
+                background: red;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                cursor: pointer;
+                font-size: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        /* Applies only to screens up to 767px width (typical mobile devices) */
+        @@media (max-width: 767px) {
+            #mainitemtable input, #mainitemtable select, #mainitemtable textarea {
+                width: 150px !important;
+            }
+
+            #mainitemtable .input-group {
+                width: 200px !important; /* Let it expand naturally */
+            }
+        }
+
+        .suggestion-item:hover {
+            background-color: #FF3301 !important;
+            color: white !important;
+        }
+
+        .suggestion-item-active {
+            background-color: #FF3301 !important;
+            color: white !important;
+        }
+
+        .navbar-badge {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            font-size: 0.6rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 50%;
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            padding: 0.5rem;
+        }
+
+        .dropdown-header {
+            background-color: #4a6cf7;
+            color: white;
+            border-radius: 8px 8px 0 0;
+            padding: 10px 15px;
+            font-weight: 600;
+        }
+
+        .shortcut-dropdown {
+            width: 380px;
+        }
+
+        .shortcut-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 4px 0;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+            .shortcut-item:hover {
+                background-color: #f1f5ff;
+            }
+
+        .shortcut-number {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eef4ff;
+            border-radius: 6px;
+            font-weight: 600;
+            color: #4a6cf7;
+            margin-right: 12px;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+
+        .shortcut-action {
+            flex-grow: 1;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .shortcut-key {
+            background: #f1f3f9;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #495057;
+            border: 1px solid #e2e6ea;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .key-icon {
+            display: inline-block;
+            padding: 1px 5px;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            margin: 0 2px;
+            font-size: 0.75rem;
+        }
+
+        .user-image {
+            width: 32px;
+            height: 32px;
+            object-fit: cover;
+        }
+
+        .dropdown-divider {
+            margin: 0.4rem 0;
+        }
+
+        .demo-content {
+            max-width: 1000px;
+            margin: 30px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #4a6cf7;
+            margin-bottom: 20px;
+        }
+
+        .instructions {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+
+        .Quantity {
+            color: green !important;
+            font-weight: bold !important;
+        }
+
+        .StockInWhs {
+            color: white !important;
+            background-color: deepskyblue !important;
+            font-weight: bold !important;
+        }
+
+        .Mrp {
+            color: white !important;
+            background-color: red !important;
+            font-weight: bold !important;
+        }
+
+        .NetAmt {
+            color: white !important;
+            background-color: green !important;
+            font-weight: bold !important;
+        }
+
+        .Price {
+            color: white !important;
+            background-color: purple !important;
+            font-weight: bold !important;
+        }
+    </style>
+
+@*Style for Stock Check Model*@
+        <style>
+            /* Custom modal that takes 80% of screen - START FROM TOP */
+            .modal-80 {
+                max-width: 75%;
+                width: 95%;
+                margin-top: 2%;
+                margin-left: 16%;
+                top: 0;
+            }
+
+            .modal-80 .modal-content {
+                height: auto;
+                border-radius: 0;
+                border: none;
+            }
+
+            .modal-80 .modal-body {
+                overflow-y: auto;
+                max-height: calc(100vh - 120px); /* Account for header and footer */
+            }
+
+            /* Remove modal backdrop padding */
+            .modal {
+                padding: 0 !important;
+            }
+
+            /* Remove vertical centering */
+            .modal-dialog-centered {
+                align-items: flex-start !important;
+            }
+
+            /* Responsive adjustments */
+            @@media (max-width: 992px) {
+                .modal-80 {
+                    max-width: 100%;
+                    width: 100%;
+                }
+            }
+
+            @@media (max-width: 768px) {
+                .modal-80 {
+                    max-width: 100%;
+                    width: 100%;
+                    margin: 0;
+                }
+
+                    .modal-80 .modal-content {
+                        height: 100vh;
+                    }
+            }
+        </style>
+
+</head>
+<body class="layout-fixed sidebar-expand-lg sidebar-mini bg-body-tertiary">
+    <!-- Hidden Google Translate widget -->
+    <div id="google_translate_element" style="display:none;"></div>
+    <div id="load">
+        <div class="preloader-skeleton">
+            <!-- Top Navbar Skeleton -->
+            <div class="navbar-skeleton">
+                <div class="logo-skeleton"></div>
+                <div class="nav-items-skeleton">
+                    <div class="nav-item-skeleton"></div>
+                    <div class="nav-item-skeleton"></div>
+                    <div class="nav-item-skeleton"></div>
+                    <div class="nav-item-skeleton"></div>
+                </div>
+                <div class="mobile-menu-skeleton"></div>
+            </div>
+
+            <!-- Main Layout Skeleton -->
+            <div class="main-layout-skeleton">
+                <!-- Sidebar Skeleton -->
+                <div class="sidebar-skeleton">
+                    <div class="sidebar-item-skeleton"></div>
+                    <div class="sidebar-item-skeleton"></div>
+                    <div class="sidebar-item-skeleton"></div>
+                    <div class="sidebar-item-skeleton"></div>
+                    <div class="sidebar-item-skeleton"></div>
+                    <div class="sidebar-item-skeleton"></div>
+                    <div class="sidebar-item-skeleton"></div>
+                </div>
+
+                <!-- Main Content Skeleton -->
+                <div class="main-content-skeleton">
+                    <!-- Content Header -->
+                    <div class="content-header-skeleton"></div>
+
+                    <!-- Cards Section -->
+                    <div class="cards-skeleton">
+                        <div class="card-skeleton"></div>
+                        <div class="card-skeleton"></div>
+                        <div class="card-skeleton"></div>
+                    </div>
+
+                    <!-- Table Section -->
+                    <div class="table-skeleton">
+                        <div class="table-row-skeleton"></div>
+                        <div class="table-row-skeleton"></div>
+                        <div class="table-row-skeleton"></div>
+                        <div class="table-row-skeleton"></div>
+                    </div>
+
+                    <!-- Cards Section -->
+                    <div class="cards-skeleton">
+                        <div class="card-skeleton"></div>
+                        <div class="card-skeleton"></div>
+                        <div class="card-skeleton"></div>
+                        <div class="card-skeleton"></div>
+                    </div>
+                    <div class="cards-skeleton">
+                        <div class="card-skeleton"></div>
+                        <div class="card-skeleton"></div>
+                        <div class="card-skeleton"></div>
+                        <div class="card-skeleton"></div>
+                    </div>
+
+                    <!-- Footer Section -->
+                    <div class="footer-skeleton"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="alertContainer"></div>
+    <!-- Create Customer Modal -->
+    <div class="modal fade" id="createCustomerModal" tabindex="-1" aria-labelledby="createCustomerLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <!-- Header -->
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="createCustomerLabel">Quick Business Partner Add</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <!-- Body -->
+                <div class="modal-body">
+                    <!-- Hidden Fields -->
+                    <input type="number" hidden id="QLedgerID" name="LedgerID" value="">
+                    <!-- Personal & Contact Info -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4 col-12">
+                            <label for="Type" class="form-label">Type</label>
+                            <select class="form-control" id="QType">
+                                <option value="C">Customer</option>
+                                <option value="S">Supplier</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <label for="QCode" class="form-label">Code</label>
+                            <input type="text" disabled class="form-control" id="QCode" name="QCode" placeholder="Auto-generated">
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <label for="QName" class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="QName" name="Name" placeholder="Enter Customer Name" required>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <label for="MobileNo" class="form-label">Mobile</label>
+                            <input type="text" class="form-control" id="QMobileNo" name="MobileNo" placeholder="Enter Mobile Number">
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <label for="Phone" class="form-label">Phone</label>
+                            <input type="text" class="form-control" id="QPhone" name="Phone" placeholder="Optional">
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <label for="Email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="QEmail" name="Email" placeholder="Enter Email">
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <label for="ContactPerson" class="form-label">Contact Person</label>
+                            <input type="text" class="form-control" id="QContactPerson" name="ContactPerson" placeholder="Optional">
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <label for="CPMobileNumber" class="form-label">Contact Person Mo No</label>
+                            <input type="number" class="form-control" id="QCPMobileNumber" name="CPMobileNumber" placeholder="Optional">
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <label for="CreaditDays" class="form-label">Credit Days</label>
+                            <select class="form-control" id="QCreaditDays">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <label for="PanNo" class="form-label">PAN Number</label>
+                            <input type="text" class="form-control" id="QPanNo" name="PanNo" placeholder="ABCDE1234F">
+                        </div>
+                    </div>
+
+                    <!-- Address Info -->
+                    <div class="border p-3 rounded mb-3">
+                        <input hidden value="" id="QID" />
+                        <input hidden value="" id="QSID" />
+                        <h6>Address</h6>
+                        <div class="form-check form-check-inline" hidden>
+                            <input class="form-check-input" type="radio" name="addressType" id="billToRadio" value="BillTo" checked>
+                            <label class="form-check-label" for="billToRadio">Bill To Address</label>
+                        </div>
+                        <div class="form-check form-check-inline" hidden>
+                            <input class="form-check-input" type="radio" name="addressType" id="shipToRadio" value="ShipTo">
+                            <label class="form-check-label" for="shipToRadio">Ship To Address</label>
+                        </div>
+                        <div class="form-check mt-2" hidden>
+                            <input class="form-check-input" type="checkbox" id="addisActive" checked>
+                            <label class="form-check-label" for="addisActive">Is Active</label>
+                        </div>
+
+                        <div class="row g-2 mt-2">
+                            <div class="col-md-4 col-12">
+                                <label for="AddId" class="form-label">Address ID</label>
+                                <input type="text" class="form-control" value="BILL TO" id="QAddId" placeholder="Street, Building">
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <label for="Address1" class="form-label">Address Line 1</label>
+                                <input type="text" class="form-control" id="QAddress1" placeholder="Street, Building">
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <label for="Address2" class="form-label">Address Line 2</label>
+                                <input type="text" class="form-control" id="QAddress2" placeholder="Optional">
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <label for="City" class="form-label">City</label>
+                                <input type="text" class="form-control" id="QCity" placeholder="Enter City">
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <label for="PinCode" class="form-label">Pin Code</label>
+                                <input type="text" class="form-control" id="QPinCode" placeholder="Enter PIN">
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <label for="Country1" class="form-label">Country</label>
+                                <select class="form-select Country1" id="QCountry"></select>
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <label for="State1" class="form-label">State</label>
+                                <select class="form-select State1" id="QState"></select>
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <label for="ADDGSTIN" class="form-label">GSTIN</label>
+                                <input type="text" class="form-control" id="QADDGSTIN" placeholder="22AAAAA0000A1Z5">
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <label for="ADDGSTINTYP" class="form-label">GST Type</label>
+                                <select class="form-select" id="QADDGSTINTYP">
+                                    <option value="">Select</option>
+                                    <option>Casual Taxable Person</option>
+                                    <option>Composition Levy</option>
+                                    <option>Government Department or PSU</option>
+                                    <option>Non Resident Taxable Person</option>
+                                    <option>Regular/TDS/ISD</option>
+                                    <option>UN Agency or Embassy</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="resetcustomerform" class="btn btn-warning">Reset</button>
+                    <button type="button" id="createCustomerForm" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--begin::App Wrapper-->
+    <div class="app-wrapper">
+        <!--begin::Header-->
+        <nav class="app-header navbar navbar-expand bg-body">
+            <!--begin::Container-->
+            <div class="container-fluid">
+                <!--begin::Start Navbar Links-->
+                <ul class="navbar-nav">
+                    <li class="nav-item" id="menutoggle">
+                        <a class="nav-link " data-lte-toggle="sidebar" href="#" role="button">
+                            <i class="bi bi-list"></i>
+                        </a>
+                    </li>
+                </ul>
+                <div class="text-center align-items-center w-100">
+                    <h5 class="mt-2">@CompName</h5>
+                </div>
+                <!--begin::End Navbar Links-->
+                <ul class="navbar-nav ms-auto">
+                    <!-- Shortcuts Dropdown Menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link" data-bs-toggle="dropdown" href="#">
+                            <i class="bi bi-keyboard-fill"></i>
+                            <span class="navbar-badge badge text-bg-info">13</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-xl dropdown-menu-end shortcut-dropdown">
+                            <span class="dropdown-item dropdown-header">Keyboard Shortcuts</span>
+                            <div class="dropdown-divider"></div>
+
+                            <div class="shortcut-item">
+                                <div class="shortcut-number">1</div>
+                                <div class="shortcut-action">SAVE</div>
+                                <div class="shortcut-key"><span class="key-icon">F1</span> </div>
+                            </div>
+                            <div class="shortcut-item">
+                                <div class="shortcut-number">2</div>
+                                <div class="shortcut-action">ADD NEW LINE</div>
+                                <div class="shortcut-key"><span class="key-icon">F2</span></div>
+                            </div>
+                            <div class="shortcut-item">
+                                <div class="shortcut-number">3</div>
+                                <div class="shortcut-action">FIND</div>
+                                <div class="shortcut-key"><span class="key-icon">F3</span></div>
+                            </div>
+                            <div class="shortcut-item">
+                                <div class="shortcut-number">3</div>
+                                <div class="shortcut-action">PRINT</div>
+                                <div class="shortcut-key"><span class="key-icon">F4</span></div>
+                            </div>
+                            <div class="shortcut-item">
+                                <div class="shortcut-number">4</div>
+                                <div class="shortcut-action">REFRESH</div>
+                                <div class="shortcut-key"><span class="key-icon">F5</span></div>
+                            </div>
+                            <div class="shortcut-item">
+                                <div class="shortcut-number">5</div>
+                                <div class="shortcut-action">PARK</div>
+                                <div class="shortcut-key"><span class="key-icon">F6</span></div>
+                            </div>
+                            <div class="shortcut-item">
+                                <div class="shortcut-number">6</div>
+                                <div class="shortcut-action">RESUME</div>
+                                <div class="shortcut-key"><span class="key-icon">F7</span></div>
+                            </div>
+
+                            <div class="shortcut-item">
+                                <div class="shortcut-number">7</div>
+                                <div class="shortcut-action">ATTACHMENT</div>
+                                <div class="shortcut-key"><span class="key-icon">F8</span></div>
+                            </div>
+
+                            <div class="shortcut-item">
+                                <div class="shortcut-number">8</div>
+                                <div class="shortcut-action">RESET</div>
+                                <div class="shortcut-key"><span class="key-icon">F9</span></div>
+                            </div>
+                            <div class="shortcut-item">
+                                <div class="shortcut-number">9</div>
+                                <div class="shortcut-action">DELETE</div>
+                                <div class="shortcut-key"><span class="key-icon">F10</span></div>
+                            </div>
+                            <div class="shortcut-item">
+                                <div class="shortcut-number">11</div>
+                                <div class="shortcut-action">FULL SCREEN</div>
+                                <div class="shortcut-key"><span class="key-icon">F11</span></div>
+                            </div>
+                            <div class="shortcut-item">
+                                <div class="shortcut-number">12</div>
+                                <div class="shortcut-action">PDF</div>
+                                <div class="shortcut-key"><span class="key-icon">Ctrl</span> + <span class="key-icon">Shift</span> + <span class="key-icon">P</span></div>
+                            </div>
+                            <div class="shortcut-item">
+                                <div class="shortcut-number">13</div>
+                                <div class="shortcut-action">EXCEL</div>
+                                <div class="shortcut-key"><span class="key-icon">Ctrl</span> + <span class="key-icon">Shift</span> + <span class="key-icon">E</span></div>
+                            </div>
+                            <div class="shortcut-item">
+                                <div class="shortcut-number">14</div>
+                                <div class="shortcut-action">PAYMENT</div>
+                                <div class="shortcut-key"><span class="key-icon">Shift</span> + <span class="key-icon">F1</span></div>
+                            </div>
+                        </div>
+                    </li>
+                    <!--begin::Fullscreen Toggle-->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-lte-toggle="fullscreen">
+                            <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
+                            <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display: none"></i>
+                        </a>
+                    </li>
+                    <!--end::Fullscreen Toggle-->
+                    <li class="nav-item dropdown user-menu">
+                        <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="~/bootstrap-icons/person.svg"
+                                 class="user-image rounded-circle border border-dark p-1 me-2"
+                                 alt="User Image" />
+                            <span class="d-none d-md-inline">@userName</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow p-2" style="min-width: 220px;">
+                            <li class="p-1 text-end">
+                                <button class="btn  btn-sm btn-danger" onclick="window.location.href='@Url.Action("Index", "Home")'"><i class="bi-box-arrow-left me-2"></i>Logout</button>
+                            </li>
+                            <li class="p-1 text-end">
+                                <button class="btn btn-sm btn-primary text-white" id="toMarathi">Marathi</button>
+                                <button class="btn btn-sm btn-primary text-white" id="toEnglish">English</button>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!--end::User Menu Dropdown-->
+                </ul>
+                <!--end::End Navbar Links-->
+            </div>
+            <!--end::Container-->
+        </nav>
+        <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+            <div class="sidebar-brand ">
+                <a href="@Url.Action("Home", "Home")" class="brand-link">
+                    <!--begin::Brand Image-->
+                    <img src="~/img/techno logo/TS - Logo.png"
+                         alt="Logo"
+                         class=" logo " style="height:35px;" />
+                    <img src="~/img/techno logo/withoutbg.png"
+                         alt="Logo"
+                         class=" d-none logo" style="height:45px;" />
+                </a>
+                <!--end::Brand Link-->
+            </div>
+            <!--end::Sidebar Brand-->
+            <!--begin::Sidebar Wrapper-->
+            <div class="sidebar-wrapper">
+                <nav class="mt-2">
+                    <!--begin::Sidebar Menu-->
+                    @{
+                        // Get ordered parent menus (convert MenuOrderID to int for proper numeric sorting)
+                        var mainMenus = auth.MenuAuth
+                            .Where(x => x["ParentID"] == "0" && x["Auth"] == "Y")
+                            .OrderBy(x => int.Parse(x["MenuOrderID"]))  // Ensure numeric sorting
+                            .ToList();
+
+                        // Get child menus grouped by ParentID, each group ordered numerically
+                        var childMenus = auth.MenuAuth
+                            .Where(x => x["ParentID"] != "0" && x["Auth"] == "Y")
+                            .GroupBy(x => x["ParentID"])
+                            .ToDictionary(
+                                g => g.Key,
+                                g => g.OrderBy(x => int.Parse(x["MenuOrderID"])).ToList()
+                            );
+
+                        <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" aria-label="Main navigation" data-accordion="false" id="navigation">
+
+                            @foreach (var menu in mainMenus)
+                            {
+                                string menuId = menu["MenuID"];
+                                bool hasChildren = childMenus.ContainsKey(menuId);
+                                string controller = menu["Controller"];
+                                string action = menu["Action"];
+                                string icon = menu["Icon"];
+                                string menuName = menu["MenuName"];
+
+                                if (hasChildren)
+                                {
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link">
+                                            <i class="nav-icon @icon"></i>
+                                            <p>
+                                                @menuName
+                                                <i class="nav-arrow bi bi-chevron-right"></i>
+                                            </p>
+                                        </a>
+                                        <ul class="nav nav-treeview">
+                                            @foreach (var child in childMenus[menuId])
+                                            {
+                                                <li class="nav-item" id="">
+                                                    <a href="@Url.Action(child["Action"], child["Controller"])" class="nav-link">
+                                                        <i class="nav-icon @child["Icon"]"></i>
+                                                        <p>@child["MenuName"]</p>
+                                                    </a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="nav-item">
+                                        <a href="@Url.Action(action, controller)" class="nav-link">
+                                            <i class="nav-icon @icon"></i>
+                                            <p>@menuName</p>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                        </ul>
+
+                    }
+                    <!--end::Sidebar Menu-->
+                </nav>
+            </div>
+            <!--end::Sidebar Wrapper-->
+        </aside>
+        <!--end::Sidebar-->
+        <!--begin::App Main-->
+        <main class="app-main">
+            @RenderBody()
+        </main>
+        <!--  Attachment -->
+        <div class="modal fade" id="Attachment" aria-labelledby="attachmentModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="exampleModalLabel">Attachments</h5>
+                        <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="row g-3">
+                            <div class="mb-3 col-md-12">
+                                <label for="formFileMultiple" class="form-label">Select files (Images, PDF, EXCEL, CSV,PPT,PPTX,DOC,DOCX)</label>
+                                <div class="drop-zone" id="dropZone">
+                                    <span class="drop-zone__prompt">Drop files here or click to upload</span>
+                                    <input class="drop-zone__input" type="file" id="formFileMultiple" multiple
+                                           accept=".jpg, .jpeg, .png, .gif, .pdf, .xls, .xlsx, .csv, .ppt, .pptx, .doc, .docx">
+                                </div>
+                                <!-- Container for file tiles -->
+                                <div class="file-tiles mt-3" id="fileTiles"></div>
+                            </div>
+                            <div class="col-md-12 text-end justify-content-end align-content-md-end">
+                                <button hidden type="button" class="btn btn-primary mb-3" id="addFilesButton">Add</button>
+                                <button hidden type="button" class="btn btn-primary mb-3" data-bs-dismiss="modal" aria-label="Close" id="AttachmentContinue">Continue</button>
+                                <button type="button" class="btn btn-secondary mb-3" id="resetAttachment">Reset</button>
+                            </div>
+                        </form>
+                        <div class="bg-white mb-2 table-responsive">
+                            <table class="table table-bordered table-striped table-hover w-100" cellpadding="3" id="AttchmentTable">
+                                <thead class="w-100">
+                                    <tr>
+                                        <th class="text-center" nowrap>Sr No</th>
+                                        <th nowrap>File Name</th>
+                                        <th nowrap class="text-center">Extention</th>
+                                        <th nowrap hidden>Path</th>
+                                        <th nowrap hidden>Filedata</th>
+                                        <th nowrap hidden>DocId</th>
+                                        <th nowrap hidden>ObjType</th>
+                                        <th nowrap hidden>UserId</th>
+                                        <th nowrap hidden>CounterCode</th>
+                                        <th nowrap hidden>Sr No</th>
+                                        <th nowrap class="text-center">View</th>
+                                        <th nowrap class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="AttchmentTable_Body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Attachment Priview Modal-->
+        <div class="modal fade" id="attachmentModal" tabindex="-1" aria-labelledby="attachmentModalLabel" aria-hidden="true">
+            <div class="modal-dialog  modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="attachmentModalLabel">Attachment Preview</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div id="download_btn_sec" class="text-end modal-body p-3">
+
+                    </div>
+                    <div class="modal-footer text-center" id="attachmentPreview">
+                        <!-- File preview will be inserted here dynamically -->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- Print Modal -->
+        <div class="modal fade" id="PrintModal" tabindex="-1" aria-labelledby="PrintModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow-lg">
+                    <!-- Header -->
+                    <div class="modal-header bg-gradient text-white bg-primary">
+                        <h5 class="modal-title" id="PrintModalLabel">
+                            <i class="fas fa-print me-2"></i> Print Options
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            @if (ViewBag.DLCData != null)
+                            {
+                                @foreach (var item in ViewBag.DLCData)
+                                {
+                                    <div class="col-md-6 col-lg-4">
+                                        <button class="print-layout-btn btn w-100 py-3 d-flex flex-column align-items-center PrintLayout position-relative"
+                                                data-filename="@item["FileName"]"
+                                                data-size="@item["Size"]"
+                                                title="Layout: @item["LayoutName"] (Size: @item["Size"])">
+                                            <div class="icon-wrapper mb-2">
+                                                <i class="@item["Icon"] fs-1 text-primary"></i>
+                                            </div>
+                                            <span class="fw-semibold">@item["LayoutName"]</span>
+                                        </button>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="col-md-6 col-lg-4">
+                                    <button class="print-layout-btn btn w-100 py-3 d-flex flex-column align-items-center PrintLayout position-relative"
+                                            data-filename=""
+                                            data-size="A4"
+                                            title="Layout  (Size: A4)">
+                                        <div class="icon-wrapper mb-2">
+                                            <i class="bi bi-file-pdf fs-1 text-primary"></i>
+                                        </div>
+                                        <span class="fw-semibold">Print A4</span>
+                                    </button>
+                                </div>
+                                <div class="col-md-6 col-lg-4">
+                                    <button class="print-layout-btn btn w-100 py-3 d-flex flex-column align-items-center PrintLayout position-relative"
+                                            data-filename=""
+                                            data-size="A5"
+                                            title="Layout Print (Size: A5)">
+                                        <div class="icon-wrapper mb-2">
+                                            <i class="bi bi-file-pdf fs-1 text-primary"></i>
+                                        </div>
+                                        <span class="fw-semibold">Print A5</span>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Extra Styling -->
+        <style>
+            .print-layout-btn {
+                border: 2px solid #007bff;
+                border-radius: 15px;
+                transition: all 0.3s ease;
+                background: #fff;
+            }
+
+                .print-layout-btn:hover {
+                    background: linear-gradient(135deg, #007bff, #00a2ff);
+                    color: #fff;
+                    transform: translateY(-4px);
+                    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+                }
+
+                    .print-layout-btn:hover i {
+                        color: #fff !important;
+                        transform: scale(1.2);
+                    }
+
+                .print-layout-btn:active {
+                    transform: scale(0.98);
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+                }
+
+            .icon-wrapper {
+                transition: transform 0.3s ease;
+            }
+
+            .modal-content {
+                border-radius: 1rem;
+            }
+        </style>
+        <!-- Resume List Modal -->
+        <div class="modal fade" id="ResumeModal" tabindex="-1" aria-labelledby="ResumeModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="ResumeModalLabel">Resume </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mb-2">
+                            <div class="col-md-3  mb-2">
+                                <label for="rUserid" class="form-label">User</label>
+                                <select class="form-control" id="rUserid">
+                                    <option value="">Select User</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3  mb-2">
+                                <label for="rrefno" class="form-label">Ref Number</label>
+                                <input id="rrefno" class="form-control" type="text" />
+                            </div>
+                            <div class="col-md-3  mb-2">
+                                <label for="rfromdate" class="form-label ">From Date</label>
+                                <input id="rfromdate" class="form-control datepicker" type="date" />
+                            </div>
+                            <div class="col-md-3  mb-2">
+                                <label for="rtodate" class="form-label">To Date</label>
+                                <input id="rtodate" class="form-control datepicker" type="date" />
+                            </div>
+                            <div class="col-md-12  mb-2 text-end   mt-3 ">
+                                <button class="btn btn-outline-primary me-2" id="ResumeBtnSearch"><i class="bi bi-search me-2"></i>Find</button>
+                                <button class="btn btn-outline-secondary me-2" id="ResumeBtnReset"><i class="bi bi-arrow-counterclockwise me-2"></i>Reset</button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped w-100 display nowrap" id="ResumeModaltbl">
+                                <thead>
+                                    <tr>
+                                        <th>Doc Num</th>
+                                        <th>Action</th>
+                                        <th>Posting Date</th>
+                                        <th>Ref No</th>
+                                        <th>Created By</th>
+                                        <th hidden>Payload</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*Model For Stock Check*@
+        <section>
+            <!-- Inventory Check Modal - 80% of screen -->
+            <div class="modal fade" id="inventoryCheckModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-80 modal-dialog-centered">
+                    <div class="modal-content">
+
+                        <!-- Header -->
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title">Item Stock - By Warehouse</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="modal-body">
+
+                            <!-- QR Code Section -->
+                            <div class="row mb-4 justify-content-center">
+                                <div class="col-12 text-center">
+                                    <i class="bi bi-qr-code-scan" style="font-size:50px;"></i>
+                                </div>
+                            </div>
+
+                            <!-- Form Section -->
+                            <div class="container-fluid mb-4">
+                                <div class="row mb-3 align-items-center">
+                                    <div class="col-md-3 col-lg-2 text-md-end">
+                                        <label class="form-label fw-bold" for="BarCode">Bar Code</label>
+                                    </div>
+                                    <div class="col-md-9 col-lg-8">
+                                        <input type="text" class="form-control" id="BarCode" placeholder="Scan or enter barcode">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3 align-items-center">
+                                    <div class="col-md-3 col-lg-2 text-md-end">
+                                        <label class="form-label fw-bold" for="ItemName">Item Name</label>
+                                    </div>
+                                    <div class="col-md-9 col-lg-8">
+                                        <input type="text" class="form-control" id="ItemName" >
+                                    </div>
+                                </div>
+
+                                <div class="row mb-4 align-items-center">
+                                    <div class="col-md-3 col-lg-2 text-md-end">
+                                        <label class="form-label fw-bold" for="InventoryUoM">Inventory UoM</label>
+                                    </div>
+                                    <div class="col-md-9 col-lg-8">
+                                        <input type="text" class="form-control" id="InventoryUoM">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Table Section -->
+                            <div class="container-fluid">
+                                <h6 class="mb-3">Warehouse Stock Details</h6>
+                                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                    <table class="table table-bordered table-striped table-hover mb-0" id="StockCheckModel">
+                                        <thead class="table-primary">
+                                            <tr>
+                                                <th>Sr No</th>
+                                                <th>Whs Code</th>
+                                                <th>Avil. Qty.</th>
+                                                <th>MRP</th>
+                                                <th>Discount (%)</th>
+                                                <th>Disc Amt</th>
+                                                <th>Net Amt</th>
+                                                <th>Whs Name</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="inventoryTableBody">
+
+                                            <!-- Add more rows as needed -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button class="btn btn-primary">Print Report</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // Auto-focus on barcode input when modal opens
+                $(document).ready(function () {
+                    $('#inventoryCheckModal').on('shown.bs.modal', function () {
+                        $(this).find('input[type="text"]').first().focus();
+                    });
+                });
+            </script>
+        </section>
+
+
+        <footer class="app-footer">
+            <div class="float-end d-none d-sm-inline">Help</div>
+            <strong>
+                Copyright &copy; 2025&nbsp;
+                <a href="https://technosync.in" class="text-decoration-none">Technosync.in</a>.
+            </strong>
+            All rights reserved.
+        </footer>
+        <!--end::Footer-->
+    </div>
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script>
+
+
+            const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
+            const Default = {
+              scrollbarTheme: 'os-theme-light',
+              scrollbarAutoHide: 'leave',
+              scrollbarClickScroll: true,
+            };
+            document.addEventListener('DOMContentLoaded', function () {
+              const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+
+              // Disable OverlayScrollbars on mobile devices to prevent touch interference
+              const isMobile = window.innerWidth <= 992;
+
+              if (
+                sidebarWrapper &&
+                OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined &&
+                !isMobile
+              ) {
+                OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+                  scrollbars: {
+                    theme: Default.scrollbarTheme,
+                    autoHide: Default.scrollbarAutoHide,
+                    clickScroll: Default.scrollbarClickScroll,
+                  },
+                });
+              }
+            });
+
+
+        $(document).ready(function () {
+            $(document).off('focus', 'input[type="text"], input[type="number"], textarea')
+                .on('focus', 'input[type="text"], input[type="number"], textarea', function () {
+                    var self = this;
+
+                    // Clear any existing timeout to prevent multiple selections
+                    if (self.selectTimeout) {
+                        clearTimeout(self.selectTimeout);
+                    }
+
+                    self.selectTimeout = setTimeout(function () {
+                        if (document.activeElement === self) {
+                            self.select();
+                        }
+                    }, 50);
+                });
+
+            // Only prevent default for text inputs and textareas, not number inputs
+            $(document).off('mouseup', 'input[type="text"], textarea')
+                .on('mouseup', 'input[type="text"], textarea', function (e) {
+                    e.preventDefault();
+                });
+            $(".nav-item").click(function () {
+                var index = $(".nav-item").index(this);
+                sessionStorage.setItem("Activemenu", index);
+            });
+            var index = sessionStorage.getItem("Activemenu");
+            if (index !== null) {
+                $(".nav-item").eq(index).addClass("menu-open active");
+            }
+            $("#menutoggle").click(function () {
+                $(".logo").toggleClass("d-none");
+            })
+
+
+            //Key Events
+            {
+                // Helper function to trigger click only if not disabled
+
+                function triggerIfEnabled(selector) {
+                    var $btn = $(selector);
+
+                    if (!$btn.hasClass("disabled") && !$btn.prop("disabled")) {
+                        $btn.trigger("click");
+                    }
+                }
+
+                $(document).on("keydown", function (e) {
+
+                    // ✅ New event: Shift + F1
+                    if (e.which === 112 && e.shiftKey) {
+                        e.preventDefault();
+                        triggerIfEnabled("#openpaymentmean");
+                        return; // stop so it doesn't fire the normal F1 action
+                    }
+                    switch (e.which) {
+
+                        case 112: // F1 -> Save
+
+                            e.preventDefault();
+
+                            triggerIfEnabled("#btnSave");
+
+                            break;
+
+                        case 113: // F2 -> Add New Line
+
+                            e.preventDefault();
+
+                            triggerIfEnabled("#btnAddLine");
+
+                            break;
+
+                        case 114: // F3 -> Find
+
+                            e.preventDefault();
+
+                            triggerIfEnabled("#btnFind");
+
+                            break;
+
+                        case 115: // F4 -> Print
+
+                            e.preventDefault();
+
+                            triggerIfEnabled("#btnPrint");
+
+                            break;
+
+                        case 116: // F5 -> Refresh / Reset
+
+                            e.preventDefault();
+
+                            triggerIfEnabled("#btnReset");
+
+                            break;
+
+                        case 117: // F6 -> Park
+
+                            e.preventDefault();
+
+                            triggerIfEnabled("#btnPark");
+
+                            break;
+
+                        case 118: // F7 -> Resume
+
+                            e.preventDefault();
+
+                            triggerIfEnabled("#btnResume");
+
+                            break;
+
+                        case 119: // F8 -> Attachments
+
+                            e.preventDefault();
+
+                            triggerIfEnabled("#Attachments");
+
+                            break;
+
+                        case 120: // F9 -> Reset
+
+                            e.preventDefault();
+
+                            triggerIfEnabled("#btnReset");
+
+                            break;
+
+                        case 121: // F10 -> Delete
+
+                            e.preventDefault();
+
+                            triggerIfEnabled("#btnDelete");
+
+                            break;
+
+                    }
+
+                });
+
+                $(document).on("keydown", function (e) {
+
+                    if (e.ctrlKey && e.shiftKey) {
+
+                        switch (e.key.toLowerCase()) {
+
+                            case 'p': // Ctrl + Shift + P -> PDF
+
+                                e.preventDefault();
+
+                                triggerIfEnabled("#btnPrint");
+
+                                break;
+
+                            case 'e': // Ctrl + Shift + E -> Excel
+
+                                e.preventDefault();
+
+                                triggerIfEnabled("#btnExcel");
+
+                                break;
+
+                        }
+
+                    }
+
+                });
+
+                $(document).keydown(function (e) {
+                    let focusedElement = $(':focus');
+
+                    // ========== Handle Suggestion Dropdown First ==========
+                    var $suggestionContainer = $('.suggestions-container:visible');
+                    if ($suggestionContainer.length && focusedElement.hasClass('LedgerID')) {
+                        var $items = $suggestionContainer.find('.suggestion-item');
+                        var $current = $items.filter('.active');
+                        var idx = $items.index($current);
+
+                        if (e.key === "ArrowDown") {
+                            e.preventDefault();
+                            if (idx < $items.length - 1) {
+                                $current.removeClass('active');
+                                $items.eq(idx + 1).addClass('active');
+                            }
+                            return; // stop here → don't move table
+                        }
+
+                        if (e.key === "ArrowUp") {
+                            e.preventDefault();
+                            if (idx > 0) {
+                                $current.removeClass('active');
+                                $items.eq(idx - 1).addClass('active');
+                            }
+                            return;
+                        }
+
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            if ($current.length) {
+                                selectSuggestion($current); // reuse your click logic
+                            }
+                            return;
+                        }
+
+                        if (e.key === "Tab") {
+                            // optional: auto-select on Tab
+                            if ($current.length) {
+                                selectSuggestion($current);
+                            }
+                            return; // let browser move to next cell naturally
+                        }
+                    }
+
+                    // ========== Otherwise, Normal Table Navigation ==========
+                    const focusable = focusedElement.closest('td');
+                    if (!focusable.length) return;
+
+                    const rows = $("#mainitemtable tbody tr");
+                    let rowIndex = focusable.closest('tr').index();
+                    let colIndex = focusable.index();
+
+                    const moveFocus = (newRow, newCol) => {
+                        let newCell = rows.eq(newRow).children().eq(newCol);
+                        let focusElem = newCell.find('input, textarea, button, select').first();
+                        if (focusElem.length) {
+                            focusElem.focus();
+                        } else {
+                            newCell.focus();
+                        }
+                        rows.find('td').removeClass('active-cell');
+                        newCell.addClass('active-cell');
+                    };
+
+                    // Prevent ↑/↓ default inside number inputs and selects
+                    if (focusedElement.is('input[type="number"], select')) {
+                        if ([38, 40].includes(e.keyCode)) {
+                            e.preventDefault();
+                        }
+                    }
+
+                    switch (e.keyCode) {
+                        case 38: if (rowIndex > 0) moveFocus(rowIndex - 1, colIndex); break;  // Up arrow
+                        case 40: if (rowIndex < rows.length - 1) moveFocus(rowIndex + 1, colIndex); break;  // Down arrow
+                    }
+                });
+            }
+            // Initialize jsPDF namespace
+            {
+                window.jsPDF = window.jspdf.jsPDF;
+                // Pass clicked button's data-title into functions
+                $('#btnPdf').click(function () {
+                    exportToPDF($("#doctitle").text());
+                });
+                $('#btnExcel').click(function () {
+                    exportToExcel($("#doctitle").text());
+                });
+                $('#btnCSV').click(function () {
+                    exportToCSV($("#doctitle").text());
+                });
+                // Pass clicked button's data-title into functions
+                $('#btnPdf1').click(function () {
+                    exportToPDF($(this).data("title"));
+                });
+                $('#btnExcel1').click(function () {
+                    exportToExcel($(this).data("title"));
+                });
+                $('#btnCSV1').click(function () {
+                    exportToCSV($(this).data("title"));
+                });
+                function getTableData() {
+                    const headers = [];
+                    const visibleIndices = []; // store the index of each visible th
+
+                    // Collect visible headers and their indices
+                    $('#mainitemtable thead th').each(function (index) {
+                        const $th = $(this);
+                        if (index === 1 || $th.hasClass('d-none')) return; // skip Action and hidden th
+                        headers.push($th.text().trim());
+                        visibleIndices.push(index);
+                    });
+
+                    const rows = [];
+
+                    // Collect row data
+                    $('#mainitemtable tbody tr').each(function () {
+                        const row = {};
+                        $(this).find('td').each(function (index) {
+                            // Only include td if its index is in visibleIndices
+                            if (!visibleIndices.includes(index)) return;
+
+                            const headerIndex = visibleIndices.indexOf(index);
+                            const header = headers[headerIndex];
+
+                            let value = '';
+                            const $td = $(this);
+                            const $input = $td.find('input, select, textarea');
+                            if ($input.length) {
+                                if ($input.is('select')) value = $input.find('option:selected').text();
+                                else value = $input.val();
+                            } else {
+                                value = $td.text().trim();
+                            }
+
+                            row[header] = value;
+                        });
+                        rows.push(row);
+                    });
+
+                    return { headers, rows };
+                }
+                // ==== PDF ====
+                function exportToPDF(title) {
+                    const { headers, rows } = getTableData();
+                    const { jsPDF } = window.jspdf;
+
+                    // Calculate max text width for each column
+                    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+                    const margin = 10;
+                    doc.setFontSize(8);
+
+                    const getTextWidth = (text) => doc.getTextWidth(text);
+
+                    const columnWidths = headers.map((header, i) => {
+                        let maxWidth = getTextWidth(header);
+                        rows.forEach(row => {
+                            const cellText = row[header] || '';
+                            const w = getTextWidth(cellText);
+                            if (w > maxWidth) maxWidth = w;
+                        });
+                        return maxWidth + 4; // add padding
+                    });
+
+                    // Calculate total width and adjust page width if needed
+                    let totalWidth = columnWidths.reduce((a, b) => a + b, 0);
+                    const pageWidth = Math.max(totalWidth + 2 * margin, 297); // A4 landscape min width
+                    const pageHeight = 210;
+
+                    const doc2 = new jsPDF({ orientation: "landscape", unit: "mm", format: [pageWidth, pageHeight] });
+                    const date = new Date().toLocaleDateString();
+
+                    doc2.setFontSize(18).setTextColor(40, 40, 40);
+                    doc2.text(title, margin, 20);
+
+                    doc2.setFontSize(11).setTextColor(100, 100, 100);
+                    doc2.text(`Generated on: ${date}`, margin, 28);
+
+                    const data = rows.map(row => headers.map(header => row[header] || ''));
+
+                    const columnStyles = {};
+                    columnWidths.forEach((w, i) => columnStyles[i] = { cellWidth: w });
+
+                    doc2.autoTable({
+                        startY: 35,
+                        head: [headers],
+                        body: data,
+                        theme: 'grid',
+                        styles: {
+                            fontSize: 8,
+                            cellPadding: 2,
+                            overflow: 'visible', // no splitting
+                            valign: 'middle'
+                        },
+                        headStyles: {
+                            fillColor: [13, 110, 253],
+                            textColor: [255, 255, 255],
+                            fontStyle: 'bold',
+                            halign: 'center',
+                            overflow: 'visible'
+                        },
+                        bodyStyles: {
+                            fillColor: [255, 255, 255],
+                            textColor: [0, 0, 0]
+                        },
+                        columnStyles: columnStyles,
+                        tableWidth: 'auto',
+                        showHead: 'everyPage'
+                    });
+
+                    doc2.save(`${title}_${new Date().toISOString().slice(0, 10)}.pdf`);
+                }
+                // ==== Excel ====
+                function exportToExcel(title) {
+                    const { headers, rows } = getTableData();
+                    const data = [headers, ...rows.map(row => headers.map(header => row[header] || ''))];
+                    const ws = XLSX.utils.aoa_to_sheet(data);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+                    XLSX.writeFile(wb, `${title}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+                }
+
+                // ==== CSV ====
+                function exportToCSV(title) {
+                    const { headers, rows } = getTableData();
+                    let csv = headers.join(',') + '\n';
+                    rows.forEach(row => {
+                        const values = headers.map(header => {
+                            let value = row[header] || '';
+                            if (typeof value === 'string' && value.includes(',')) {
+                                value = `"${value.replace(/"/g, '""')}"`;
+                            }
+                            return value;
+                        });
+                        csv += values.join(',') + '\n';
+                    });
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const link = $('<a>', {
+                        href: url,
+                        download: `${title}_${new Date().toISOString().slice(0, 10)}.csv`,
+                        css: { visibility: 'hidden' }
+                    }).appendTo('body');
+                    link[0].click();
+                    setTimeout(() => { link.remove(); URL.revokeObjectURL(url); }, 100);
+                }
+            }
+                //Main Table Function
+                {
+                    const table = $("#mainitemtable");
+                    const headers = table.find("th");
+
+                    // === SEARCHING (support inputs, selects, textarea) ===
+                    $("#tableSearch").on("keyup", function () {
+                        let value = $(this).val().toLowerCase();
+                        table.find("tbody tr").filter(function () {
+                            let rowText = "";
+
+                            // get visible text
+                            rowText += $(this).text().toLowerCase();
+
+                            // get input values
+                            $(this).find("input, select, textarea").each(function () {
+                                rowText += " " + ($(this).val() || "").toLowerCase();
+                            });
+
+                            $(this).toggle(rowText.indexOf(value) > -1);
+                        });
+                    });
+                }
+                $("#load").hide();
+               //Business Partner
+                {
+                    // Function to validate PAN format
+                    function isValidPAN(pan) {
+                        return /^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan);
+                    }
+
+                    // Function to validate GSTIN format
+                    function isValidGSTIN(gstin) {
+                        return /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(gstin);
+                    }
+
+                    // Function to validate email
+                    function isValidEmail(email) {
+                        return /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/.test(email);
+                    }
+
+                    // Function to validate mobile number (10 digits)
+                    function isValidMobile(mobile) {
+                        return /^[0-9]{10}$/.test(mobile);
+                    }
+
+                    // Function to validate name (minimum 3 characters)
+                    function isValidName(name) {
+                        return name.length >= 3;
+                    }
+
+                    // Function to validate phone number (optional field)
+                    function isValidPhone(phone) {
+                        return phone === '' || /^[0-9]{6,15}$/.test(phone);
+                    }
+
+                    // Function to validate pincode (6 digits)
+                    function isValidPincode(pincode) {
+                        return pincode === '' || /^[0-9]{6}$/.test(pincode);
+                    }
+
+                    // Function to show/hide error message
+                    function showError(fieldId, message) {
+                        let errorElement = $('#' + fieldId + '-error');
+                        if (!errorElement.length) {
+                            errorElement = $('<div class="error-message text-danger small mt-1"></div>').attr('id', fieldId + '-error');
+                            $('#' + fieldId).after(errorElement);
+                        }
+                        errorElement.text(message).show();
+                    }
+
+                    function hideError(fieldId) {
+                        $('#' + fieldId + '-error').hide();
+                    }
+
+                    var ObjType = $('#doctype').val()
+                    if (ObjType == "SQ" || ObjType == "SO" || ObjType == "STI" || ObjType == "SDN" || ObjType == "SR" || ObjType == "SCN") {
+                        $("#QType").val("C");
+                        GetNextCardcode1("C");
+                    } else {
+                        $("#QType").val("S")
+                        GetNextCardcode1("S");
+
+                    }
+                    // Real-time validation for Name
+                    $('#QName').on('input', function() {
+                        const name = $(this).val().trim();
+                        if (name && !isValidName(name)) {
+                            showError('Name', 'Name must be at least 3 characters long');
+                        } else {
+                            hideError('Name');
+                        }
+                    });
+
+                    // Real-time validation for MobileNo (only digits, max 10)
+                    $('#QMobileNo').on('input', function() {
+                        let mobile = $(this).val().trim();
+                        // Allow only digits
+                        mobile = mobile.replace(/\D/g, '');
+                        // Limit to 10 digits
+                        if (mobile.length > 10) {
+                            mobile = mobile.substring(0, 10);
+                        }
+                        $(this).val(mobile);
+
+                        if (mobile && !isValidMobile(mobile)) {
+                            showError('MobileNo', 'Mobile number must be exactly 10 digits');
+                        } else {
+                            hideError('MobileNo');
+                        }
+                    });
+
+                    // Real-time validation for Contact Person Mobile (only digits, max 10)
+                    $('#QCPMobileNumber').on('input', function() {
+                        let mobile = $(this).val().trim();
+                        // Allow only digits
+                        mobile = mobile.replace(/\D/g, '');
+                        // Limit to 10 digits
+                        if (mobile.length > 10) {
+                            mobile = mobile.substring(0, 10);
+                        }
+                        $(this).val(mobile);
+
+                        if (mobile && !isValidMobile(mobile)) {
+                            showError('CPMobileNumber', 'Contact Person Mobile must be exactly 10 digits');
+                        } else {
+                            hideError('CPMobileNumber');
+                        }
+                    });
+
+                    // Real-time validation for Phone (only digits)
+                    $('#QPhone').on('input', function() {
+                        let phone = $(this).val().trim();
+                        // Allow only digits
+                        phone = phone.replace(/\D/g, '');
+                        $(this).val(phone);
+
+                        if (phone && !isValidPhone(phone)) {
+                            showError('Phone', 'Phone number must be 6-15 digits');
+                        } else {
+                            hideError('Phone');
+                        }
+                    });
+
+                    // Real-time validation for Email
+                    $('#QEmail').on('input', function() {
+                        const email = $(this).val().trim();
+                        if (email && !isValidEmail(email)) {
+                            showError('Email', 'Invalid email format');
+                        } else {
+                            hideError('Email');
+                        }
+                    });
+
+                    // Real-time validation for PAN (uppercase only)
+                    $('#QPanNo').on('input', function() {
+                        let pan = $(this).val().trim().toUpperCase();
+                        $(this).val(pan);
+
+                        if (pan && !isValidPAN(pan)) {
+                            showError('PanNo', 'Invalid PAN format. Example: ABCDE1234F');
+                        } else {
+                            hideError('PanNo');
+                        }
+                    });
+
+                    // Real-time validation for GSTIN (uppercase only)
+                    $('#QADDGSTIN').on('input', function() {
+                        let gstin = $(this).val().trim().toUpperCase();
+                        $(this).val(gstin);
+
+                        if (gstin && !isValidGSTIN(gstin)) {
+                            showError('ADDGSTIN', 'Invalid GSTIN format');
+                        } else {
+                            hideError('ADDGSTIN');
+                        }
+                    });
+
+                    // Real-time validation for PinCode (only digits, max 6)
+                    $('#QPinCode').on('input', function() {
+                        let pincode = $(this).val().trim();
+                        // Allow only digits
+                        pincode = pincode.replace(/\D/g, '');
+                        // Limit to 6 digits
+                        if (pincode.length > 6) {
+                            pincode = pincode.substring(0, 6);
+                        }
+                        $(this).val(pincode);
+
+                        if (pincode && !isValidPincode(pincode)) {
+                            showError('PinCode', 'Pincode must be 6 digits');
+                        } else {
+                            hideError('PinCode');
+                        }
+                    });
+                    $("#resetcustomerform").click(function () {
+
+                            $('#QName').val("")
+                            $('#QMobileNo').val("")
+                            $('#QEmail').val("")
+                            $('#QPanNo').val("")
+                            $('#QADDGSTIN').val("")
+                            $('#QCPMobileNumber').val("")
+                            $('#QPhone').val("")
+                            $('#QPinCode').val("")
+                            $('#QLedgerID').val("")
+                            $('#QContactPerson').val("")
+                            $('#QCreaditDays').val("")
+                            $('#QADDGSTIN').val("")
+                            $('#QADDGSTINTYP').val("")
+                            $('#QType').val("C")
+                            $('#QID').val("")
+                            $('#QAddId').val("BILL TO")
+                            $('#QAddress1').val("")
+                            $('#QAddress2').val("")
+                            $('#QCity').val("")
+                            $('#QCountry').val("103")
+                            $('#QState').val("18")
+                            $('#QADDGSTINTYP').val("")
+                            $('#addisActive').prop("checked", true)
+                            $(".ledgername").text("");
+                            $(".ledger_mobileno").text("");
+                            $(".ledger_credit").text("");
+                            $(".ledger_creditLimit").text("0.00");
+                            $(".ledger_add").text("");
+                            $(".ledger_gstno").text("");
+                            $(".ledger_balance").text("0.00");
+                            $("#LedgerBalance").text("0.00");
+                             GetNextCardcode1("C");
+                             $('#LedgerCode').val('');
+                             $('#LedgerCode').attr('data-id', ' ');
+                             $('#LedgerCode').attr('data-name', ' ');
+                             $('#LedgerCode').attr('data-code', ' ');
+                    })
+                    // Form submission handler
+                    $('#createCustomerForm').on('click', function() {
+                        // Basic validations
+                        let name = $('#QName').val().trim();
+                        let mobile = $('#QMobileNo').val().trim();
+                        let email = $('#QEmail').val().trim();
+                        let pan = $('#QPanNo').val().trim();
+                        let gstin = $('#QADDGSTIN').val().trim();
+                        let cpMobile = $('#QCPMobileNumber').val().trim();
+                        let phone = $('#QPhone').val().trim();
+                        let pincode = $('#QPinCode').val().trim();
+
+                        let errors = [];
+
+                        if(!isValidName(name)) errors.push("Name must be at least 3 characters.");
+                        if(mobile && !isValidMobile(mobile)) errors.push("Mobile number must be 10 digits.");
+                        if(cpMobile && !isValidMobile(cpMobile)) errors.push("Contact Person Mobile must be 10 digits.");
+                        if(phone && !isValidPhone(phone)) errors.push("Phone number must be 6-15 digits.");
+                        if(email && !isValidEmail(email)) errors.push("Invalid Email format.");
+                        if(pan && !isValidPAN(pan)) errors.push("Invalid PAN format. Example: ABCDE1234F");
+                        if(gstin && !isValidGSTIN(gstin)) errors.push("Invalid GSTIN format.");
+                        if(pincode && !isValidPincode(pincode)) errors.push("Pincode must be 6 digits.");
+
+                        if (errors.length > 0) {
+                            Notify("error", errors.join("\n"),"")
+                            return;
+                        }
+                        var Ledgerss = [];
+                        // Collect main customer data
+                        let Ledgers = {
+                            ID: $('#QLedgerID').val() || null,
+                            GroupName: name,
+                            Postable: "A",
+                            BaseID: "7",
+                            Code: $('#QCode').val(),
+                            PhoneNo: phone,
+                            MobileNo: mobile,
+                            Email: email,
+                            WebSite: "",
+                            ContPer: $('#QContactPerson').val().trim(),
+                            ContMobiNo: cpMobile,
+                            CredID: $('#QCreaditDays').val() || null,
+                            CredAmt: "0",
+                            GSTIN: $('#QADDGSTIN').val(),
+                            GSTINTYP: $('#QADDGSTINTYP').val(),
+                            LedgerType: $('#QType').val(),
+                            PANNO: pan,
+                            TDSApplicable: null,
+                            AssesseeTyp: "",
+                            TDSID: null,
+                            IsActive: $('#addisActive').is(':checked') ?"A":"I"
+                        };
+                        Ledgerss.push(Ledgers)
+                        var Addressq = [];
+                        // Collect address data separately
+                        let Address = {
+                            AddID: $('#QID').val(),
+                            AddressID: $('#QAddId').val(),
+                            LedgerID: null,
+                            Address1: $('#QAddress1').val().trim(),
+                            Address2: $('#QAddress2').val().trim(),
+                            City: $('#QCity').val().trim(),
+                            PinCode: pincode,
+                            Coun_Id: $('#QCountry').val(),
+                            Stat_Id: $('#QState').val(),
+                            GSTIN: gstin,
+                            GSTINTYP: $('#QADDGSTINTYP').val(),
+                            IsActive: "A",
+                            AdresType: "B",
+                        };
+                        Addressq.push(Address)
+                        let Address1 = {
+                            AddID: $('#QSID').val(),
+                            AddressID: "SHIP TO",
+                            LedgerID: null,
+                            Address1: $('#QAddress1').val().trim(),
+                            Address2: $('#QAddress2').val().trim(),
+                            City: $('#QCity').val().trim(),
+                            PinCode: pincode,
+                            Coun_Id: $('#QCountry').val(),
+                            Stat_Id: $('#QState').val(),
+                            GSTIN: gstin,
+                            GSTINTYP: $('#QADDGSTINTYP').val(),
+                            IsActive: "A",
+                            AdresType: "S",
+                        };
+                        Addressq.push(Address1)
+                        var BankInfo = [];
+                         $.ajax({
+                              type: "POST",
+                              url: '@Url.Action("CREATELEDGER", "Master")',
+                              contentType: "application/json; charset=utf-8",
+                              data: JSON.stringify({
+                                  Ledgers: Ledgerss,
+                                  Address: Addressq,
+                                  BankInfo: BankInfo
+                               }),
+                             success: function (data) {
+                                 if (data.success) {
+                                     $("#createCustomerModal").modal("hide")
+                                      Loadbp(data.id)
+                                      Notify('success', data.message, '');
+                                  } else {
+                                      Notify('error', data.message, '');
+                                  }
+                              },
+                              error: function(xhr) {
+                                  const errorMessage = xhr.responseText || "Failed to save ledger data";
+                                  Notify('error', errorMessage, '');
+                              },
+                              complete: function() {
+
+                              }
+                          });
+
+                    });
+                    // Add some CSS for error messages
+                    $('<style>.error-message { display: none; }</style>').appendTo('head');
+                   function LoadTerms1() {
+                        $.ajax({
+                            url: '@Url.Action("GETTERMS", "Master")',
+                            type: 'GET',
+                            dataType: 'json',
+                            success: function (response) {
+                               if (response && response.length) {
+                                    const dropdown = $('#QCreaditDays');
+                                    dropdown.empty();
+                                    dropdown.append('<option value="" data-days="">Select</option>');
+
+                                    $.each(response, function (index, country) {
+                                        dropdown.append(
+                                            $('<option>')
+                                                .attr('data-days', country.CredDays)
+                                                .val(country.CredID)
+                                                .text(country.CredName)
+                                        );
+                                    });
+                                }
+                            },
+                            error: function (xhr) {
+                                showToast('Failed to load payment terms: ' + (xhr.responseJSON?.message || xhr.statusText), 'error');
+                            }
+                        });
+                    }
+
+                    function GetNextCardcode1(flag){
+                         $.ajax({
+                                type: "GET",
+                                url: '@Url.Action("GETNEXTLEDGERCODE", "Master")',
+                                contentType: "application/json; charset=utf-8",
+                                data: { flag: flag },
+                                cache: false,
+                                success: function (data) {
+                                    if (data && data.length) {
+                                        $("#QCode").val(data[0].NextLedgerCode);
+                                    } else {
+                                        Notify('error', 'Failed to get next ledger code', '');
+                                    }
+                                },
+                                error: function(xhr) {
+                                    const errorMessage = xhr.responseText || "Failed to load ledger data";
+                                    Notify('error', errorMessage, '');
+                                },
+                                complete: function() {
+                                }
+                         });
+                    }
+
+                    $("#QType").change(function () {
+                        GetNextCardcode1($(this).val())
+                    })
+                    // Load all countries for dropdown
+                    function loadCountries() {
+                        $.ajax({
+                            url: '@Url.Action("GETCOUNTRY", "Master")',
+                            type: 'GET',
+                            success: function (response) {
+                                if (response && response.length > 0) {
+                                    const dropdown = $('#QCountry');
+                                    dropdown.empty();
+                                    dropdown.append('<option value="">Select Country</option>');
+
+                                    $.each(response, function(index, country) {
+                                        dropdown.append($('<option></option>').val(country.Coun_Id).text(country.Name));
+                                    });
+                                    dropdown.val("103")
+                                }
+                            },
+                            error: function(xhr) {
+                                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading countries';
+                                Notify('error', 'Load Error', errorMessage);
+                            }
+                        });
+                    }
+                    // Load all states
+                    function loadStates() {
+                        $.ajax({
+                            url: '@Url.Action("GETSTATE", "Master")',
+                            type: 'GET',
+                            success: function (response) {
+                                if (response && response.length > 0) {
+                                    const dropdown = $('#QState');
+                                    dropdown.empty();
+                                    dropdown.append('<option value="">Select State</option>');
+
+                                    $.each(response, function(index, state) {
+                                        dropdown.append($('<option></option>').val(state.Stat_Id).text(state.Name));
+                                    });
+                                    dropdown.val("18")
+                                }
+                            },
+                            error: function(xhr) {
+                                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading states';
+                                Notify('error', 'Load Error', errorMessage);
+                            }
+                        });
+                    }
+                    loadCountries();
+                    loadStates();
+                    LoadTerms1();
+
+
+                }
+            })
+             //Attachement
+             {
+                $("#Attachments").click(function () {
+                    const docId =    $('#DocumentEntry').val();
+                    GetAttachments()
+                    if (docId == "" || docId == null) {
+                        $("#addFilesButton").prop("hidden", true)
+                        $("#AttachmentContinue").prop("hidden", false)
+
+                    } else {
+                        $("#addFilesButton").prop("hidden", false)
+                        $("#AttachmentContinue").prop("hidden", true)
+                    }
+                })
+                document.addEventListener('DOMContentLoaded', () => {
+                    const dropZone = document.getElementById('dropZone');
+                    const fileInput = dropZone.querySelector('.drop-zone__input');
+                    const fileTilesContainer = document.getElementById('fileTiles');
+                    const resetButton = document.getElementById('resetAttachment');
+
+                    // Open file selection dialog when drop zone is clicked
+                    dropZone.addEventListener('click', () => {
+                        fileInput.click();
+                    });
+
+                    // Handle file selection
+                    fileInput.addEventListener('change', () => {
+                        if (fileInput.files.length) {
+                            Array.from(fileInput.files).forEach(file => {
+                                createFileTile(file);
+                            });
+                        }
+                    });
+
+                    // Handle drag and drop
+                    dropZone.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        dropZone.classList.add('drop-zone--over');
+                    });
+
+                    ['dragleave', 'dragend'].forEach(type => {
+                        dropZone.addEventListener(type, () => {
+                            dropZone.classList.remove('drop-zone--over');
+                        });
+                    });
+
+                    dropZone.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        dropZone.classList.remove('drop-zone--over');
+
+                        if (e.dataTransfer.files.length) {
+                            Array.from(e.dataTransfer.files).forEach(file => {
+                                createFileTile(file);
+                            });
+                            // Update the file input with the new files
+                            const dataTransfer = new DataTransfer();
+                            Array.from(fileInput.files).forEach(file => dataTransfer.items.add(file));
+                            Array.from(e.dataTransfer.files).forEach(file => dataTransfer.items.add(file));
+                            fileInput.files = dataTransfer.files;
+                        }
+                    });
+
+                    // Handle reset
+                    resetButton.addEventListener('click', () => {
+                        fileTilesContainer.innerHTML = ''; // Clear all tiles
+                        fileInput.value = ''; // Clear the file input
+                    });
+
+                    // Function to create a file tile
+                    function createFileTile(file) {
+                        const fileTile = document.createElement('div');
+                        fileTile.className = 'file-tile';
+                        fileTile.dataset.file = JSON.stringify({ name: file.name, type: file.type }); // Store file metadata
+
+                        // Add thumbnail for images
+                        if (file.type.startsWith('image/')) {
+                            const img = document.createElement('img');
+                            img.src = URL.createObjectURL(file);
+                            fileTile.appendChild(img);
+                        } else {
+                            const icon = document.createElement('div');
+                            icon.className = 'file-icon';
+                            icon.textContent = '📄'; // Placeholder icon for non-image files
+                            fileTile.appendChild(icon);
+                        }
+
+                        // Add file name
+                        const fileName = document.createElement('div');
+                        fileName.className = 'file-name';
+                        fileName.textContent = file.name;
+                        fileTile.appendChild(fileName);
+
+                        // Add remove button
+                        const removeBtn = document.createElement('button');
+                        removeBtn.className = 'remove-btn';
+                        removeBtn.textContent = '×';
+                        removeBtn.addEventListener('click', () => {
+                            fileTile.remove(); // Remove the tile
+                            removeFileFromInput(file); // Remove the file from the input
+                        });
+                        fileTile.appendChild(removeBtn);
+
+                        // Append the tile to the container
+                        fileTilesContainer.appendChild(fileTile);
+                    }
+
+                    // Function to remove a file from the input
+                    function removeFileFromInput(fileToRemove) {
+                        const files = Array.from(fileInput.files);
+                        const updatedFiles = files.filter(file => file !== fileToRemove);
+
+                        // Create a new FileList and assign it to the input
+                        const dataTransfer = new DataTransfer();
+                        updatedFiles.forEach(file => dataTransfer.items.add(file));
+                        fileInput.files = dataTransfer.files;
+                    }
+
+                    // Handle "Add New" button click
+                    document.getElementById('addFilesButton').addEventListener('click', function () {
+                        AddAttchments($("#DocumentEntry").val())
+                    });
+                    function AddAttchments(DocumentEntry){
+                         const fileTiles = document.querySelectorAll('.file-tile'); // Get all file tiles
+                            let fileList = [];
+                            let fileReadPromises = [];
+                            fileTiles.forEach((tile) => {
+                                const fileData = JSON.parse(tile.dataset.file); // Parse the file metadata
+                                const file = Array.from(fileInput.files).find(f => f.name === fileData.name && f.type === fileData.type); // Find the corresponding file object
+
+                                if (file) {
+                                    const fileName = file.name.slice(0, file.name.lastIndexOf('.')); // Get file name without extension
+                                    const fileExtension = file.name.slice(file.name.lastIndexOf('.') + 1).toLowerCase(); // Get file extension
+                                    const filePath = URL.createObjectURL(file);
+                                    const docIdRaw = DocumentEntry;
+                                    const docId = docIdRaw ? docIdRaw.replace(/\D/g, '') : '';
+
+                                    const objType =  $("#doctype").val();
+                                    const userId = @userId;
+                                    const counter = "";
+                                    const reader = new FileReader();
+
+                                    // Wrap the file read process in a Promise
+                                    let fileReadPromise = new Promise((resolve, reject) => {
+                                        reader.onload = function (e) {
+                                            const fileBase64 = e.target.result.split(',')[1];
+                                            fileList.push({
+                                                DocId: docId,
+                                                ObjType: objType,
+                                                FileName: fileName,
+                                                Extension: fileExtension,
+                                                Path: filePath,
+                                                FileData: fileBase64,
+                                                UserId: userId,
+                                                Counter: counter
+                                            });
+                                            resolve(); // Resolve the promise once the file is read
+                                        };
+
+                                        reader.onerror = function (err) {
+                                            reject(err); // Reject if there's an error reading the file
+                                        };
+
+                                        reader.readAsDataURL(file);
+                                    });
+
+                                    fileReadPromises.push(fileReadPromise); // Add this file read promise to the array
+                                }
+                            });
+
+                            // Once all files are processed, send them to the server
+                            Promise.all(fileReadPromises)
+                                .then(() => {
+                                    sendFileDataToServer(fileList,DocumentEntry); // Send the file data to the server after all files are read
+                                })
+                                .catch((error) => {
+                                    console.error("Error reading file:", error);
+                                });
+
+                            // Clear the file input and tiles after processing
+                            fileInput.value = '';
+                            fileTilesContainer.innerHTML = ''; // Clear all tiles
+                    }
+                    // Function to send file data to the server (dummy implementation)
+                    function sendFileDataToServer(fileList,DocumentEntry) {
+                          var docId =DocumentEntry;
+                          if (docId !== "" && docId !== null && docId !== undefined && fileList.length>0) {
+                              $("load2").show();
+                              $.ajax({
+                                  url: '@Url.Action("ADD", "Attachment")',
+                                  type: 'POST',
+                                  contentType: 'application/json',
+                                  data: JSON.stringify(fileList),
+                                  success: function (response) {
+                                      $("load2").hide();
+                                      if (response.success) {
+                                          //Swal.fire("Files uploaded successfully!", "", "success");
+                                          GetAttachments(); // Reload attachments if upload is successful
+                                          $("#resetAttachment").click();
+                                      } else {
+                                          console.error("Error uploading files:", response.error);
+                                      }
+                                  },
+                                  error: function (error) {
+                                      $("load2").hide();
+                                      Swal.fire("Slow Network Please Check Attachment Was Linked Or Not..","If Not The Add Again.","error")
+                                      console.error("Error uploading files:", error);
+                                  }
+                              });
+                          } else {
+                              //Swal.fire("Please Add Document First", "", "warning");
+                          }
+                      }
+                });
+
+                function GetAttachments() {
+                    $('#AttchmentTable_Body').empty();
+                    const docIdRaw =  $('#DocumentEntry').val();
+                    const docId = docIdRaw ? docIdRaw.replace(/\D/g, '') : '';
+                     var ObjType = $("#doctype").val();
+                     if(!docId){
+                        return;
+                     }
+                     $.ajax({
+                         url: '@Url.Action("GETATTACHMENTS", "Attachment")',
+                         type: 'GET', // Ensure you use GET for the GET method
+                         contentType: "application/json; charset=utf-8",
+                         dataType: "json",
+                         data: {
+                             docId: docId,
+                             ObjType: ObjType
+                         },
+                         success: function (response) {
+                             if (response && Array.isArray(response)) {
+
+                                 for (var i = 0; i < response.length; i++) {
+                                     let previewContent = '';
+                                     // Handling different file types for preview
+                                     if (response[i].Extension == 'png' || response[i].Extension == 'jpg' || response[i].Extension == 'jpeg' || response[i].Extension == 'gif') {
+                                         previewContent = `<img src="data:image/${response[i].Extension};base64,${response[i].base64data}" alt="${response[i].FileName}" style="max-width: 100px; max-height: 100px;">`;
+
+                                     } else if (response[i].Extension === 'pdf') {
+                                         previewContent = `<i class="bi bi-file-pdf fa-2x text-danger"></i>`;
+                                     } else if (response[i].Extension === 'xls' || response[i].Extension === 'xlsx') {
+                                         previewContent = `<i class="bi bi-file-excel fa-2x text-success"></i>`;
+                                     } else if (response[i].Extension === 'csv') {
+                                         previewContent = `<i class="bi bi-file-csv fa-2x text-primary"></i>`;
+                                     } else {
+                                         previewContent = `<i class="bi bi-file fa-2x text-secondary"></i>`;
+                                     }
+                                     // Construct new row in the table
+                                     var newRow = `
+                                         <tr>
+                                             <td class="text-center srno">${parseInt(i)+1}</td>
+                                             <td class='FileName' >${response[i].FileName}</td>
+                                             <td class='text-center Extension' >${response[i].Extension}</td>
+                                             <td class='' hidden>${response[i].Path}</td>
+                                             <td class='' hidden>${response[i].DocId}</td>
+                                             <td class='' hidden>${response[i].ObjType}</td>
+                                             <td class='' hidden>${response[i].UserId}</td>
+                                             <td class='' hidden>${response[i].CounterCode}</td>
+                                             <td class='SrNo' hidden>${response[i].SrNo}</td>
+                                             <td class="text-center"><button data-imagedata="${response[i].base64data}" class="btn btn-sm btn-info ViewAttachment">View</button></td>
+                                             <td class="text-center" ><button class="btn btn-sm btn-danger deleteattachment-btn" data-id="${response[i].SrNo}">Delete</button></td>
+                                         </tr>
+                                     `;
+                                     $('#AttchmentTable_Body').append(newRow);
+                                 }
+                             } else {
+                                 console.error("Invalid response format:", response);
+                             }
+                         },
+                         error: function (error) {
+                             console.error("Error retrieving files:", error);
+                         }
+                     });
+                }
+                function sanitizeFileName(name) {
+                       return name.replace(/[.@@\/|\\]/g, "_"); // replace with underscore
+                }
+                $(document).on("click", ".ViewAttachment", function () {
+                    let fileData = $(this).data("imagedata"); // Base64 data
+                    let fileType = $(this).closest("tr").find(".Extension").text().toLowerCase();
+                    let FileName = sanitizeFileName($(this).closest("tr").find(".FileName").text());
+                    let previewContainer = $("#attachmentPreview");
+                    let download_btn_sec = $("#download_btn_sec");
+
+                    previewContainer.html("");
+                    download_btn_sec.html("");
+
+                    // Map extensions to correct MIME types
+                    let mimeTypes = {
+                        "jpg": "image/jpeg",
+                        "jpeg": "image/jpeg",
+                        "png": "image/png",
+                        "gif": "image/gif",
+                        "pdf": "application/pdf",
+                        "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "xls": "application/vnd.ms-excel",
+                        "csv": "text/csv",
+                        "doc": "application/msword",
+                        "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        "ppt": "application/vnd.ms-powerpoint",
+                        "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                    };
+                    let mimeType = mimeTypes[fileType] || "application/octet-stream";
+                    let fileUrl = `data:${mimeType};base64,${fileData}`;
+                    if (["jpg", "jpeg", "png", "gif"].includes(fileType)) {
+                              // Preview image
+                             previewContainer.html(`
+                                <img src="${fileUrl}" style="max-width:100%; height:auto;" class="img-fluid">
+                            `);
+
+                    } else if (fileType === "pdf") {
+                        // Preview PDF
+                        previewContainer.html(`
+                            <embed src="${fileUrl}" type="application/pdf" style="width:100%; min-height:700px;">
+                        `);
+                    } else {
+                        previewContainer.html(`<p>No preview available for .${fileType} files.</p>`);
+                    }
+                    download_btn_sec.html(`
+                        <a href="${fileUrl}" download="${FileName.trim()}" class="btn btn-primary">
+                            Download ${fileType.toUpperCase()}
+                        </a>
+                    `);
+                    $("#attachmentModal").modal("show");
+                });
+
+                $(document).on('click', '.deleteattachment-btn', function () {
+                     const row = $(this).closest('tr');
+                     const fileId = $(this).data('id');
+                     Swal.fire({
+                         title: 'Are you sure?',
+                         text: "You Want To Delete This Attachment..!",
+                         icon: 'warning',
+                         showCancelButton: true,
+                         confirmButtonColor: '#d33',
+                         cancelButtonColor: '#3085d6',
+                         confirmButtonText: 'Yes, delete it!',
+                     }).then((result) => {
+                         if (result.isConfirmed) {
+                             $.ajax({
+                                 url: '@Url.Action("DELETE", "Attachment")',
+                                 data: { srno:fileId },
+                                 type: 'GET',
+                                 success: function (data) {
+                                     if (data.success) {
+                                         row.remove();
+                                         updateSerialNumbers();
+                                         Swal.fire(
+                                             'Deleted!',
+                                             'Your file has been deleted.',
+                                             'success'
+                                         );
+                                     }
+                                 },
+                                 error: function (error) {
+                                     console.error("Error deleting file:", error);
+                                 }
+                             });
+                         }
+                     });
+                 });
+                 function updateSerialNumbers() {
+                     $('#AttchmentTable_Body tr').each(function (index, row) {
+                         $(row).find('td:first').text(index + 1);
+                     });
+                 }
+                  //print Layout
+                 {
+                      $(".PrintLayout").click(function () {
+                          PrintLayout($(this).attr("data-size"), $(this).attr("data-filename"),$(this));
+                      });
+                      function PrintLayout(Size,Name,activeinp) {
+                              var docentry =$("#DocumentEntry").val()
+                          var DocType = $("#doctype").val()
+                          var curentinputhtml = activeinp.html();
+                              if(docentry=="")
+                              {
+                                  Notify('warning','Please Select Valid Document..!','');
+                                  return;
+                              }
+                              // AJAX call to save
+                              $.ajax({
+                                  url: '@Url.Action("GenerateLayout", "Layout")',
+                                  method: 'GET',
+                                  contentType: 'application/json',
+                                  data: { DocType: DocType, DocEntry: docentry, Size: Size, Name: Name },
+                                  beforeSend: function() {
+                                      $('#btnPrint').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Processing...');
+                                       activeinp.prop('disabled', true).html('<i class="bi bi-hourglass"></i> Processing...');
+                                  },
+                                  success: function (response) {
+                                      if (response.success) {
+                                          if (response.message && response.fileName) {
+                                              // Extract the base64 part after the comma
+                                              const base64Data = response.message.split(',')[1];
+                                              // Decode the base64 string
+                                              const byteCharacters = atob(base64Data);
+                                              const byteNumbers = new Array(byteCharacters.length);
+                                              for (let i = 0; i < byteCharacters.length; i++) {
+                                                  byteNumbers[i] = byteCharacters.charCodeAt(i);
+                                              }
+                                              const byteArray = new Uint8Array(byteNumbers);
+                                              const blob = new Blob([byteArray], { type: 'application/pdf' });
+                                              const pdfUrl = URL.createObjectURL(blob);
+
+                                              // Open PDF in a new tab
+                                              const newTab = window.open(pdfUrl, '_blank');
+                                              if (newTab) {
+                                                  newTab.focus();
+                                              } else {
+                                                  alert("Please allow popups to view the PDF.");
+                                              }
+
+                                              // Revoke the URL after some time (to free memory)
+                                              setTimeout(() => {
+                                                  URL.revokeObjectURL(pdfUrl);
+                                              }, 5 * 60 * 1000); // keep alive for 5 minutes so PDF loads fine
+                                          }
+                                          $('#addFilesButton').click();
+                                      } else {
+                                          Notify('error', 'Failed To Create', response.message);
+                                      }
+                                  },
+                                  error: function (xhr) {
+                                      console.error(xhr.responseText)
+                                      const errorMessage = xhr.responseText || 'Error to print document ';
+                                      Notify('error', 'Error', errorMessage);
+
+                                  },complete: function() {
+                                      $('#btnPrint').prop('disabled', false).html('<i class="bi bi-printer"></i> Print');
+                                      activeinp.prop('disabled', false).html(curentinputhtml);
+                                  }
+                              });
+
+                          }
+                      }
+            }
+             function Loadbp(id) {
+                $("#resetcustomerform").click()
+                 if (!id || id == "" || id == " ") {
+                     return
+                 }
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("GETBPPARTNERBYID", "Master")',
+                    contentType: "application/json; charset=utf-8",
+                    data: { id: id },
+                    cache: false,
+                    success: function (data) {
+                        // ✅ Ledger data
+                        if (data.ledgerdata && data.ledgerdata.length > 0) {
+                            var ledger = data.ledgerdata[0];
+                            $('#QLedgerID').val(ledger.ID);
+                            $('#QType').val(ledger.LedgerType);
+                            $('#QName').val(ledger.GroupName);
+                            $('#QCode').val(ledger.Code);
+                            $('#QMobileNo').val(ledger.MobileNo);
+                            $('#QEmail').val(ledger.Email);
+                            $('#QPanNo').val(ledger.PANNO);
+                            $('#QADDGSTIN').val(ledger.GSTIN);
+                            $('#QCPMobileNumber').val(ledger.ContMobiNo);
+                            $('#QContactPerson').val(ledger.ContPer);
+                            $('#QPhone').val(ledger.PhoneNo);
+                            $('#QCreaditDays').val(ledger.CredID || ""); // ✅ fixed field name
+                            $('.ledgername').attr("data-credamt",ledger.CredAmt || "0"); // ✅ fixed field name
+
+                            $(".ledgername").text(ledger.GroupName);
+                            $(".ledger_mobileno").text(ledger.MobileNo);
+                            $("#LedgerCode").val(ledger.Code)
+                            $("#LedgerCode").attr("data-id", ledger.ID)
+                            $("#LedgerCode").attr("data-name", ledger.GroupName)
+                            $("#LedgerCode").attr("data-code", ledger.Code)
+
+                        }
+
+                        // ✅ Address data
+                        if (data.addressdata && data.addressdata.length > 0) {
+                            var address = data.addressdata[0];
+                            $('#QID').val(address.AddID);
+                            $('#QADDGSTIN').val(address.GSTIN);
+                            $('#QADDGSTINTYP').val(address.GSTINTYP);
+                            $('#QPinCode').val(address.PinCode);
+                            $('#QAddId').val(address.AddressId);
+                            $('#QAddress1').val(address.Address1);
+                            $('#QAddress2').val(address.Address2);
+                            $('.ledger_add').text(address.Address1 + " " + address.Address2); // ✅ fixed field name
+                            $('#QCity').val(address.City);
+                            $('#QCountry').val(address.Coun_Id);
+                            $('#QState').val(address.Stat_Id);
+                            $('#addisActive').prop("checked", address.IsActive == "A" ? true : false)
+                            $(".ledger_gstno").text(address.GSTIN);
+                            if (data.addressdata[1] !== undefined && data.addressdata[1] !== null) {
+                                var address1 = data.addressdata[1];
+                                $('#QSID').val(address1.AddID);
+                            }
+                        }
+                        if (data.balance && data.balance.length > 0) {
+                            var balance = data.balance[0];
+                            var bal = parseFloat(balance.BALANCE);
+
+                            // Prevent NaN by falling back to 0
+                            if (isNaN(bal)) {
+                                bal = 0;
+                            }
+
+                            $(".ledger_balance").text(bal.toFixed(2));
+                            $("#LedgerBalance").val(bal.toFixed(2));
+                            $("#PayReco").prop("checked", false)
+                            if (bal < 0) {
+                                $("#PayReco").prop("disabled", false)
+                            } else {
+                                $("#PayReco").prop("disabled", true)
+                            }
+                        }
+                        $("#btnCopyFrom").prop("disabled", false);
+
+                        reloadshipto("", id)
+                        var CrediteDays = $("#QCreaditDays option:selected").attr("data-days");
+                        DueDateFromCreditDays()
+                        $(".ledger_credit").text(CrediteDays || 0)
+                        $(".ledger_creditLimit").text(ledger.CredAmt ||"0.00")
+                        $("#PayLater").prop("checked", false)
+                        if (parseInt(CrediteDays) >0) {
+                            $("#PayLater").prop("disabled", false)
+                        } else {
+                            $("#PayLater").prop("disabled", true)
+                        }
+
+                    },
+                    error: function (xhr) {
+                        Notify('error', 'Error', xhr.responseText || 'Error loading BP Partners');
+                    }
+                });
+        }
+             function DueDateFromCreditDays() {
+            var creditDays = parseInt($("#QCreaditDays option:selected").attr("data-days")) || 0;
+            var today = new Date();
+            var dueDate = new Date(today);
+            dueDate.setDate(today.getDate() + creditDays);
+            var dd = String(dueDate.getDate()).padStart(2, '0');
+            var mm = String(dueDate.getMonth() + 1).padStart(2, '0');
+            var yyyy = dueDate.getFullYear();
+            var formattedDueDate = `${yyyy}-${mm}-${dd}`;
+            $("#DueDate").val(formattedDueDate);
+        }
+
+
+
+             function reloadshipto(defaultValue,Ledgerid) {
+             $.ajax({
+                url: '@Url.Action("GETADDBYLEDGER", "Inventory")', // This must be in a Razor .cshtml view
+                method: 'GET',
+                data: { id: Ledgerid },
+                success: function(response) {
+                    const select = $('#AddID');
+                    select.empty();
+
+                    if (Array.isArray(response) && response.length > 0) {
+                        response.forEach(function(add) {
+                            // Replace these keys with the correct ones from your response JSON
+                            const addId = add.AddID || add.addID || add.id;
+                            const addressName = add.AddressId || add.AddressName || add.name;
+                            select.append(`<option value="${addId}">${addressName}</option>`);
+                        });
+
+                        if (defaultValue) {
+                            const found = select.find(`option[value="${defaultValue}"]`).length > 0;
+                            if (found) {
+                                select.val(defaultValue);
+                            } else {
+                                console.warn("Default value not found in options.");
+                            }
+                        }
+                    } else {
+                        select.append(`<option value=""></option>`);
+                    }
+                },
+                error: function(xhr) {
+                    Notify('error', 'Error', xhr.responseText || 'Failed to load addresses.');
+                }
+            });
+        }
+
+    </script>
+    <script src="~/js/alert.js"></script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement(
+                { pageLanguage: 'en', includedLanguages: 'en,mr,hi', autoDisplay: false },
+                'google_translate_element'
+            );
+        }
+        function triggerTranslate(lang) {
+            var select = document.querySelector(".goog-te-combo");
+            if (select) {
+                select.value = lang;
+                select.dispatchEvent(new Event("change"));
+            }
+        }
+        document.getElementById("toMarathi").addEventListener("click", function () {
+            triggerTranslate("mr");
+        });
+        document.getElementById("toEnglish").addEventListener("click", function () {
+            triggerTranslate("en");
+        });
+    </script>
+
+  
+
+
+
+    @*timepicker*@
+    <script>
+        setCurrentTime();
+        function setCurrentTime() {
+            let now = new Date();
+            let hours = String(now.getHours()).padStart(2, '0');
+            let minutes = String(now.getMinutes()).padStart(2, '0');
+            let currentTime = hours + ":" + minutes;
+
+            $('.timepicker').val(currentTime);
+        }
+
+
+    </script>
+
+
+</body>
+</html>

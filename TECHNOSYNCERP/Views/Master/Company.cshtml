@@ -1,0 +1,669 @@
+﻿<!-- Company Master Form Section -->
+<section id="companyMasterSection">
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title">
+                    <i class="bi bi-building"></i> Company Master
+                </h3>
+            </div>
+            <div class="card-body">
+                <form id="companyMasterForm">
+                    <input type="hidden" id="CompanyID" name="CompanyID">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="ComName" class="form-label">Company Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-building"></i></span>
+                                <input type="text" class="form-control" id="ComName" name="ComName" required maxlength="100">
+                                <div class="invalid-feedback">Please provide a valid company name (2-100 characters).</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="ComAddre" class="form-label">Company Address <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                <input type="text" class="form-control" id="ComAddre" name="ComAddre" required maxlength="200">
+                                <div class="invalid-feedback">Please provide a company address.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="City" class="form-label">City <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-building"></i></span>
+                                <input type="text" class="form-control" id="City" name="City" required maxlength="50">
+                                <div class="invalid-feedback">Please provide a city name.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="PinCode" class="form-label">Pin Code</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-mailbox"></i></span>
+                                <input type="text" class="form-control" id="PinCode" name="PinCode" maxlength="10">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="Coun_Id" class="form-label">Country <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                                <select class="form-select" id="Coun_Id" name="Coun_Id" required>
+                                    <option value="">Select Country</option>
+                                    <!-- Countries will be loaded here -->
+                                </select>
+                                <div class="invalid-feedback">Please select a country.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="Stat_Id" class="form-label">State <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                <select class="form-select" id="Stat_Id" name="Stat_Id" required>
+                                    <option value="">Select State</option>
+                                    <!-- States will be loaded here -->
+                                </select>
+                                <div class="invalid-feedback">Please select a state.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="MobileNo" class="form-label">Mobile Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-phone"></i></span>
+                                <input type="text" class="form-control" id="MobileNo" name="MobileNo" maxlength="10">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="PhoneNo" class="form-label">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                <input type="text" class="form-control" id="PhoneNo" name="PhoneNo" maxlength="12">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="Email" class="form-label">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input type="email" class="form-control" id="Email" name="Email" maxlength="100">
+                                <div class="invalid-feedback">Please provide a valid email address.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="GSTIN" class="form-label">GSTIN</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-receipt"></i></span>
+                                <input type="text" class="form-control" id="GSTIN" name="GSTIN" maxlength="15">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="PAN" class="form-label">PAN</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-credit-card"></i></span>
+                                <input type="text" class="form-control" id="PAN" name="PAN" maxlength="10">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="TANNO" class="form-label">TAN Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-file-text"></i></span>
+                                <input type="text" class="form-control" id="TANNO" name="TANNO" maxlength="20">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="CINNO" class="form-label">CIN Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-file-earmark-text"></i></span>
+                                <input type="text" class="form-control" id="CINNO" name="CINNO" maxlength="30">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="BankAcctName" class="form-label">Bank Account Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control" id="BankAcctName" name="BankAcctName" maxlength="100">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="BankAcctNo" class="form-label">Bank Account Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-credit-card"></i></span>
+                                <input type="text" class="form-control" id="BankAcctNo" name="BankAcctNo" maxlength="20">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="IFSCCode" class="form-label">IFSC Code</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-file-earmark-text"></i></span>
+                                <input type="text" class="form-control" id="IFSCCode" name="IFSCCode" maxlength="50">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+
+                        <div class="col-md-6">
+                            <label for="BankID" class="form-label">Bank Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-bank"></i></span>
+                                <select class="form-select" id="BankID" name="BankID" required>
+                                    <option value="">Select Bank</option>
+                                    <!-- States will be loaded here -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="ValidFrom" class="form-label">Valid From</label>
+                                    <input type="date" class="form-control" id="ValidFrom" name="ValidFrom">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="ValidTo" class="form-label">Valid To</label>
+                                    <input type="date" class="form-control" id="ValidTo" name="ValidTo">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3 text-end">
+                        <div class="col-md-12">
+                            @if (ViewBag.BtnAuth != null)
+                            {
+                                <!-- Button Rendering Logic -->
+                                @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                                {
+                                    var btnName = item["BtnName"]?.ToString().Trim();
+                                    var btnauth = item["Auth"]?.ToString();
+                                    var icon = item["Icon"]?.ToString();
+                                    var ColorClass = item["ColorClass"]?.ToString();
+
+                                    if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                    {
+                                        switch (btnName)
+                                        {
+                                            case "Save":
+                                                <button type="button" id="btnSave" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2">
+                                                    <i class="@icon"></i>@btnName
+                                                </button>
+                                                break;
+                                            case "Delete":
+                                                <button type="button" id="btnDelete" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2" disabled>
+                                                    <i class="@icon"></i>@btnName
+                                                </button>
+                                                break;
+                                            case "Reset":
+                                                <button type="reset" id="btnReset" class="btn @ColorClass mb-1   me-2">
+                                                    <i class="@icon"></i> Reset
+                                                </button>
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <div class="alert alert-primary" role="alert">
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- jQuery CRUD Operations -->
+<script>
+    $(document).ready(function() {
+
+        // ============================
+        // 🔹 Validation Patterns
+        // ============================
+           const patterns = {
+            PAN: /^[A-Z]{5}[0-9]{4}[A-Z]$/,
+            GSTIN: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/,
+            TANNO: /^[A-Z]{4}[A-Z][0-9]{4}[A-Z]$/,
+            CINNO: /^[LU][0-9]{5}[A-Z]{2}[0-9]{4}[A-Z]{3}[0-9]{6}$/,
+        };
+
+
+        // ============================
+        // 🔹 Single Field Validation
+        // ============================
+         function validate($field, pattern, fieldName) {
+                if (!$field || !$field.length) {
+                    console.warn(`Field with id="${fieldName}" not found`);
+                    return true; // skip validation if field doesn't exist
+                }
+
+                const value = $field.val()?.trim() || ''; // safe trim
+                const $feedback = $field.siblings('.invalid-feedback');
+
+                if (!value) {
+                    $field.removeClass('is-invalid');
+                    $feedback.hide();
+                    return true;
+                }
+
+                let valid = pattern.test(value);
+                let duplicate = false;
+                const cid = $('#CompanyID').val();
+
+                $('#companyMasterTable tbody tr').each(function() {
+                    const cellValue = $(this).find(`td[data-field="${fieldName}"]`).text().trim();
+                    if (cellValue === value && $(this).data('id') != cid) {
+                        duplicate = true;
+                        return false;
+                    }
+                });
+
+                const msg = !valid ? `Invalid ${fieldName} format.` : duplicate ? `${fieldName} already exists.` : '';
+                $field.toggleClass('is-invalid', !!msg);
+
+                if ($feedback.length) {
+                    $feedback.toggle(!!msg).text(msg);
+                } else if (msg) {
+                    $field.after(`<div class="invalid-feedback">${msg}</div>`);
+                }
+
+                return !msg;
+            }
+
+        // ============================
+        // 🔹 Form Validation
+        // ============================
+        function validateForm() {
+            return Object.keys(patterns).every(id => validate($(`#${id}`), patterns[id], id));
+        }
+
+        function validateBasicForm() {
+            let isValid = true;
+
+            const companyName = $('#ComName').val().trim();
+            const address = $('#ComAddre').val().trim();
+            const city = $('#City').val().trim();
+            const countryId = $('#Coun_Id').val();
+            const stateId = $('#Stat_Id').val();
+
+            if (companyName.length < 2 || companyName.length > 100) {
+                $('#ComName').addClass('is-invalid'); isValid = false;
+            } else { $('#ComName').removeClass('is-invalid'); }
+
+            if (address.length < 5) {
+                $('#ComAddre').addClass('is-invalid'); isValid = false;
+            } else { $('#ComAddre').removeClass('is-invalid'); }
+
+            if (city.length < 2) {
+                $('#City').addClass('is-invalid'); isValid = false;
+            } else { $('#City').removeClass('is-invalid'); }
+
+            if (!countryId) {
+                $('#Coun_Id').addClass('is-invalid'); isValid = false;
+            } else { $('#Coun_Id').removeClass('is-invalid'); }
+
+            if (!stateId) {
+                $('#Stat_Id').addClass('is-invalid'); isValid = false;
+            } else { $('#Stat_Id').removeClass('is-invalid'); }
+
+            return isValid;
+        }
+
+        // ============================
+        // 🔹 Email Validation
+        // ============================
+         // Email validation function
+        function validateEmailField($field) {
+            const email = $field.val().trim();
+            let isValid = false;
+
+            // Basic email validation
+            if (email && email.indexOf(' ') === -1 && email.indexOf('@@') === -1 && email.includes('@@')) {
+                const parts = email.split('.');
+                if (parts.length > 1) {
+                    const lastPart = parts[parts.length - 1];
+                    if (lastPart.length >= 2 && lastPart.length <= 10) isValid = true;
+                }
+            }
+
+            const $feedback = $field.siblings('.invalid-feedback');
+
+            if (!isValid) {
+                // Remove d-none only if invalid
+                $feedback.removeClass('d-none').show();
+                $field.addClass('is-invalid');
+            } else {
+                $field.removeClass('is-invalid');
+                $feedback.hide();
+            }
+
+            return isValid;
+        }
+
+        // Attach validation on change
+        $('#Email').on('change', function () {
+            const $this = $(this);
+
+            // Run validation
+            validateEmailField($this);
+        });
+
+        // ============================
+        // 🔹 Real-time Validation
+        // ============================
+        Object.keys(patterns).forEach(id => {
+            $(`#${id}`).on('blur', () => validate($(`#${id}`), patterns[id], id));
+        });
+
+          $('#companyMasterForm input:not(#Email),#companyMasterForm ').on('input change', function() {
+                $(this).removeClass('is-invalid').siblings('.invalid-feedback').hide();
+            });
+
+
+        $('input, select').on('input change', function() {
+            $(this).removeClass('is-invalid');
+        });
+
+        // ============================
+        // 🔹 Load Dropdown Data
+        // ============================
+        function loadCountries() {
+            $.ajax({
+                url: '@Url.Action("GETCOUNTRY", "Master")',
+                type: 'GET',
+                success: function(response) {
+                    if (response && response.length) {
+                        const dropdown = $('#Coun_Id');
+                        dropdown.empty().append('<option value="">Select Country</option>');
+                        $.each(response, function(_, country) {
+                            dropdown.append($('<option></option>').val(country.Coun_Id).text(country.Name));
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading countries';
+                    Notify('error', 'Error', errorMessage);
+                }
+            });
+        }
+
+        function loadBanks() {
+            $.ajax({
+                url: '@Url.Action("GETBANK", "Master")',
+                type: 'GET',
+                success: function(response) {
+                    if (response && response.length) {
+                        const dropdown = $('#BankID');
+                        dropdown.empty().append('<option value="">Select Bank</option>');
+                        $.each(response, function(_, bank) {
+                            dropdown.append($('<option></option>').val(bank.BankID).text(bank.BankName));
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading banks';
+                    Notify('error', 'Error', errorMessage);
+                }
+            });
+        }
+
+        // ============================
+        // 🔹 Load States Based on Country
+        // ============================
+        $('#Coun_Id').change(function() {
+            const countryId = $(this).val();
+            const $stateDropdown = $('#Stat_Id');
+
+            if (!countryId) {
+                $stateDropdown.empty().append('<option value="">Select State</option>').prop('disabled', true);
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("GETSTATEBYCOUNTRY", "Master")',
+                data: { id: countryId },
+                type: 'GET',
+                beforeSend: function() {
+                    $stateDropdown.prop('disabled', true).html('<option value="">Loading states...</option>');
+                },
+                success: function(response) {
+                    $stateDropdown.empty().append('<option value="">Select State</option>');
+                    if (response && response.length) {
+                        $.each(response, function(_, state) {
+                            $stateDropdown.append($('<option></option>').val(state.Stat_Id).text(state.Name));
+                        });
+                    }
+                    $stateDropdown.prop('disabled', false);
+
+                    if ($stateDropdown.data('pending-value')) {
+                        $stateDropdown.val($stateDropdown.data('pending-value')).removeData('pending-value');
+                    }
+                },
+                error: function(xhr) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading states';
+                    Notify('error', 'Error', errorMessage);
+                    $stateDropdown.prop('disabled', false).html('<option value="">Error loading states</option>');
+                }
+            });
+        });
+
+        // ============================
+        // 🔹 Load Company Data
+        // ============================
+        function loadCompanies() {
+            $.ajax({
+                url: '@Url.Action("GETCOMPANY", "Master")',
+                type: 'GET',
+                success: function(response) {
+                    if (response && response.length) {
+                        const company = response[0];
+
+                        // Bind all inputs
+                        for (const key in company) {
+                            if (company.hasOwnProperty(key)) {
+                                const $input = $(`#${key}`);
+                                if ($input.length) {
+                                    if ($input.attr('type') === 'date' && company[key]) {
+                                        const parts = company[key].split('-');
+                                        if (parts.length === 3) $input.val(`${parts[2]}-${parts[1]}-${parts[0]}`);
+                                        else $input.val(company[key]);
+                                    } else {
+                                        $input.val(company[key] || '');
+                                    }
+                                    $input.removeClass('is-invalid').siblings('.invalid-feedback').addClass('d-none');
+                                }
+                            }
+                        }
+
+                        // Bind dropdowns
+                        const bindDropdown = ($dropdown, value, callback) => {
+                            if ($dropdown.find(`option[value='${value}']`).length) {
+                                $dropdown.val(value).trigger('change');
+                                if (callback) callback();
+                            } else {
+                                setTimeout(() => bindDropdown($dropdown, value, callback), 100);
+                            }
+                        };
+
+                        if (company.Coun_Id) {
+                            const $country = $('#Coun_Id');
+                            const $state = $('#Stat_Id');
+                            $state.data('pending-value', company.Stat_Id);
+                            bindDropdown($country, company.Coun_Id, () => {
+                                const pendingState = $state.data('pending-value');
+                                if (pendingState) bindDropdown($state, pendingState);
+                                $state.removeData('pending-value');
+                            });
+                        }
+
+                        if (company.BankID) bindDropdown($('#BankID'), company.BankID);
+                    } else {
+                        Notify('warning', 'No Data', 'No company records found.');
+                    }
+                },
+                error: function(xhr) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading company data';
+                    Notify('error', 'Error', errorMessage);
+                }
+            });
+        }
+
+        // ============================
+        // 🔹 Save/Update Company
+        // ============================
+        $('#btnSave').click(function() {
+            if (!validateForm() || !validateBasicForm()) {
+                Notify('warning', 'Validation Error', 'Please correct the form errors before saving.');
+                return;
+            }
+
+            const formData = {
+                CompanyID: $('#CompanyID').val(),
+                ComName: $('#ComName').val().trim(),
+                ComAddre: $('#ComAddre').val().trim(),
+                City: $('#City').val().trim(),
+                PinCode: $('#PinCode').val().trim(),
+                Coun_Id: $('#Coun_Id').val(),
+                Stat_Id: $('#Stat_Id').val(),
+                MobileNo: $('#MobileNo').val().trim(),
+                PhoneNo: $('#PhoneNo').val().trim(),
+                Email: $('#Email').val().trim(),
+                BankID: $('#BankID').val().trim(),
+                BankAcctNo: $('#BankAcctNo').val().trim(),
+                BankAcctName: $('#BankAcctName').val().trim(),
+                GSTIN: $('#GSTIN').val().trim(),
+                CINNO: $('#CINNO').val().trim(),
+                TANNO: $('#TANNO').val().trim(),
+                PAN: $('#PAN').val().trim(),
+                ValidFrom: $('#ValidFrom').val(),
+                ValidTo: $('#ValidTo').val(),
+                IFSCCode: $('#IFSCCode').val()
+            };
+
+            const isEdit = formData.CompanyID !== '';
+
+            $.ajax({
+                url: '@Url.Action("CREATECOMPANY", "Master")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                beforeSend: function() {
+                    $('#btnSave').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Processing...');
+                },
+                success: function(response) {
+                    if (response && response.success) {
+                        Notify('success', 'Success', response.message || (isEdit ? 'Company updated successfully!' : 'Company created successfully!'));
+                        loadCompanies();
+                        $('#companyMasterForm')[0].reset();
+                        $('#CompanyID').val('');
+                        $('#btnDelete').prop('disabled', true);
+                    } else {
+                        Notify('warning', 'Warning', response.message || 'Operation completed but with warnings.');
+                    }
+                },
+                error: function(xhr) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error saving company';
+                    Notify('error', 'Error', errorMessage);
+                },
+                complete: function() {
+                    $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
+                }
+            });
+        });
+
+        // ============================
+        // 🔹 Delete Company
+        // ============================
+        $('#btnDelete').click(function() {
+            const companyId = $('#CompanyID').val();
+            if (!companyId) {
+                Notify('warning', 'Warning', 'No company selected to delete.');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("DELETECOMPANY", "Master")',
+                        type: 'POST',
+                        data: { id: companyId },
+                        beforeSend: function() {
+                            $('#btnDelete').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Deleting...');
+                        },
+                        success: function(response) {
+                            if (response && response.success) {
+                                Notify('success', 'Success', response.message || 'Document deleted successfully!');
+                                $('#companyMasterForm')[0].reset();
+                                $('#CompanyID').val('');
+                            } else {
+                                Notify('warning', 'Warning', response.message || 'Document deleted successfully!');
+                            }
+                        },
+                        error: function(xhr) {
+                            const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error deleting Document';
+                            Notify('error', 'Error', errorMessage);
+                        },
+                        complete: function() {
+                            $('#btnDelete').prop('disabled', false).html('<i class="bi bi-trash"></i> Delete');
+                        }
+                    });
+                }
+            });
+        });
+
+        // ============================
+        // 🔹 Helper Functions
+        // ============================
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const parts = dateString.split('-');
+            if (parts.length !== 3) return dateString;
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+
+        // ============================
+        // 🔹 Reset Form
+        // ============================
+        $('#btnReset').click(function() {
+            $('#CompanyID').val('');
+            $('#btnDelete').prop('disabled', true);
+            $('.is-invalid').removeClass('is-invalid');
+        });
+
+        // ============================
+        // 🔹 Initial Load
+        // ============================
+        loadCountries();
+        loadBanks();
+        loadCompanies();
+
+    });
+</script>
+

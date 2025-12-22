@@ -1,0 +1,897 @@
+﻿<div class="container mt-5">
+    <h3 class="mb-4">Menu Management</h3>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" id="menuSearch" class="form-control" placeholder="Search menus...">
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button id="addMenuBtn" class="btn btn-secondary">
+                        <i class="bi bi-arrow-clockwise"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-diagram-3"></i> Menu Structure
+                </div>
+                <div class="card-body">
+                    <div id="menuTree" class="tree">
+                        <!-- Tree structure will be generated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-list-ul"></i> Menu Details</span>
+                    <span id="formModeBadge" class="badge bg-light text-dark">Add Mode</span>
+                </div>
+                <div class="card-body" id="menuDetailsForm">
+                    <form id="menuForm">
+                        <input type="hidden" id="menuID">
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="menuName" class="form-label">Menu Name *</label>
+                                <input type="text" class="form-control" id="menuName" required>
+                                <div class="invalid-feedback">Please provide a menu name.</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="parentMenu" class="form-label">Parent Menu</label>
+                                <select class="form-select" id="parentMenu">
+                                    <option value="0">-- Root Menu --</option>
+                                    <!-- Parent options will be populated here -->
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="Role" class="form-label">Role</label>
+                                <select class="form-select" id="Role">
+                                    <option value="B">Admin/Erp User</option>
+                                    <option value="A">Admin</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="controller" class="form-label">Controller</label>
+                                <input type="text" class="form-control" id="controller">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="action" class="form-label">Action</label>
+                                <input type="text" class="form-control" id="action">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="icon" class="form-label">Icon</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i id="iconPreview"></i></span>
+                                    <input type="text" class="form-control" id="icon" placeholder="bi bi-house">
+                                    <button class="btn btn-outline-secondary" type="button" id="iconPickerBtn">
+                                        <i class="bi bi-card-image"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted">Use Bootstrap Icons class names</small>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Is Active</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="authCheck" checked>
+                                    <label class="form-check-label" for="authCheck"></label>
+                                </div>
+                            </div>
+                            @* <div class="col-md-8"> *@
+                            @*     <label for="role" class="form-label">Allowed Roles</label> *@
+                            @*     <input type="text" class="form-control" id="role" placeholder="admin,user,manager"> *@
+                            @*     <small class="text-muted">Comma separated list of roles</small> *@
+                            @* </div> *@
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 text-end">
+                                <button type="button" id="cancelBtn" class="btn btn-secondary me-2">Cancel</button>
+                                <button type="submit" id="saveBtn" class="btn btn-primary">
+                                    <span id="saveBtnText">Save Menu</span>
+                                    <span id="saveBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                </button>
+                                <button type="button" id="deleteBtn" class="btn btn-danger ms-2" style="display:none;">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Icon Picker Modal -->
+<div class="modal fade" id="iconPickerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select an Icon</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" id="iconSearch" class="form-control" placeholder="Search icons...">
+                </div>
+                <div class="icon-grid" id="iconGrid">
+                    <!-- Icons will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="selectIconBtn" disabled>Select Icon</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Initialize with sample data
+        let menuData = [];
+         $.ajax({
+                type: "GET",
+                url: '@Url.Action("GETMENU", "DevUtility")',
+                contentType: "application/json; charset=utf-8",
+                cache: true,
+                success: function (data) {
+                    if(data.length){
+                     menuData=data;
+                      initApplication();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // handle error here
+                    var errorMessage = xhr.responseJSON.error;
+                    $("#error").text(errorMessage);
+                }
+         });
+        // Save data to localStorage
+        function saveData() {
+            if(menuData.length){
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("UPDATEMENU", "DevUtility")',
+                    contentType: "application/json; charset=utf-8",
+                    cache: true,
+                    data: JSON.stringify({ Menus: menuData }), // menuData is an array of Menu objects
+                    success: function (data) {
+                        if (data.success) {
+                            showToast(data.message, 'success');
+                        } else {
+                            $("#error").text(data.message);
+                            showToast(data.message, 'error');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        var errorMessage = xhr.responseJSON?.message || "Unknown error";
+                        $("#error").text(errorMessage);
+                    }
+                });
+            }
+        }
+
+        // Current selected menu
+        let currentMenu = null;
+
+        // Form mode (add/edit)
+        let formMode = 'add';
+
+        // Selected icon in picker
+        let selectedIcon = null;
+
+        // Initialize the application
+
+
+        function initApplication() {
+            renderMenuTree();
+            populateParentMenuOptions();
+            resetForm();
+            bindEvents();
+            loadIconPicker();
+        }
+
+        // Render the menu tree
+        function renderMenuTree() {
+            let $tree = $('#menuTree');
+            $tree.empty();
+            // Get root menus (ParentID = 0)
+            let rootMenus = menuData.filter(menu => menu.ParentID === "0")
+                                     .sort((a, b) => a.MenuOrderID - b.MenuOrderID);
+
+            if (rootMenus.length === 0) {
+                $tree.append('<div class="text-muted">No menus found. Click "Add Menu" to create one.</div>');
+                return;
+            }
+
+            let $ul = $('<ul class="list-group list-group-flush"></ul>');
+
+            rootMenus.forEach(menu => {
+                $ul.append(createMenuItem(menu));
+            });
+
+            $tree.append($ul);
+
+            // Initialize Sortable for drag and drop
+            initSortable();
+        }
+
+        // Create a menu item for the tree
+        function createMenuItem(menu) {
+            let hasChildren = menuData.some(m => m.ParentID === menu.MenuID);
+            let $li = $(`
+                <li class="list-group-item tree-item" data-id="${menu.MenuID}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-grip-vertical drag-handle me-2 text-muted"></i>
+                            <i class="${menu.Icon || 'bi bi-menu-button'} me-2"></i>
+                            <span class="menu-name">${menu.MenuName}</span>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary edit-item" data-id="${menu.MenuID}" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                    </div>
+                </li>
+            `);
+
+            // Find children
+            let children = menuData.filter(m => m.ParentID === menu.MenuID)
+                                  .sort((a, b) => a.MenuOrderID - b.MenuOrderID);
+
+            if (children.length > 0) {
+                let $childrenUl = $('<ul class="list-group list-group-flush ms-4"></ul>');
+
+                children.forEach(child => {
+                    $childrenUl.append(createMenuItem(child));
+                });
+
+                $li.append($childrenUl);
+
+                // Add expand/collapse icon if has children
+                $li.find('> div > div:first-child').prepend(
+                    `<i class="bi bi-caret-down-fill me-1 toggle-children" style="font-size:0.8rem;"></i>`
+                );
+            } else if (hasChildren) {
+                // Placeholder for potential children (for drag and drop)
+                $li.append('<ul class="list-group list-group-flush ms-4" style="display:none;"></ul>');
+            }
+
+            return $li;
+        }
+
+        // Initialize Sortable for drag and drop
+        function initSortable() {
+            new Sortable(document.getElementById('menuTree'), {
+                animation: 150,
+                handle: '.drag-handle',
+                draggable: '.tree-item',
+                group: 'menu',
+                onEnd: function(evt) {
+                    updateMenuMenuOrderID();
+                }
+            });
+
+            // Make child lists sortable too
+            $('#menuTree ul').each(function() {
+                new Sortable(this, {
+                    animation: 150,
+                    handle: '.drag-handle',
+                    draggable: '.tree-item',
+                    group: 'menu',
+                    onEnd: function(evt) {
+                        updateMenuMenuOrderID();
+                    }
+                });
+            });
+        }
+
+        // Update menu order after drag and drop
+        function updateMenuMenuOrderID() {
+            // Clear existing order IDs to prevent conflicts
+            menuData.forEach(menu => {
+                menu.MenuOrderID = 0;
+            });
+
+            // Process root level items first
+            let orderCounter = 1;
+            $('#menuTree > ul > li[data-id]').each(function () {
+                let menuID = $(this).data('id').toString();
+                let menu = menuData.find(m => m.MenuID === menuID);
+                if (menu) {
+                    menu.MenuOrderID = orderCounter++;
+                    updateChildMenuOrder($(this), menuID);
+                }
+            });
+
+            saveData();
+        }
+
+        function updateChildMenuOrder($parentElement, parentID) {
+            let childOrderCounter = 1;
+            $parentElement.find('> ul > li[data-id]').each(function () {
+                let menuID = $(this).data('id').toString();
+                let menu = menuData.find(m => m.MenuID === menuID);
+                if (menu) {
+                    menu.MenuOrderID = childOrderCounter++;
+                    menu.ParentID = parentID; // Set the correct parent ID
+                    updateChildMenuOrder($(this), menuID);
+                }
+            });
+        }
+        // Populate parent menu dropdown
+        function populateParentMenuOptions() {
+            let $parentMenu = $('#parentMenu');
+            $parentMenu.empty();
+            $parentMenu.append('<option value="0">-- Root Menu --</option>');
+
+            // Add all menus except the current one (in edit mode) and its children
+            menuData.forEach(menu => {
+                if (formMode !== 'edit' || menu.MenuID !== currentMenu?.MenuID) {
+                    // Check if this menu is not a child of the current menu (to prevent circular references)
+                    if (!isChildOf(menu.MenuID, currentMenu?.MenuID)) {
+                        $parentMenu.append(`<option value="${menu.MenuID}">${menu.MenuName}</option>`);
+                    }
+                }
+            });
+        }
+
+        // Check if a menu is a child of another menu
+        function isChildOf(menuID, potentialParentID) {
+            if (!potentialParentID) return false;
+
+            let menu = menuData.find(m => m.MenuID === menuID);
+            if (!menu) return false;
+
+            // Check direct parent
+            if (menu.ParentID === potentialParentID) return true;
+
+            // Recursively check ancestors
+            if (menu.ParentID !== "0") {
+                return isChildOf(menu.ParentID, potentialParentID);
+            }
+
+            return false;
+        }
+
+        // Reset form to add mode
+        function resetForm() {
+            formMode = 'add';
+            currentMenu = null;
+            $('#menuForm')[0].reset();
+            $('#Role').val('B');
+            $('#menuID').val('');
+            $('#authCheck').prop('checked', true);
+            $('#parentMenu').val('0');
+            $('#deleteBtn').hide();
+            $('#iconPreview').removeClass().addClass('bi bi-menu-button');
+            $('#menuName').removeClass('is-invalid');
+            $('#formModeBadge').text('Add Mode').removeClass('bg-warning').addClass('bg-light text-dark');
+            $('#saveBtnText').text('Save Menu');
+
+            // Clear all validation
+            $('.is-invalid').removeClass('is-invalid');
+        }
+
+        // Load menu into form for editing
+        function loadMenuIntoForm(menu) {
+        formMode = 'edit';
+        currentMenu = menu;
+
+        $('#menuID').val(menu.MenuID);
+        $('#menuName').val(menu.MenuName);
+        $('#controller').val(menu.Controller || '');
+        $('#action').val(menu.Action || '');
+        $('#icon').val(menu.Icon || '');
+        $('#authCheck').prop('checked', menu.IsActive === 'Y');
+        $('#Role').val(menu.Role || '');
+        $('#deleteBtn').show();
+        $('#formModeBadge').text('Edit Mode').removeClass('bg-light text-dark').addClass('bg-warning');
+        $('#saveBtnText').text('Update Menu');
+
+        // Update icon preview
+        if (menu.Icon) {
+            $('#iconPreview').removeClass().addClass(menu.Icon);
+        } else {
+            $('#iconPreview').removeClass().addClass('bi bi-menu-button');
+        }
+
+        // Re-populate parent options (excluding current menu and its children)
+        populateParentMenuOptions();
+        $('#parentMenu').val(menu.ParentID || '0');
+
+        // Scroll to form
+        $('html, body').animate({
+            scrollTop: $('#menuDetailsForm').offset().top - 20
+        }, 300);
+    }
+
+        // Save menu (add or update)
+        function saveMenu() {
+            let menuName = $('#menuName').val().trim();
+            if (!menuName) {
+                $('#menuName').addClass('is-invalid');
+                return false;
+            }
+
+            // Show loading state
+            $('#saveBtn').prop('disabled', true);
+            $('#saveBtnSpinner').removeClass('d-none');
+
+            // Simulate async operation
+            setTimeout(() => {
+                let menu = {
+                    MenuID: $('#menuID').val() || "",
+                    MenuName: menuName,
+                    ParentID: $('#parentMenu').val(),
+                    Controller: $('#controller').val().trim(),
+                    Action: $('#action').val().trim(),
+                    Role: $('#Role').val().trim(),
+                    Icon: $('#icon').val().trim(),
+                    IsActive: $('#authCheck').is(':checked') ? 'Y' : 'N',
+                    MenuOrderID: formMode === 'add'
+                    ? (menuData.length + 1).toString()
+                    : currentMenu.MenuOrderID.toString()
+                };
+
+                if (formMode === 'add') {
+                    menuData.push(menu);
+                    showToast('Menu added successfully!', 'success');
+                } else {
+                    let index = menuData.findIndex(m => m.MenuID === menu.MenuID);
+                    if (index !== -1) {
+                        menuData[index] = menu;
+                        showToast('Menu updated successfully!', 'success');
+                    }
+                }
+
+                saveData();
+                renderMenuTree();
+                resetForm();
+
+                // Restore button state
+                $('#saveBtn').prop('disabled', false);
+                $('#saveBtnSpinner').addClass('d-none');
+
+            }, 500);
+
+            return true;
+        }
+
+        // Generate a new unique ID
+        function generateNewID() {
+            let maxID = 0;
+            menuData.forEach(menu => {
+                let idNum = parseInt(menu.MenuID);
+                if (idNum > maxID) maxID = idNum;
+            });
+            return (maxID + 1).toString();
+        }
+
+        // Delete menu
+        function deleteMenu() {
+            if (!currentMenu) return;
+
+            if (confirm(`Are you sure you want to delete "${currentMenu.MenuName}"? This will also delete all its submenus.`)) {
+                menuData = menuData.filter(m =>
+                    m.MenuID !== currentMenu.MenuID &&
+                    m.ParentID !== currentMenu.MenuID
+                );
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("DeleteMenu", "Auth")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({ MenuID: currentMenu.MenuID }),
+                    success: function (data) {
+                        if (data.success) {
+                            Notify('success', 'Deleted', data.message);
+                            renderMenuTree();
+                            resetForm();
+                        } else {
+                            Notify('error', 'Error', data.message);
+                        }
+                    },
+                    error: function (xhr) {
+                        const errorMessage = xhr.responseJSON?.message || "Unknown error";
+                        Notify('error', 'Error', errorMessage);
+                    }
+                });
+                showToast('Menu deleted successfully!', 'success');
+            }
+        }
+
+        // Load icons for the icon picker
+        function loadIconPicker() {
+            // This is a simplified version - in a real app you might load from Bootstrap Icons library
+    const icons = [
+        // Original icons
+        'bi bi-house', 'bi bi-speedometer2', 'bi bi-people', 'bi bi-gear',
+        'bi bi-graph-up', 'bi bi-file-text', 'bi bi-calendar', 'bi bi-envelope',
+        'bi bi-bell', 'bi bi-lock', 'bi bi-box-arrow-right', 'bi bi-list-ul',
+        'bi bi-grid', 'bi bi-cart', 'bi bi-wallet', 'bi bi-bookmark',
+        'bi bi-chat', 'bi bi-folder', 'bi bi-image', 'bi bi-collection',
+
+        // ERP-specific additions
+        'bi bi-building',          // Company/Organization
+        'bi bi-briefcase',         // Business/Projects
+        'bi bi-cash',              // Finance
+        'bi bi-credit-card',       // Payments
+        'bi bi-graph-up-arrow',    // Analytics
+        'bi bi-pie-chart',         // Reports
+        'bi bi-clipboard-data',    // Statistics
+        'bi bi-box-seam',          // Inventory
+        'bi bi-truck',             // Logistics
+        'bi bi-shop',              // Retail
+        'bi bi-cpu',               // Manufacturing
+        'bi bi-tools',             // Maintenance
+        'bi bi-person-badge',      // HR/Employees
+        'bi bi-clock-history',     // Time Tracking
+        'bi bi-file-earmark-medical', // Documents
+        'bi bi-file-earmark-spreadsheet', // Spreadsheets
+        'bi bi-diagram-3',         // Hierarchy
+        'bi bi-archive',           // Archives
+        'bi bi-database',          // Database
+        'bi bi-cloud',             // Cloud Services
+        'bi bi-shield-check',      // Security
+        'bi bi-tags',              // Pricing/Tags
+        'bi bi-percent',           // Discounts
+        'bi bi-currency-exchange', // Forex
+        'bi bi-receipt',           // Invoices
+        'bi bi-file-earmark-bar-graph', // Financial Reports
+        'bi bi-person-lines-fill', // Contacts
+        'bi bi-telephone',         // Communication
+        'bi bi-printer',           // Printing
+        'bi bi-barcode',           // Scanning
+        'bi bi-qr-code',           // QR Codes
+        'bi bi-geo-alt',           // Locations
+        'bi bi-globe',             // Global/International
+        'bi bi-flag',              // Targets/Goals
+        'bi bi-lightbulb',         // Ideas
+        'bi bi-exclamation-circle', // Alerts
+        'bi bi-check-circle',      // Approvals
+        'bi bi-x-circle',          // Rejections
+        'bi bi-arrow-repeat',      // Processes
+        'bi bi-arrow-left-right',  // Transactions
+        'bi bi-collection-play',   // Workflows
+        'bi bi-kanban',            // Kanban Boards
+        'bi bi-calendar-check',    // Scheduling
+        'bi bi-calendar-week',     // Weekly View
+        'bi bi-calendar-month',    // Monthly View
+        'bi bi-hourglass',         // Time Management
+        'bi bi-stopwatch',         // Timers
+        'bi bi-clipboard-check',   // Checklists
+        'bi bi-clipboard-plus',    // New Entries
+        'bi bi-funnel',            // Filters
+        'bi bi-search',            // Search
+        'bi bi-sort-down',         // Sorting
+        'bi bi-filter-square',     // Advanced Filters
+        'bi bi-sliders',           // Settings
+        'bi bi-pencil-square',     // Edit
+        'bi bi-eye',               // View
+        'bi bi-trash',             // Delete
+        'bi bi-download',          // Export
+        'bi bi-upload',            // Import
+        'bi bi-link',              // Connections
+        'bi bi-share',             // Sharing
+        'bi bi-layers',            // Multi-level
+        'bi bi-stack' ,             // Stacks
+        'bi bi-bag-fill' ,             // Stacks
+        'bi bi-bag-heart-fill' ,             // Stacks
+        'bi bi-bag-plus-fill' ,             // Stacks
+        'bi bi-arrow-up-left-square-fill' ,             // Stacks
+        'bi bi-archive-fill' ,             // Stacks
+        'bi bi-clipboard-check-fill' ,             // Stacks
+        'bi bi-person-fill-lock' ,             // Stacks
+        'bi bi-people-fill' ,             // Stacks
+        'bi bi-box-fill' ,             // Stacks
+        'bi bi-box' ,             // Stacks
+        'bi bi-arrow-return-left' ,             // Stacks
+        'bi bi-journals' ,             // Stacks
+        'bi bi-journal-bookmark-fill' ,             // Stacks
+        'bi bi-journal-text' ,             // Stacks
+        'bi bi-wallet' ,             // Stacks
+        'bi bi-wallet-fill' ,             // Stacks
+        'bi bi-code' ,             // Stacks
+        'bi bi-gear-wide-connected'              // Stacks
+    ];
+
+            let $iconGrid = $('#iconGrid');
+            $iconGrid.empty();
+
+            icons.forEach(icon => {
+                $iconGrid.append(`
+                    <div class="icon-item" data-icon="${icon}">
+                        <i class="${icon}"></i>
+                        <small>${icon.replace('bi bi-', '')}</small>
+                    </div>
+                `);
+            });
+        }
+
+        // Bind all event handlers
+        function bindEvents() {
+            // Add new menu
+            $('#addMenuBtn').click(function() {
+                resetForm();
+            });
+
+            // Cancel editing
+            $('#cancelBtn').click(function() {
+                resetForm();
+            });
+
+            // Save menu
+            $('#menuForm').submit(function(e) {
+                e.preventDefault();
+                saveMenu();
+            });
+
+            // Delete menu
+            $('#deleteBtn').click(function() {
+                deleteMenu();
+            });
+
+            // Icon preview
+            $('#icon').on('input', function() {
+                $('#iconPreview').removeClass().addClass($(this).val() || 'bi bi-menu-button');
+            });
+
+            // Open icon picker
+            $('#iconPickerBtn').click(function() {
+                selectedIcon = null;
+                $('#iconSearch').val('');
+                $('#iconGrid .icon-item').removeClass('selected');
+                $('#selectIconBtn').prop('disabled', true);
+                $('#iconPickerModal').modal('show');
+            });
+
+            // Select icon in picker
+            $(document).on('click', '.icon-item', function() {
+                $('.icon-item').removeClass('selected');
+                $(this).addClass('selected');
+                selectedIcon = $(this).data('icon');
+                $('#selectIconBtn').prop('disabled', false);
+            });
+
+            // Confirm icon selection
+            $('#selectIconBtn').click(function() {
+                if (selectedIcon) {
+                    $('#icon').val(selectedIcon);
+                    $('#iconPreview').removeClass().addClass(selectedIcon);
+                    $('#iconPickerModal').modal('hide');
+                }
+            });
+
+            // Search icons
+            $('#iconSearch').on('input', function() {
+                let searchTerm = $(this).val().toLowerCase();
+                $('.icon-item').each(function() {
+                    let iconText = $(this).data('icon').toLowerCase();
+                    if (iconText.includes(searchTerm)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+
+            // Edit menu when clicked in tree
+              $(document).on('click', '.edit-item', function(e) {
+                e.stopPropagation();
+                let menuID = $(this).data('id');
+                let menu = menuData.find(m => m.MenuID === menuID.toString()); // Added toString()
+                if (menu) {
+                    loadMenuIntoForm(menu);
+                }
+            });
+            // Toggle children visibility when clicking on menu item
+            $(document).on('click', '.tree-item > div:first-child', function(e) {
+                if (!$(e.target).is('button') && !$(e.target).is('i.bi-grip-vertical') && !$(e.target).is('i.toggle-children')) {
+                    $(this).parent().find('> ul').toggle();
+                }
+            });
+
+            // Toggle children with the caret icon
+            $(document).on('click', '.toggle-children', function(e) {
+                e.stopPropagation();
+                $(this).parent().parent().find('> ul').toggle();
+                $(this).toggleClass('bi-caret-down-fill ');
+            });
+
+            // Search functionality
+            $('#menuSearch').on('input', function() {
+                let searchTerm = $(this).val().toLowerCase();
+
+                if (searchTerm === '') {
+                    $('#menuTree li').show();
+                    return;
+                }
+
+                $('#menuTree li').each(function() {
+                    let menuName = $(this).find('.menu-name').text().toLowerCase();
+                    if (menuName.includes(searchTerm)) {
+                        $(this).show();
+                        // Show all ancestors
+                        $(this).parents('li').show();
+                        // Show all children
+                        $(this).find('li').show();
+                        // Expand parent menus
+                        $(this).parents('li').find('> div > .toggle-children')
+                            //.removeClass('').addClass('');
+                        $(this).parents('ul').show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            // Remove any existing toasts
+            $('.toast').remove();
+
+            let toastClass = 'bg-primary';
+            if (type === 'success') toastClass = 'bg-success';
+            else if (type === 'error') toastClass = 'bg-danger';
+
+            let toast = $(`
+                <div class="toast align-items-center text-white ${toastClass} border-0 position-fixed bottom-0 end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `);
+
+            $('body').append(toast);
+
+            // Show the toast
+            toast.toast({ autohide: true, delay: 3000 }).toast('show');
+
+            // Remove toast after it's hidden
+            toast.on('hidden.bs.toast', function () {
+                $(this).remove();
+            });
+        }
+    });
+</script>
+
+<style>
+    .tree {
+        user-select: none;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+        .tree ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .tree li {
+            cursor: pointer;
+            margin-bottom: 2px;
+        }
+
+        .tree .list-group-item {
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+        }
+
+    .drag-handle {
+        cursor: move;
+        opacity: 0.5;
+        transition: opacity 0.2s;
+    }
+
+        .drag-handle:hover {
+            opacity: 1;
+        }
+
+    .tree-item > ul {
+        display: none;
+    }
+
+    .tree-item.expanded > ul {
+        display: block;
+    }
+
+    #iconPreview {
+        min-width: 20px;
+        text-align: center;
+    }
+
+    .edit-item {
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+
+    .tree-item:hover .edit-item {
+        opacity: 1;
+    }
+
+    .toast {
+        z-index: 1100;
+    }
+
+    .toggle-children {
+        cursor: pointer;
+        font-size: 0.8rem;
+        margin-right: 0.25rem;
+    }
+
+    /* Icon picker styles */
+    .icon-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 10px;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    .icon-item {
+        padding: 15px;
+        text-align: center;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .icon-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .icon-item.selected {
+            background-color: #e9ecef;
+            border: 1px solid #0d6efd;
+        }
+
+        .icon-item i {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .icon-item small {
+            display: block;
+            font-size: 0.7rem;
+            color: #6c757d;
+            word-break: break-word;
+        }
+
+    #formModeBadge {
+        font-size: 0.8rem;
+        padding: 0.35em 0.65em;
+    }
+</style>

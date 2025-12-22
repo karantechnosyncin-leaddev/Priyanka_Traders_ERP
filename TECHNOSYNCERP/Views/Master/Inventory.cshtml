@@ -1,0 +1,2894 @@
+﻿@using System.Text.Json
+@using TECHNOSYNCERP.Models
+@{
+    var authJson = Context.Session.GetString("Auth");
+    var auth = authJson != null
+        ? JsonSerializer.Deserialize<AuthModel>(authJson)
+        : null;
+
+}
+<style>
+    /* Outline States */
+    .btn-outline-red {
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    background-color: transparent;
+    }
+
+    .btn-outline-green {
+    color: #28a745;
+    border: 1px solid #28a745;
+    background-color: transparent;
+    }
+
+    .btn-outline-blue {
+    color: #0d6efd;
+    border: 1px solid #0d6efd;
+    background-color: transparent;
+    }
+
+    /* Filled States */
+    .btn-red-filled {
+    color: white;
+    background-color: #dc3545;
+    border: 1px solid #dc3545;
+    }
+
+    .btn-green-filled {
+    color: white;
+    background-color: #28a745;
+    border: 1px solid #28a745;
+    }
+
+    .btn-blue-filled {
+    color: white;
+    background-color: #0d6efd;
+    border: 1px solid #0d6efd;
+    }
+
+    /* Hover States */
+    .btn-outline-red:hover,
+    .btn-red-filled:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+    }
+
+    .btn-outline-green:hover,
+    .btn-green-filled:hover {
+    background-color: rgba(40, 167, 69, 0.1);
+    }
+
+    .btn-outline-blue:hover,
+    .btn-blue-filled:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    }
+    /* Drag and Drop Zone Styles */
+    .file-upload-container {
+    margin-bottom: 1rem;
+    }
+
+    .dropzone {
+    border: 2px dashed #dee2e6;
+    border-radius: 0.375rem;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    }
+
+    .dropzone:hover {
+    border-color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.05);
+    }
+
+    .dropzone.drag-over {
+    border-color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.1);
+    }
+
+    .dropzone-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    }
+
+    .dropzone-icon {
+    font-size: 2.5rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+    }
+
+    .dropzone-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.25rem;
+    }
+
+    .dropzone-subtext {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin: 0.5rem 0;
+    }
+
+    /* File Info Styles */
+    .file-info {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.75rem 1rem;
+    background-color: #f8f9fa;
+    }
+
+    .file-info-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    }
+
+    .file-name {
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    }
+
+    .remove-file {
+    padding: 0;
+    margin-left: 0.5rem;
+    }
+
+</style>
+<div class="container-fluid">
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="card p-2 rounded shadow-sm">
+                <div class="row">
+                    <div class="col-md-6 d-flex align-items-center">
+                        <h3><b>Inventory Master</b></h3>
+                    </div>
+                    <div class="col-md-6 d-flex justify-content-end align-items-center flex-wrap">
+                        @if (ViewBag.BtnAuth != null)
+                        {
+                          
+                            <!-- Button Rendering Logic -->
+                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                            {
+                                var btnName = item["BtnName"]?.ToString().Trim();
+                                var btnauth = item["Auth"]?.ToString();
+                                var icon = item["Icon"]?.ToString();
+                                var ColorClass = item["ColorClass"]?.ToString();
+                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                {
+                                    switch (btnName)
+                                    {
+                                        case "Bulk Upload":
+                                            <button id="btnBulkUpload" data-bs-toggle="modal" data-bs-target="#bulkUploadModal" class="btn @ColorClass mb-1  me-2 mb-1">
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break;
+                                        case "Find":
+                                            <button id="btnFind" data-bs-toggle="modal" data-bs-target="#itemListModal" class="btn @ColorClass mb-1  me-2 mb-1">
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break;
+                                        case "Attachments":
+                                            <button id="Attachments" data-bs-toggle="modal" data-bs-target="#Attachment" class="btn @ColorClass mb-1   me-2 mb-1">
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break;
+                                        @* case "Export":
+                                            <button id="btnPdf" class="btn btn-outline-danger me-2 mb-1">
+                                                <i class="bi bi-file-pdf me-1"></i> PDF
+                                            </button>
+                                            <button id="btnExcel" class="btn btn-outline-success me-2 mb-1">
+                                                <i class="bi bi-file-earmark-excel me-1"></i> EXCEL
+                                            </button>
+                                            <button id="btnCSV" class="btn btn-outline-success me-2 mb-1">
+                                                <i class="bi bi-file-earmark-excel me-1"></i> CSV
+                                            </button>
+                                            break; *@
+                                        @* case "Copy From":
+                                            <button id="btnCopyFrom" class="btn @ColorClass mb-1  me-2 mb-1">
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break; 
+                                        case "Copy To":
+                                            <button id="btnCopyFrom" class="btn @ColorClass mb-1  me-2 mb-1">
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break; *@
+                                        default:
+                                           
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-primary" role="alert">
+                               
+                            </div>
+                        }
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mt-3">
+            <div class="card p-3 rounded shadow-sm">
+                <!-- Action Buttons -->
+                <div class="row mb-3">
+                    <div class="col-12 d-flex justify-content-end">
+                        @if (ViewBag.BtnAuth != null)
+                        {
+                            <!-- Button Rendering Logic -->
+                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                            {
+                                var btnName = item["BtnName"]?.ToString().Trim();
+                                var btnauth = item["Auth"]?.ToString();
+                                var icon = item["Icon"]?.ToString();
+                                var ColorClass = item["ColorClass"]?.ToString();
+
+                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                {
+                                    switch (btnName)
+                                    {
+                                        case "Save":
+                                            <button id="btnSave" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2">
+                                                <i class="@icon"></i>@btnName
+                                            </button>
+                                            break;
+                                        case "Update":
+                                            <button id="btnUpdate" data-action="update" class="btn @ColorClass mb-1  me-2" disabled>
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break;
+                                       @*  case "Park":
+                                            <button id="btnPark"  class="btn @ColorClass mb-1  me-2" >
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break;
+                                         case "Resume":
+                                            <button id="btnResume"  class="btn @ColorClass mb-1  me-2" >
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break; *@
+                                        case "Print":
+                                            <button id="btnPrint" data-action="create" data-item-id="" class="btn @ColorClass mb-1   me-2" disabled>
+                                                <i class="@icon"></i>@btnName
+                                            </button>
+                                            break;
+                                        case "Delete":
+                                            <button id="btnDelete" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2" disabled>
+                                                <i class="@icon"></i>@btnName
+                                            </button>
+                                            break;
+                                        case "Reset":
+                                            <button id="btnReset" class="btn @ColorClass mb-1   me-2">
+                                                <i class="@icon"></i> Reset
+                                            </button>
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-primary" role="alert">
+                                
+                            </div>
+                        }
+        
+                    </div>
+                </div>
+
+                <!-- Main Form -->
+                <div class="row g-2">
+                    <div class="col-md-2 col-6 mb-2" hidden>
+                        <input id="DocumentEntry" hidden class="form-control" type="text" readonly />
+                        <input id="doctype" type="text" hidden value="ITM" class="form-control" />
+                    </div>
+                    <!-- First Row -->
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label for="txtItemCode">Item Code</label>
+                        <div class="input-group">
+                            <input id="txtItemCode" class="form-control" type="text" data-id="" />
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#itemListModal">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label for="txtItemName">Item Name</label>
+                        <input id="txtItemName" class="form-control" type="text" />
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label for="ddlItemType">Item Type</label>
+                        <select id="ddlItemType" class="form-select">
+                            <option value="I">Item</option>
+                            <option value="S">Service</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label for="txtEanCode">EAN Code</label>
+                        <input id="txtEanCode" class="form-control" type="text" />
+                    </div>
+
+                    <!-- Second Row -->
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label for="ddlUomCode">UOM Code</label>
+                        <div class="input-group">
+                            <select id="ddlUomCode" class="form-select">
+                                <option value="">Select</option>
+                            </select>
+                            <button id="btnAddUom" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#uomMasterModal">
+                                <b><i class="bi bi-plus"></i></b>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label for="ddlItemGroup">Item Group</label>
+                        <div class="input-group">
+                            <select id="ddlItemGroup" class="form-select">
+                                <option value="">Select</option>
+                            </select>
+                            <button id="btnAddItemGroup" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#itemGroupMasterModal">
+                                <b><i class="bi bi-plus"></i></b>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label for="ddlItemStatus">Item Status</label>
+                        <select id="ddlItemStatus" class="form-select">
+                            <option value="A">Active</option>
+                            <option value="I">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex align-items-end justify-content-center gap-2">
+                        <div class="row g-1 w-100">
+
+                            <!-- Inventory Switch -->
+                            <div class="col-4 p-1 form-check form-switch d-flex align-items-center justify-content-between border-end">
+                                <label class="form-check-label me-2" for="InventoryItem">Inventory</label>
+                                <input class="form-check-input" type="checkbox" id="InventoryItem" checked>
+                            </div>
+
+                            <!-- Sales Switch -->
+                            <div class="col-4 p-1 form-check form-switch d-flex align-items-center justify-content-between border-end">
+                                <label class="form-check-label me-2" for="SalesItem">Sales</label>
+                                <input class="form-check-input" type="checkbox" id="SalesItem" checked>
+                            </div>
+
+                            <!-- Purchasing Switch -->
+                            <div class="col-4 p-1 form-check form-switch d-flex align-items-center justify-content-between border-end">
+                                <label class="form-check-label me-2" for="PurchasingItem">Purchasing</label>
+                                <input class="form-check-input" type="checkbox" id="PurchasingItem" checked>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+
+                    <!-- Third Row -->
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label for="dtItemActiveFrom">Item Active From</label>
+                        <input id="dtItemActiveFrom" class="form-control" type="date" />
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label for="dtItemActiveTo">Item Active To</label>
+                        <input id="dtItemActiveTo" class="form-control" type="date" />
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label for="ddlHsnSacCode">HSN / SAC Code</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="ddlHsnSacCode">
+                            <button id="btnAddHsnSac" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#hsnSacMasterModal">
+                                <b><i class="bi bi-plus"></i></b>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label for="ddlGstRate">GST Rate (%)</label>
+                        <select id="ddlGstRate" class="form-select">
+                            <option value="">Select</option>
+                        </select>
+                    </div>
+
+                    <!-- Fourth Row -->
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label for="ddlTypeOfSupply">Type Of Supply</label>
+                        <select id="ddlTypeOfSupply" class="form-select">
+                            <option value="G">Goods</option>
+                            <option value="C">Capital Goods</option>
+                            <option value="S">Service</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label for="Weight1">Weight (Kg)</label>
+                        <input id="Weight1" class="form-control" type="number" />
+                    </div>
+                </div>
+                <!-- Tabs Section -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <ul class="nav nav-tabs" id="inventoryTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="sale-tab" data-bs-toggle="tab" data-bs-target="#sale-data" type="button" role="tab">Price Setup</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="warehouse-tab" data-bs-toggle="tab" data-bs-target="#warehouse" type="button" role="tab">Warehouse</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content p-3 border border-top-0 rounded-bottom" id="inventoryTabsContent">
+                            <!-- Sale Data Tab -->
+                            <div class="tab-pane fade show active" id="sale-data" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="table-responsive">
+                                            <table class="table" id="Pricesetuptbl">
+                                                <thead>
+                                                    <tr data-id="">
+                                                        <th nowrap>Sr No</th>
+                                                        <th nowrap>Conversion Code</th>
+                                                        <th nowrap>Conversion Qty</th>
+                                                        <th nowrap>Uom</th>
+                                                        <th nowrap>MRP</th>
+                                                        <th nowrap>Discount</th>
+                                                        <th nowrap>Rate</th>
+                                                        <th nowrap>IsActive</th>
+                                                        <th nowrap class="text-center">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td nowrap>1</td>
+                                                        <td nowrap><input class="form-control form-control-sm ConversionCode" type="text" readonly value="" /></td>
+                                                        <td nowrap><input class="form-control form-control-sm text-end" type="number" value="1" /></td>
+                                                        <td nowrap>NOS</td>
+                                                        <td nowrap class="MRP"><input class="MRPINP form-control form-control-sm text-end" type="number" /></td>
+                                                        <td nowrap class="Discount"><input class="DiscountINP form-control form-control-sm text-end" type="number" /></td>
+                                                        <td nowrap class="Rate"><input class="RateINP form-control form-control-sm text-end" type="number" /></td>
+                                                        <td nowrap class="text-center IsActive">
+                                                            <select class='form-control form-control-sm text-center'>
+                                                                <option value='A'>Active</option><option value='I'>In Active</option></select>
+                                                                    </td>
+                                                        <td nowrap class="text-center"><button class='btn  btn-sm btn-outline-danger price_setup_delete' disabled><i class='bi bi-trash'></i></button></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="col-12 text-end mt-2">
+                                            @if (ViewBag.BtnAuth != null)
+                                            {
+                                                <!-- Button Rendering Logic -->
+                                                @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                                                {
+                                                    var btnName = item["BtnName"]?.ToString().Trim();
+                                                    var btnauth = item["Auth"]?.ToString();
+                                                    var icon = item["Icon"]?.ToString();
+                                                    var ColorClass = item["ColorClass"]?.ToString();
+
+                                                    if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                                    {
+                                                        switch (btnName)
+                                                        {
+                                                            case "Add New Line":
+                                                                <button class="btn @ColorClass mb-1 " id="btnAddLine"><i class="@icon"></i> @btnName</button>
+                                                                break;
+                                                            default:
+                                                                break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <div class="alert alert-primary" role="alert">
+                                                    
+                                                </div>
+                                            }
+                                          
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Warehouse Tab -->
+                            <div class="tab-pane fade" id="warehouse" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="table-responsive">
+                                            <table class="table" id="whstable">
+                                                <thead>
+                                                    <tr>
+                                                        <th nowrap>Sr No</th>
+                                                        <th nowrap>Whs Code</th>
+                                                        <th nowrap>Stock</th>
+                                                        <th nowrap>Min Qty</th>
+                                                        <th nowrap>Max Qty</th>
+                                                        <th nowrap>Lock</th>
+                                                        <th nowrap>Item Cost</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- UOM Master Modal -->
+<div class="modal fade" id="uomMasterModal" tabindex="-1" aria-labelledby="uomMasterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uomMasterModalLabel">UOM Master</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="uomMasterTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="create-uom-tab" data-bs-toggle="tab" data-bs-target="#create-uom" type="button" role="tab">Create UOM</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="view-uom-tab" data-bs-toggle="tab" data-bs-target="#view-uom" type="button" role="tab">View UOM</button>
+                    </li>
+                </ul>
+                <div class="tab-content p-3 border border-top-0" id="uomMasterTabsContent">
+                    <div class="tab-pane fade show active" id="create-uom" role="tabpanel">
+                        <div class="row">
+                           <input type="text" hidden id="UOM_ID" />
+                            <div class="col-md-6 mb-3">
+                                <label for="txtUomCode" class="form-label">UOM Code</label>
+                                <input type="text" class="form-control" id="txtUomCode">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="txtUomName" class="form-label">UOM Name</label>
+                                <input type="text" class="form-control" id="txtUomName">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="ddlUomStatus" class="form-label">Status</label>
+                                <select class="form-select" id="ddlUomStatus">
+                                    <option value="A">Active</option>
+                                    <option value="I">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="view-uom" role="tabpanel">
+                        <div class="table-responsive" style="height:550px;">
+                            <table class="table table-bordered table-striped table-hover" id="tblUomMaster">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th nowrap>Code</th>
+                                        <th nowrap>Name</th>
+                                        <th nowrap>Status</th>
+                                        <th nowrap hidden>ID</th>
+                                        <th nowrap>Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>M</td>
+                                        <td>Meter</td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>1</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary uom_edite"><i class="bi bi-pencil"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnUomSave">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Item Group Master Modal -->
+<div class="modal fade" id="itemGroupMasterModal" tabindex="-1" aria-labelledby="itemGroupMasterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="itemGroupMasterModalLabel">Item Group Master</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="itemGroupMasterTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="create-item-group-tab" data-bs-toggle="tab" data-bs-target="#create-item-group" type="button" role="tab">Create Item Group</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="view-item-group-tab" data-bs-toggle="tab" data-bs-target="#view-item-group" type="button" role="tab">View Item Groups</button>
+                    </li>
+                </ul>
+                <div class="tab-content p-3 border border-top-0" id="itemGroupMasterTabsContent">
+                    <div class="tab-pane fade show active" id="create-item-group" role="tabpanel">
+                        <div class="row">
+                            <input type="text" hidden id="ItmGrpID" />
+                            <div class="col-md-6 mb-3">
+                                <label for="txtItemGroupCode" class="form-label">Group Name</label>
+                                <input type="text" class="form-control" id="txtItemGroupName">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="ddlItemGroupValuationMethod" class="form-label">Valuation Methode</label>
+                                <select class="form-select" id="ddlItemGroupValuationMethod">
+                                    <option value="S">Standard</option>
+                                    <option value="M">Moving Average</option>
+                                    <option value="F">FIFO</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="ddlItemCategory">Item Category</label>
+                                <select id="ddlItemCategory" class="form-select">
+                                    <option value="M">Material</option>
+                                    <option value="S">Service</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="ddlItemGroupStatus" class="form-label">Status</label>
+                                <select class="form-select" id="ddlItemGroupStatus">
+                                    <option value="A">Active</option>
+                                    <option value="I">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="view-item-group" role="tabpanel">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover" id="tblItemGroupMaster">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Sr No</th>
+                                        <th hidden>ItmGrpID</th>
+                                        <th>Group Name</th>
+                                        <th>Valuation Methode</th>
+                                        <th>Item Category</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td hidden>1</td>
+                                        <td>Electronic items</td>
+                                        <td data-id="S">Standerd</td>
+                                        <td data-id="S">Material</td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary"><i class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnItemGroupReset" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnItemGroupSave">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- HSN/SAC Master Modal -->
+<div class="modal fade" id="hsnSacMasterModal" tabindex="-1" aria-labelledby="hsnSacMasterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="hsnSacMasterModalLabel">HSN/SAC Master</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="hsnSacMasterTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="create-hsn-sac-tab" data-bs-toggle="tab" data-bs-target="#create-hsn-sac" type="button" role="tab">Create HSN/SAC</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="view-hsn-sac-tab" data-bs-toggle="tab" data-bs-target="#view-hsn-sac" type="button" role="tab">View HSN/SAC</button>
+                    </li>
+                </ul>
+                <div class="tab-content p-3 border border-top-0" id="hsnSacMasterTabsContent">
+                    <div class="tab-pane fade show active" id="create-hsn-sac" role="tabpanel">
+                        <div class="row">
+                            <input type="text" hidden id="hsnid"/>
+                            <div class="col-md-6 mb-3">
+                                <label for="txtHsnSacCode" class="form-label">HSN/SAC Code</label>
+                                <input type="text" class="form-control" id="txtHsnSacCode">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="txtHsnSacDescription" class="form-label">Description</label>
+                                <input type="text" class="form-control" id="txtHsnSacDescription">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="TaxCode" class="form-label">TaxCode</label>
+                                <select class="form-select" id="TaxCode">
+                                    <option value="">Select</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="Type" class="form-label">Type</label>
+                                <select class="form-select" id="Type">
+                                    <option value="H">HSN - Goods</option>
+                                    <option value="S">SAC - Service</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="view-hsn-sac" role="tabpanel" >
+                        <div class="table-responsive " style="height:550px;">
+                            <table class="table table-bordered table-striped table-hover" id="tblHsnSacMaster">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th nowrap >Sr No</th>
+                                        <th nowrap hidden>ID</th>
+                                        <th nowrap hidden>Class</th>
+                                        <th nowrap >Code</th>
+                                        <th nowrap >Description</th>
+                                        <th nowrap>Tax Code</th>
+                                        <th nowrap >Type</th>
+                                        <th nowrap hidden>TaxCodeId</th>
+                                        <th nowrap >Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnHsnReset" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="btnHsnSave" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Item List Modal -->
+<div class="modal fade" id="itemListModal" tabindex="-1" aria-labelledby="priceListMasterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="priceListMasterModalLabel">Item Master</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+                <div class="modal-body p-3">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover w-100 nowrap" id="ItemMaster_tbl">
+                        </table>
+                    </div>
+                </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="modal fade" id="bulkUploadModal" tabindex="-1" aria-labelledby="bulkUploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bulkUploadModalLabel">Bulk Upload Items</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mt-3 mb-3 text-end">
+                        <button class="btn btn-outline-primary btn-download-template">
+                            <i class="bi bi-download me-1"></i> Download Template
+                        </button>
+                    </div>
+                    <!-- Drag and Drop Zone -->
+                    <div class="file-upload-container">
+                        <div class="dropzone" id="excelDropzone">
+                            <div class="dropzone-content">
+                                <i class="bi bi-cloud-arrow-up dropzone-icon"></i>
+                                <div class="dropzone-text">Drag & drop your Excel file here</div>
+                                <div class="dropzone-subtext">or</div>
+                                <label for="excelFile" class="btn btn-outline-primary">
+                                    <i class="bi bi-folder2-open me-1"></i> Browse Files
+                                </label>
+                                <input class="d-none" type="file" id="excelFile" accept=".xlsx, .xls">
+                            </div>
+                        </div>
+                        <div class="file-info mt-2 d-none" id="fileInfo">
+                            <div class="file-info-content">
+                                <i class="bi bi-file-earmark-excel text-success"></i>
+                                <span class="file-name ms-2"></span>
+                                <button class="btn btn-sm btn-link text-danger remove-file">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                   
+                    <div class="progress mt-3 d-none" id="uploadProgress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnProcessUpload" disabled>Process Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .btn-group {
+            flex-direction: column;
+        }
+
+            .btn-group .btn {
+                margin-bottom: 5px;
+                width: 100%;
+            }
+
+        .input-group {
+            flex-wrap: nowrap;
+        }
+
+        .modal-dialog {
+            margin: 0.5rem;
+        }
+    }
+</style>
+
+<script>
+
+       $(document).ready(function() {
+            // Region Data Binding
+            function LoadTaxCode() {
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("GETTAXCODE", "Master")',
+                    contentType: "application/json; charset=utf-8",
+                    cache: true,
+                    success: function(data) {
+                        if (data && data.length) {
+                            const $select = $('#TaxCode');
+                            // Create options array first for better performance
+                            const options = ['<option value="">Select</option>'];
+                            // Use for loop instead of forEach for better performance with large datasets
+                            for (let i = 0; i < data.length; i++) {
+                                const item = data[i];
+                                options.push(`<option data-id="${item.TaxCodeId}" value="${item.TaxCalRate}">${item.TaxCode}</option>`);
+                            }
+
+                            // Join and append all at once for minimal DOM manipulation
+                            $select.html(options.join(''));
+                            $("#ddlGstRate").html(options.join(''));
+                        }
+                    },
+                    error: function(xhr) {
+                        const errorMessage = xhr.responseText || 'Error loading tax codes';
+                        Notify('error', 'Error', errorMessage);
+                    }
+                });
+            }
+             LoadTaxCode(); 
+             function LoadNewItemCode() {
+                $.ajax({
+                    type: "GET",
+                        url: '@Url.Action("GETNEXTITEM", "Master")',
+                    contentType: "application/json; charset=utf-8",
+                    cache: true,
+                    success: function(data) {
+                        if (data && data.length) {
+                               $("#txtItemCode").val(data[0].NextItemCode)
+                        }
+                    },
+                    error: function(xhr) {
+                        const errorMessage = xhr.responseText || 'Error loading tax codes';
+                        Notify('error', 'Error', errorMessage);
+                    }
+                });
+            }
+             LoadNewItemCode();
+             LoadWhs("")
+             function LoadWhs(id) {
+                    $.ajax({
+                        type: "GET",
+                        url: '@Url.Action("GETWAREHOUSE", "Master")',
+                        contentType: "application/json; charset=utf-8",
+                        data:{id:id},
+                        cache: true,
+                        success: function(data) {
+                            $("#whstable tbody").html("")
+                            if (data && data.length) {
+                                // Fixed selector - make sure this matches your table ID
+                                for (let i = 0; i < data.length; i++) {
+                                    var item = data[i]
+                                    let checked = "";
+                                    // Added toUpperCase() for case insensitivity
+                                    if(item.WhsLocked && item.WhsLocked.toUpperCase() == "Y"){
+                                        checked = "checked";
+                                    }
+                                    var row = `
+                                                <tr data-id="${item.InvtDetId}">
+                                            <td nowrap>${i + 1}</td> <!-- Changed to 1-based index -->
+                                                    <td nowrap data-id="${item.WhsId}" class='WhsName'>
+                                                    ${item.WhsCode}
+                                            </td>
+                                                <td nowrap class='stock'><input  value='${parseFloat(item.Stock).toFixed(2)}' class="form-control form-control-sm text-end" type="number" disabled /></td>
+                                                <td nowrap class='minqty'><input value='${parseFloat(item.MinStock).toFixed(2) }' class="form-control form-control-sm text-end" type="number" /></td>
+                                                <td nowrap class='maxqty'><input value='${parseFloat(item.MaxStock).toFixed(2) }' class="form-control form-control-sm text-end" type="number" /></td>
+                                                <td nowrap class='islock text-center'><input class="text-end" ${checked} type="checkbox" style="height:30px;width:30px;"/></td>
+                                                <td nowrap class='itemcost'><input value='${parseFloat(item.ItemCost).toFixed(2) }' class="form-control form-control-sm text-end" disabled type="number" /></td>
+                                        </tr>
+                                    `;
+                                    $("#whstable tbody").append(row)
+                                }
+                            }
+                        },
+                        error: function(xhr) {
+                            const errorMessage = xhr.responseText || 'Error loading tax codes';
+                            Notify('error', 'Error', errorMessage);
+                        }
+                    });
+             }
+            //region HSN MASTER
+             {
+                // Load HSN data on page load
+                loadHsnData();
+                // Initialize form reset
+                $('#btnHsnReset').click(resetHsnForm);
+                // Save/Update HSN
+                $('#btnHsnSave').click(function() {
+                    const hsnId = $('#hsnid').val();
+                    if (hsnId) {
+                        updateHsn();
+                    } else {
+                        createHsn();
+                    }
+                });
+                // Edit HSN event delegation (for dynamically loaded rows)
+                $(document).on('click', '.hsn_edite', function() {
+                    const row = $(this).closest('tr');
+                    editHsn(row);
+                });
+                // Delete HSN event delegation
+                $(document).on('click', '.hsn_delete', function() {
+                    const row = $(this).closest('tr');
+                    deleteHsn(row);
+                });
+                var hsndata =[];
+                $("#ddlItemType").change(function()
+                {
+                    LoadHsn()
+                })
+                function LoadHsn(){
+                    var value = $("#ddlItemType").val();
+                    var flag='H';
+                    if(value=="S"){
+                        flag='S'
+                    }
+                      $.ajax({
+                            type: "GET",
+                            url: '@Url.Action("GETHSN", "Master")',
+                            contentType: "application/json; charset=utf-8",
+                            data:{flag:flag},
+                            cache: true,
+                            success: function(data) {
+                                if (data && data.length) {
+                                  hsndata =[];
+                                  hsndata =data;
+                                }
+                            },
+                            error: function(xhr) {
+                                const errorMessage = xhr.responseText || 'Error loading tax codes';
+                                Notify('error', 'Error', errorMessage);
+                            }
+                      });
+                }
+                // Load HSN Data
+                function loadHsnData() {
+                    $.ajax({
+                        type: "GET",
+                        url: '@Url.Action("GETHSNMASTER", "Master")',
+                        contentType: "application/json; charset=utf-8",
+                        cache: true,
+                        success: function(data) {
+                            LoadHsn()
+                            const $tbody = $("#tblHsnSacMaster tbody");
+                            $tbody.empty();
+                            if (data && data.length) {
+                                let html = '';
+                                data.forEach((item, index) => {
+                                    var type="" 
+                                    if(item.Class=="H"){type="HSN"}else{type="SAC"}
+                                    html += `
+                                    <tr>
+                                        <td nowrap>${index + 1}</td>
+                                            <td nowrap class='ID d-none'>${item.HSNID}</td>
+                                        <td nowrap class='Type d-none'>${item.Class}</td>
+                                        <td nowrap class='Code'>${item.Code}</td>
+                                        <td nowrap class='Desc'>${item.Name}</td>
+                                        <td nowrap class='TaxCode'>${item.TaxCode}</td>
+                                        <td nowrap class='TaxCodeID'>${type}</td>
+                                        <td nowrap class='TaxCodeID d-none'>${item.TaxCodeId}</td>
+                                        <td nowrap>
+                                            <button class="btn hsn_edite btn-sm btn-primary"><i class="bi bi-pencil"></i></button>
+                                            <button class="btn hsn_delete btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>`;
+                                });
+                                $tbody.html(html);
+                            }
+                        },
+                        error: function(xhr) {
+                            const errorMessage = xhr.responseText || 'Error loading HSN data';
+                            Notify('error', 'Error', errorMessage);
+                        }
+                    });
+                   //Region HSN Search
+                    {
+                        var $activeInput = null;
+                        $(document).on('input', "#ddlHsnSacCode", function () {
+                            var $input = $(this);
+                            $activeInput = $(this);
+                                var value = $input.val().toLowerCase().replace(/_/g, ' ');
+                                var suggestions = [];
+                                // Check if the suggestion container already exists, if not, create it
+                                var suggestionContainerId = 'ItemSuggestions-' + $input.closest('tr').index();
+                                if (!$('#' + suggestionContainerId).length) {
+                                    $('<div id="' + suggestionContainerId + '" class="suggestions-container"></div>').appendTo('body');
+                                }
+                                // Get the container element
+                                var $suggestionContainer = $('#' + suggestionContainerId);
+                                $suggestionContainer.empty(); // Clear previous suggestions
+                                // Check if ItemDetail exists and is an array
+                                    if (Array.isArray(hsndata) && hsndata.length > 0) {
+                                    if (value.length > 0) {
+                                        var searchTokens = value.split(/\s+/);
+                                        // Filter suggestions based on universal search (match all tokens)
+                                        suggestions = hsndata.filter(function (data) {
+                                            if (data && typeof data === 'object') {
+                                                var code = (data.Code || '').toLowerCase();
+                                                var name = (data.Name || '').toLowerCase();
+                                                var allTokens = code.split(/\s+|[_-]+/).concat(name.split(/\s+|[_-]+/));
+                                                return searchTokens.every(function (token) {
+                                                    return allTokens.some(function (itemToken) {
+                                                        return itemToken.includes(token);
+                                                    });
+                                                });
+                                            }
+                                            return false;
+                                        }).sort(function (a, b) {
+                                            return a.Code.localeCompare(b.Code);
+                                        }).slice(0, 20); // Limit to 20 results
+                                    }
+                                    // Show suggestions if any
+                                    if (suggestions.length > 0) {
+                                        suggestions.forEach(function (data) {
+                                            $suggestionContainer.append(
+                                                                `<div class="suggestion-item MBp"  data-taxcode="${data.TaxCodeId || ''}" data-code="${data.Code || ''}" data-id="${data.HSNID || ''}" data-name="${data.Name || ''}">
+                                                    <span class="item-code"><b>${data.Code || ''}</b></span> -
+                                                    <span class="item-name"><b>${data.Name || ''}</b></span>
+                                                </div>`
+                                            );
+                                        });
+                                        // Calculate the offset of the input field and position the suggestion box below it
+                                        var offset = $input.offset();
+                                        $suggestionContainer.css({
+                                            top: offset.top + $input.outerHeight(),
+                                            left: offset.left,
+                                            width: $input.outerWidth(),
+                                            position: 'absolute',
+                                            "z-index": 1000,
+                                        }).show();
+                                    } else {
+                                        $suggestionContainer.hide();
+                                    }
+                                } else {
+                                    console.error("HSN is not defined or is empty");
+                                    $suggestionContainer.hide();
+                                }
+                            });
+                        $(document).on('click', function (e) {
+                            if (!$(e.target).closest('.suggestions-container, .Item').length) {
+                                $('.suggestions-container').hide();
+                            }
+                        });
+                        $(document).on('click', '.MBp', function () {
+                            var selectedCode = $(this).data('code');
+                            var selectedName = $(this).data('name');
+                                var taxcode = $(this).data('taxcode');
+                            var id = $(this).data('id');
+                            $("#ddlHsnSacCode").val(selectedCode);
+                            $("#ddlHsnSacCode").attr("data-id",id );
+                            $("#ddlGstRate option").each(function () {
+                                var dataid = $(this).data("id");
+                                if (dataid == taxcode) {
+                                    $(this).prop("selected", true);
+                                    return false; // Stops the loop after finding the match
+                                }
+                            });
+
+                            $(".suggestions-container").hide();
+                        });
+                    }
+                }
+                // Create New HSN
+                function createHsn() {
+                    const hsnData = {
+                        Code: $('#txtHsnSacCode').val().trim(),
+                        Name: $('#txtHsnSacDescription').val().trim(),
+                        TaxCode: $('#TaxCode').val(),
+                        Class: $('#Type').val(),
+                        TaxCodeId: $('#TaxCode option:selected').attr("data-id")
+                    };
+
+                    if (!hsnData.Code  || !hsnData.TaxCode) {
+                        Notify('warning', 'Validation', 'Please fill all required fields');
+                        return;
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("CREATEHSN", "Master")',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(hsnData),
+                        success: function(response) {
+                            if (response.success) {
+                                Notify('success', 'Success', 'HSN created successfully');
+                                resetHsnForm();
+                                loadHsnData();
+                            } else {
+                                Notify('error', 'Error', response.message || 'Failed to create HSN');
+                            }
+                        },
+                        error: function(xhr) {
+                            const errorMessage = xhr.responseText || 'Error creating HSN';
+                            Notify('error', 'Error', errorMessage);
+                        }
+                    });
+                }
+                // Update HSN
+                function updateHsn() {
+                    const hsnData = {
+                            HSNID: $('#hsnid').val(),
+                        Code: $('#txtHsnSacCode').val().trim(),
+                        Name: $('#txtHsnSacDescription').val().trim(),
+                        TaxCode: $('#TaxCode').val(),
+                        Class: $('#Type').val(),
+                        TaxCodeId: $('#TaxCode option:selected').attr("data-id")
+                    };
+                    if (!hsnData.Code  || !hsnData.TaxCode) {
+                        Notify('warning', 'Validation', 'Please fill all required fields');
+                        return;
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("UPDATEHSN", "Master")',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(hsnData),
+                        success: function(response) {
+                            if (response.success) {
+                                Notify('success', 'Success', 'HSN updated successfully');
+                                resetHsnForm();
+                                loadHsnData();
+                            } else {
+                                Notify('error', 'Error', response.message || 'Failed to update HSN');
+                            }
+                        },
+                        error: function(xhr) {
+                            const errorMessage = xhr.responseText || 'Error updating HSN';
+                            Notify('error', 'Error', errorMessage);
+                        }
+                    });
+                }
+                // Edit HSN (Load data into form)
+                function editHsn(row) {
+                    $('#hsnid').val(row.find('.ID').text());
+                    $('#txtHsnSacCode').val(row.find('.Code').text());
+                    $('#txtHsnSacDescription').val(row.find('.Desc').text());
+                    $('#Type').val(row.find('.Type').text());
+                    $('#TaxCode option').filter(function() {
+                        return $(this).text().trim() === row.find('.TaxCode').text().trim();
+                    }).prop('selected', true);
+                    $("#create-hsn-sac-tab").click()
+                }
+                // Delete HSN
+                function deleteHsn(row) {
+                    const hsnId = row.find('.ID').text();
+                    const hsnCode = row.find('.Code').text();
+
+                    if (!confirm(`Are you sure you want to delete HSN ${hsnCode}?`)) {
+                        return;
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("DELETEHSN", "Master")',
+                        contentType: "application/json; charset=utf-8",
+                            data: JSON.stringify({ HSNID: hsnId }),
+                        success: function(response) {
+                            if (response.success) {
+                                Notify('success', 'Success', 'HSN deleted successfully');
+                                loadHsnData();
+                            } else {
+                                Notify('error', 'Error', response.message || 'Failed to delete HSN');
+                            }
+                        },
+                        error: function(xhr) {
+                            const errorMessage = xhr.responseText || 'Error deleting HSN';
+                            Notify('error', 'Error', errorMessage);
+                        }
+                    });
+                }
+                // Reset HSN Form
+                function resetHsnForm() {
+                    $('#hsnid').val('');
+                    $('#txtHsnSacCode').val('');
+                    $('#txtHsnSacDescription').val('');
+                    $('#TaxCode').val('');
+                }
+             }
+             var UomData=[];
+             //region UOM Master
+             {
+                     // Load UOM data on page load
+                     loadUomData();
+                     // Initialize form reset
+                     $('#btnUomReset').click(resetUomForm);
+                     // Save/Update UOM
+                     $('#btnUomSave').click(function() {
+                         const uomId = $('#UOM_ID').val();
+                         if (uomId) {
+                             updateUom();
+                         } else {
+                             createUom();
+                         }
+                     });
+                     // Edit UOM event delegation
+                     $(document).on('click', '.uom_edite', function() {
+                         const row = $(this).closest('tr');
+                         editUom(row);
+                     });
+                     
+                    // Load UOM Data
+                    function loadUomData() {
+                        $.ajax({
+                            type: "GET",
+                            url: '@Url.Action("GETUOMLIST", "Master")',
+                            contentType: "application/json; charset=utf-8",
+                            success: function(data) {
+                                const $tbody = $("#tblUomMaster tbody");
+                                $tbody.empty();
+
+                                if (data && data.length) {
+                                    getUom("")
+                                    data.forEach((item) => {
+                                        const statusBadge = item.IsActive =="A" ?
+                                            '<span class="badge bg-success">Active</span>' :
+                                            '<span class="badge bg-secondary">Inactive</span>';
+
+                                        $tbody.append(`
+                                        <tr>
+                                            <td nowrap>${item.Code}</td>
+                                            <td nowrap>${item.Name}</td>
+                                            <td nowrap>${statusBadge}</td>
+                                            <td hidden>${item.UomID}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary uom_edite">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger uom_delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>`);
+                                    });
+                                }
+                            },
+                            error: function(xhr) {
+                                const errorMessage = xhr.responseText || 'Error loading UOM data';
+                                Notify('error', 'Error', errorMessage);
+                            }
+                        });
+                    }
+                    function getUom(flag){
+                         $.ajax({
+                            type: "GET",
+                            url: '@Url.Action("GETUOM", "Master")',
+                            contentType: "application/json; charset=utf-8",
+                            cache: true,
+                            success: function(data) {
+                                if (data && data.length) {
+                                    UomData = data;
+                                    if (flag !== "A") {
+                                         var defaultval = $('#ddlUomCode').val();
+                                        const $select = $('#ddlUomCode');
+                                        const options = ['<option value="">Select</option>'];
+                                        for (let i = 0; i < data.length; i++) {
+                                            const item = data[i];
+                                            options.push(`<option data-id="${item.UomID}" value="${item.Code}">${item.Code}</option>`);
+                                        }
+                                        $select.html(options.join(''));
+                                        $select.val(defaultval)
+                                    }
+                                }
+                            },
+                            error: function(xhr) {
+                                const errorMessage = xhr.responseText || 'Error loading UOM';
+                                Notify('error', 'Error', errorMessage);
+                            }
+                        });
+                    }
+                    // Create New UOM
+                    function createUom() {
+                        const uomData = {
+                            Code: $('#txtUomCode').val().trim(),
+                            Name: $('#txtUomName').val().trim(),
+                            IsActive: $('#ddlUomStatus').val()
+                        };
+
+                        if (!uomData.Code || !uomData.Name) {
+                            Notify('warning', 'Validation', 'Please fill all required fields');
+                            return;
+                        }
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Action("CREATEUOM", "Master")',
+                            contentType: "application/json; charset=utf-8",
+                            data: JSON.stringify(uomData),
+                            success: function(response) {
+                                if (response.success) {
+                                    Notify('success', 'Success', 'UOM created successfully');
+                                    resetUomForm();
+                                    loadUomData();
+                                    // Switch to view tab after creation
+                                    $('#uomMasterTabs a[href="#view-uom"]').tab('show');
+                                } else {
+                                    Notify('error', 'Error', response.message || 'Failed to create UOM');
+                                }
+                            },
+                            error: function(xhr) {
+                                const errorMessage = xhr.responseText || 'Error creating UOM';
+                                Notify('error', 'Error', errorMessage);
+                            }
+                        });
+                    }
+
+                    // Update UOM
+                    function updateUom() {
+                        const uomData = {
+                            UomID: $('#UOM_ID').val(),
+                            Code: $('#txtUomCode').val().trim(),
+                            Name: $('#txtUomName').val().trim(),
+                            IsActive: $('#ddlUomStatus').val()
+                        };
+
+                        if (!uomData.Code || !uomData.Name) {
+                            Notify('warning', 'Validation', 'Please fill all required fields');
+                            return;
+                        }
+
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Action("UPDATEUOM", "Master")',
+                            contentType: "application/json; charset=utf-8",
+                            data: JSON.stringify(uomData),
+                            success: function(response) {
+                                if (response.success) {
+                                    Notify('success', 'Success', 'UOM updated successfully');
+                                    resetUomForm();
+                                    loadUomData();
+                                    // Switch to view tab after update
+                                    $('#uomMasterTabs a[href="#view-uom"]').tab('show');
+                                } else {
+                                    Notify('error', 'Error', response.message || 'Failed to update UOM');
+                                }
+                            },
+                            error: function(xhr) {
+                                const errorMessage = xhr.responseText || 'Error updating UOM';
+                                Notify('error', 'Error', errorMessage);
+                            }
+                        });
+                    }
+
+                    // Edit UOM (Load data into form)
+                    function editUom(row) {
+                        $('#UOM_ID').val(row.find('td:nth-child(4)').text());
+                        $('#txtUomCode').val(row.find('td:nth-child(1)').text());
+                        $('#txtUomName').val(row.find('td:nth-child(2)').text());
+
+                        const isActive = row.find('td:nth-child(3)').text().includes('Active');
+                        $('#ddlUomStatus').val(isActive ? 'A' : 'I');
+
+                        // Switch to create tab for editing
+                        $('#create-uom-tab').click();
+                    }
+
+                    // Delete UOM
+                    $(document).on('click', '.uom_delete', function() {
+                        const row = $(this).closest('tr');
+                        const uomId = row.find('td:nth-child(4)').text();
+                        const uomCode = row.find('td:nth-child(1)').text();
+
+                        if (!confirm(`Are you sure you want to delete UOM ${uomCode}?`)) {
+                            return;
+                        }
+
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Action("DELETEUOM", "Master")',
+                            contentType: "application/json; charset=utf-8",
+                            data: JSON.stringify({ UomID: uomId }),
+                            success: function(response) {
+                                if (response.success) {
+                                    Notify('success', 'Success', 'UOM deleted successfully');
+                                    loadUomData();
+                                } else {
+                                    Notify('error', 'Error', response.message || 'Failed to delete UOM');
+                                }
+                            },
+                            error: function(xhr) {
+                                const errorMessage = xhr.responseText || 'Error deleting UOM';
+                                console.log(errorMessage)
+                                Notify('error', 'Error', errorMessage);
+                            }
+                        });
+                    });
+
+                    // Reset UOM Form
+                    function resetUomForm() {
+                        $('#UOM_ID').val('');
+                        $('#txtUomCode').val('');
+                        $('#txtUomName').val('');
+                        $('#ddlUomStatus').val('A');
+                    }
+             }
+             //Item Grp Master 
+             {
+                    loadItemGroupData();
+                    $('#btnItemGroupReset').click(resetItemGroupForm);
+                    $('#btnItemGroupSave').click(function() {
+                        const itemGroupId = $('#ItmGrpID').val();
+                        if (itemGroupId) {
+                            updateItemGroup();
+                        } else {
+                            createItemGroup();
+                        }
+                    });
+                    $(document).on('click', '.item-group-edit', function() {
+                        const row = $(this).closest('tr');
+                        editItemGroup(row);
+                    });
+                    // Delete Item Group event delegation
+                    $(document).on('click', '.item-group-delete', function() {
+                        const row = $(this).closest('tr');
+                        deleteItemGroup(row);
+                    });
+                    function LoadItemGrp(){
+                             $.ajax({
+                                type: "GET",
+                                url: '@Url.Action("GETITEMGRP", "Master")',
+                                contentType: "application/json; charset=utf-8",
+                                cache: true,
+                                success: function(data) {
+                                    
+                                    if (data && data.length) {
+                                        UomData = data;
+                                            const $select = $('#ddlItemGroup');
+                                        // Create options array first for better performance
+                                        const options = ['<option value="">Select</option>'];
+                                        // Use for loop instead of forEach for better performance with large datasets
+                                        for (let i = 0; i < data.length; i++) {
+                                            const item = data[i];
+                                                        options.push(`<option data-id="${item.ItmGrpID}" value="${item.ItmGrpNam}">${item.ItmGrpNam}</option>`);
+                                        }
+                                        // Join and append all at once for minimal DOM manipulation
+                                        $select.html(options.join(''));
+                                    }
+                                },
+                                error: function(xhr) {
+                                    const errorMessage = xhr.responseText || 'Error loading ITEM GROUP';
+                                    Notify('error', 'Error', errorMessage);
+                                }
+                            });
+                        }
+               
+                // Load Item Group Data
+                function loadItemGroupData() {
+                    $.ajax({
+                        type: "GET",
+                        url: '@Url.Action("GETITEMGRPLIST", "Master")',
+                        contentType: "application/json; charset=utf-8",
+                        success: function(data) {
+                             LoadItemGrp()
+                            const $tbody = $("#tblItemGroupMaster tbody");
+                            $tbody.empty();
+                            if (data && data.length) {
+                                data.forEach((item, index) => {
+                                    const valuationMethod = getValuationMethodText(item.GrpValMeth);
+                                    const itemCategory = getItemCategoryText(item.ItemCateg);
+                                    const statusBadge = item.IsActive=="A" ?
+                                        '<span class="badge bg-success">Active</span>' :
+                                        '<span class="badge bg-secondary">Inactive</span>';
+
+                                    $tbody.append(`
+                                    <tr>
+                                        <td>${index + 1}</td>
+                                        <td hidden>${item.ItmGrpID}</td>
+                                        <td>${item.ItmGrpNam}</td>
+                                        <td data-id="${item.GrpValMeth}">${valuationMethod}</td>
+                                        <td data-id="${item.ItemCateg}">${itemCategory}</td>
+                                        <td>${statusBadge}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary item-group-edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger item-group-delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>`);
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            const errorMessage = xhr.responseText || 'Error loading Item Group data';
+                            Notify('error', 'Error', errorMessage);
+                        }
+                    });
+                }
+
+                // Helper functions for display text
+                function getValuationMethodText(code) {
+                    switch(code) {
+                        case 'S': return 'Standard';
+                        case 'M': return 'Moving Average';
+                        case 'F': return 'FIFO';
+                        default: return code;
+                    }
+                }
+
+                function getItemCategoryText(code) {
+                    switch(code) {
+                        case 'M': return 'Material';
+                        case 'S': return 'Service';
+                        default: return code;
+                    }
+                }
+
+                // Create New Item Group
+                function createItemGroup() {
+                    const itemGroupData = {
+                        ItmGrpNam: $('#txtItemGroupName').val().trim(),
+                        GrpValMeth: $('#ddlItemGroupValuationMethod').val(),
+                        ItemCateg: $('#ddlItemCategory').val(),
+                        IsActive: $('#ddlItemGroupStatus').val() 
+                    };
+
+                    if (!itemGroupData.ItmGrpNam) {
+                        Notify('warning', 'Validation', 'Please enter Group Name');
+                        return;
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("CREATEITEMGRP", "Master")',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(itemGroupData),
+                        success: function(response) {
+                            if (response.success) {
+                                Notify('success', 'Success', 'Item Group created successfully');
+                                resetItemGroupForm();
+                                loadItemGroupData();
+                                // Switch to view tab after creation
+                                $('#itemGroupMasterTabs a[href="#view-item-group"]').tab('show');
+                            } else {
+                                Notify('error', 'Error', response.message || 'Failed to create Item Group');
+                            }
+                        },
+                        error: function(xhr) {
+                            const errorMessage = xhr.responseText || 'Error creating Item Group';
+                            Notify('error', 'Error', errorMessage);
+                        }
+                    });
+                }
+
+                // Update Item Group
+                function updateItemGroup() {
+                    const itemGroupData = {
+                        ItmGrpID: $('#ItmGrpID').val(),
+                        ItmGrpNam: $('#txtItemGroupName').val().trim(),
+                        GrpValMeth: $('#ddlItemGroupValuationMethod').val(),
+                        ItemCateg: $('#ddlItemCategory').val(),
+                        IsActive: $('#ddlItemGroupStatus').val() 
+                    };
+
+                    if (!itemGroupData.ItmGrpNam) {
+                        Notify('warning', 'Validation', 'Please enter Group Name');
+                        return;
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("UPDATEITEMGRP", "Master")',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(itemGroupData),
+                        success: function(response) {
+                            if (response.success) {
+                                Notify('success', 'Success', 'Item Group updated successfully');
+                                resetItemGroupForm();
+                                loadItemGroupData();
+                                // Switch to view tab after update
+                                $('#itemGroupMasterTabs a[href="#view-item-group"]').tab('show');
+                            } else {
+                                Notify('error', 'Error', response.message || 'Failed to update Item Group');
+                            }
+                        },
+                        error: function(xhr) {
+                            const errorMessage = xhr.responseText || 'Error updating Item Group';
+                            Notify('error', 'Error', errorMessage);
+                        }
+                    });
+                }
+
+                // Edit Item Group (Load data into form)
+                function editItemGroup(row) {
+                    $('#ItmGrpID').val(row.find('td:nth-child(2)').text());
+                    $('#txtItemGroupName').val(row.find('td:nth-child(3)').text());
+                    $('#ddlItemGroupValuationMethod').val(row.find('td:nth-child(4)').data('id'));
+                    $('#ddlItemCategory').val(row.find('td:nth-child(5)').data('id'));
+
+                    const isActive = row.find('td:nth-child(6)').text().includes('Active');
+                    $('#ddlItemGroupStatus').val(isActive ? 'A' : 'I');
+                    // Switch to create tab for editing
+                    $('#create-item-group-tab').click();
+
+                    
+                }
+
+                // Delete Item Group
+                function deleteItemGroup(row) {
+                    const itemGroupId = row.find('td:nth-child(2)').text();
+                    const itemGroupName = row.find('td:nth-child(3)').text();
+
+                    if (!confirm(`Are you sure you want to delete Item Group "${itemGroupName}"?`)) {
+                        return;
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("DELETEITEMGRP", "Master")',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify({ ItmGrpID: itemGroupId }),
+                        success: function(response) {
+                            if (response.success) {
+                                Notify('success', 'Success', 'Item Group deleted successfully');
+                                loadItemGroupData();
+                            } else {
+                                Notify('error', 'Error', response.message || 'Failed to delete Item Group');
+                            }
+                        },
+                        error: function(xhr) {
+                            const errorMessage = xhr.responseText || 'Error deleting Item Group';
+                            Notify('error', 'Error', errorMessage);
+                        }
+                    });
+                }
+
+                // Reset Item Group Form
+                function resetItemGroupForm() {
+                    $('#ItmGrpID').val('');
+                    $('#txtItemGroupName').val('');
+                    $('#ddlItemGroupValuationMethod').val('S');
+                    $('#ddlItemCategory').val('M');
+                    $('#ddlItemGroupStatus').val('A');
+                }
+             }
+             //Price Setup
+             {
+                    var $activeInput = null;
+
+                    function CreateUomList(inputClass) {
+                        // Remove old listeners to prevent duplication
+                        $(document).off('input', "#Pricesetuptbl tbody tr td ." + inputClass)
+                            .on('input', "#Pricesetuptbl tbody tr td ." + inputClass, function () {
+                                var $input = $(this);
+                                $activeInput = $input;
+
+                                var value = ($input.val() || "").toLowerCase().replace(/_/g, ' ');
+                                var suggestions = [];
+
+                                // Ensure a suggestion container exists per input
+                                var suggestionContainerId = $input.data('suggestion-id');
+                                if (!suggestionContainerId) {
+                                    suggestionContainerId = 'ItemNameSuggestions-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+                                    $input.data('suggestion-id', suggestionContainerId);
+                                    $('<div id="' + suggestionContainerId + '" class="suggestions-container"></div>').appendTo('body');
+                                }
+
+                                var $suggestionContainer = $('#' + suggestionContainerId);
+                                $suggestionContainer.empty();
+
+                                if (Array.isArray(UomData) && UomData.length > 0) {
+                                    if (value.length > 0) {
+                                        var searchTokens = value.split(/\s+/);
+
+                                        suggestions = UomData.filter(function (data) {
+                                            if (data && typeof data === 'object') {
+                                                var code = (data.Code || '').toLowerCase();
+                                                var name = (data.Name || '').toLowerCase();
+                                                var allTokens = code.split(/\s+|[_-]+/).concat(name.split(/\s+|[_-]+/));
+                                                return searchTokens.every(function (token) {
+                                                    return allTokens.some(function (itemToken) {
+                                                        return itemToken.includes(token);
+                                                    });
+                                                });
+                                            }
+                                            return false;
+                                        }).sort(function (a, b) {
+                                            return a.Name.localeCompare(b.Name);
+                                        }).slice(0, 20);
+                                    }
+
+                                    if (suggestions.length > 0) {
+                                        suggestions.forEach(function (data) {
+                                            $suggestionContainer.append(
+                                                `<div class="suggestion-item MItemList" data-code="${data.Code || ''}" data-id="${data.UomID || ''}" data-name="${data.Name || ''}">
+                                                        <span class="supplier-code">${data.Code || ''}</span> -
+                                                        <span class="supplier-name">${data.Name || ''}</span>
+                                                    </div>`
+                                                 );
+                                        });
+
+                                        var offset = $input.offset();
+                                        $suggestionContainer.css({
+                                            top: offset.top + $input.outerHeight(),
+                                            left: offset.left,
+                                            width: $input.outerWidth(),
+                                            position: 'absolute',
+                                            "z-index": 1000,
+                                        }).show();
+                                    } else {
+                                        $suggestionContainer.hide();
+                                    }
+                                } else {
+                                    console.error("UomData is not defined or is empty");
+                                    $suggestionContainer.hide();
+                                }
+                            });
+
+                        // Hide suggestions on outside click
+                        $(document).off('click.uomlist').on('click.uomlist', function (e) {
+                            if (!$(e.target).closest('.suggestions-container, .' + inputClass).length) {
+                                $('.suggestions-container').hide();
+                                $activeInput = null;
+                            }
+                        });
+                    }
+
+                    CreateUomList("ConversionCode");
+
+                    // Handle selection
+                    $(document).off('click', '.MItemList').on('click', '.MItemList', function () {
+                        var selectedCode = $(this).data('code');
+                        var id = $(this).data('id');
+
+                        if ($activeInput) {
+                            var $activeRow = $activeInput.closest('tr');
+                            $activeRow.find(".ConversionCode").val(selectedCode).attr("data-id", id);
+                            $(".suggestions-container").hide();
+                            $activeInput = null;
+                        }
+                    });
+
+                    // Add Default Row when UOM changes
+                    $("#ddlUomCode").change(function () {
+                        AddDefaultRow();
+                    });
+                    function AddDefaultRow() {
+                        var UOM = $("#ddlUomCode").val().trim();
+                        var Id = $("#ddlUomCode option:selected").attr("data-id");
+                        $("#Pricesetuptbl tbody").html("");
+                        if (UOM) {
+                            var row = `
+                                    <tr data-id="">
+                                        <td nowrap class='index'>1</td>
+                                        <td nowrap class='ConversionC'><input readonly class="form-control form-control-sm ConversionCode text-end" type="text" data-id='${Id}' value="${UOM}"/></td>
+                                        <td nowrap><input class="form-control form-control-sm ConversionQty text-end" type="number" value="1" /></td>
+                                        <td nowrap data-id='${Id}' class='Uom'>${UOM}</td>
+                                        <td nowrap class='MRP'><input class="MRPINP form-control form-control-sm text-end" type="number" value="" /></td>
+                                        <td nowrap class='Discount'><input class="DiscountINP form-control form-control-sm text-end" type="number" value="" /></td>
+                                        <td nowrap class='Rate'><input class="RateINP form-control form-control-sm text-end" type="number" value="" /></td>
+                                        <td nowrap class="text-center IsActive"><select class='form-control form-control-sm text-center'><option value='A'>Active</option><option value='I'>In Active</option></select></td>
+                                        <td nowrap class="text-center"><button disabled class='btn btn-sm btn-outline-danger price_setup_delete'><i class='bi bi-trash'></i></button></td>
+                                    </tr>`;
+                            $("#Pricesetuptbl tbody").append(row);
+                        } else {
+                            var row = `
+                                    <tr data-id="">
+                                        <td nowrap class='index'>1</td>
+                                        <td nowrap class='ConversionC'><input readonly class="form-control form-control-sm ConversionCode text-end" type="text" data-id='' value=""/></td>
+                                        <td nowrap><input class="form-control form-control-sm ConversionQty text-end" type="number" value="1" /></td>
+                                        <td nowrap data-id='' class='Uom'></td>
+                                        <td nowrap class='MRP'><input class="MRPINP form-control form-control-sm text-end" type="number" value="" /></td>
+                                        <td nowrap class='Discount'><input class="DiscountINP form-control form-control-sm text-end" type="number" value="" /></td>
+                                        <td nowrap class='Rate'><input class="RateINP form-control form-control-sm text-end" type="number" value="" /></td>
+                                        <td nowrap class="text-center IsActive"><select class='form-control form-control-sm text-center'><option value='A'>Active</option><option value='I'>In Active</option></select></td>
+                                        <td nowrap class="text-center"><button disabled class='btn btn-sm btn-outline-danger price_setup_delete'><i class='bi bi-trash'></i></button></td>
+                                    </tr>`;
+                            $("#Pricesetuptbl tbody").append(row);
+                        }
+                    }
+                    // Add New Row
+                    $("#btnAddLine").click(function () {
+                        btnAddLine();
+                        getUom("A")
+
+                    });
+
+                    // Keyboard shortcut: Ctrl + A to add new row
+                    $(document).on("keydown", function(e) {
+                        if (e.ctrlKey && e.key.toLowerCase() === 'a') {
+                            e.preventDefault();
+                            btnAddLine();
+                        }
+                    });
+                    function btnAddLine() {
+                        var UOM = $("#ddlUomCode").val().trim();
+                        if (!UOM) {
+                            Notify('warning', 'Validation', 'Please select a UOM first');
+                            return;
+                        }
+                        var Id = $("#ddlUomCode option:selected").attr("data-id");
+                        var rows = $("#Pricesetuptbl tbody tr");
+                        var index = rows.length + 1;
+
+                        var row = `
+                                <tr data-id="">
+                                    <td nowrap class='index'>${index}</td>
+                                    <td nowrap class='ConversionC'><input class="form-control form-control-sm ConversionCode text-end" type="text" value="" placeholder="Search UOM" data-id=""/></td>
+                                    <td nowrap><input class="form-control form-control-sm ConversionQty text-end" type="number" value="1" /></td>
+                                    <td nowrap class="Uom" data-id='${Id}'>${UOM}</td>
+                                    <td nowrap class="MRP"><input class="MRPINP form-control form-control-sm text-end" type="number" value="" /></td>
+                                    <td nowrap class="Discount"><input class="DiscountINP form-control form-control-sm text-end" type="number" value="" /></td>
+                                    <td nowrap class="Rate"><input class="RateINP form-control form-control-sm text-end" type="number" value="" /></td>
+                                    <td nowrap class="text-center IsActive"><select class='form-control form-control-sm text-center'><option value='A'>Active</option><option value='I'>In Active</option></select></td>
+                                    <td nowrap class="text-center"><button class='btn btn-sm btn-outline-danger price_setup_delete'><i class='bi bi-trash'></i></button></td>
+                                </tr>`;
+
+                        $("#Pricesetuptbl tbody").append(row);
+                        $("#Pricesetuptbl tbody tr:last .ConversionCode").focus();
+                    }
+                    $(document).on("click", ".price_setup_delete", function () {
+                        var row = $(this).closest("tr");
+                        var Id = row.data("id"); // Use this if applicable
+                        row.remove();
+                        SetIndex("Pricesetuptbl");
+                        if (Id !=="") {
+                            deletePriceSetup(Id);
+                        }
+                    });
+                    function SetIndex(tableId) {
+                        var i = 1;
+                        $("#" + tableId + " tbody tr").each(function () {
+                            $(this).find(".index").text(i);
+                            i++;
+                        });
+                    }
+             }
+             function syncButton(btn, checkbox, filledClass, outlineClass) {
+                if ($(checkbox).is(':checked')) {
+                    $(btn).removeClass(outlineClass).addClass(filledClass);
+                } else {
+                    $(btn).removeClass(filledClass).addClass(outlineClass);
+                }
+            }
+            // Initial sync on page load
+            $(document).ready(function() {
+                syncButton('#btnInventory', '#InventoryItem', 'btn-red-filled', 'btn-outline-red');
+                syncButton('#btnSales', '#SalesItem', 'btn-green-filled', 'btn-outline-green');
+                syncButton('#btnPurchasing', '#PurchasingItem', 'btn-blue-filled', 'btn-outline-blue');
+            });
+            // Toggle on button click
+            $('#btnInventory').click(function() {
+                $('#InventoryItem').prop('checked', !$('#InventoryItem').is(':checked'));
+                syncButton('#btnInventory', '#InventoryItem', 'btn-red-filled', 'btn-outline-red');
+            });
+
+            $('#btnSales').click(function() {
+                $('#SalesItem').prop('checked', !$('#SalesItem').is(':checked'));
+                syncButton('#btnSales', '#SalesItem', 'btn-green-filled', 'btn-outline-green');
+            });
+
+            $('#btnPurchasing').click(function() {
+                $('#PurchasingItem').prop('checked', !$('#PurchasingItem').is(':checked'));
+                syncButton('#btnPurchasing', '#PurchasingItem', 'btn-blue-filled', 'btn-outline-blue');
+            });
+             var ItemData =[];
+            // Item Master CRUD Operations
+            {
+                     // Apply DataTable to Item Master table
+                     function loadItemMasterTable() {
+                            $.ajax({
+                                type: "GET",
+                                url: '@Url.Action("GETITEMLIST", "Master")',
+                                contentType: "application/json; charset=utf-8",
+                                cache: false,
+                                success: function(data) {
+                                    ItemData=[];
+                                    ItemData=data;
+                                    applyItemMasterDatatable(data);
+                                },
+                                error: function(xhr) {
+                                    Notify('error', 'Error', xhr.responseText || 'Error loading items');
+                                }
+                            });
+                        }
+                    // Initialize on page load
+                    loadItemMasterTable()
+                    function applyItemMasterDatatable(jsonData) {
+                            const tableId = '#ItemMaster_tbl';
+                            if ($.fn.DataTable.isDataTable(tableId)) {
+                                $(tableId).DataTable().destroy();
+                                $(tableId).empty(); // Clear the table
+                            }
+                            $(tableId).DataTable({
+                                data: jsonData,
+                                        responsive: {
+                                details: {
+                                    display: $.fn.dataTable.Responsive.display.modal({
+                                        header: function(row) {
+                                            return 'Details for ' + row.data().ItemName;
+                                        }
+                                    }),
+                                    renderer: $.fn.dataTable.Responsive.renderer.tableAll({
+                                        tableClass: 'table'
+                                    })
+                                }
+                            },
+                            dom: 'lrtip', // Simpler controls
+                            initComplete: function() {
+                                // Adjust modal height after table initialization
+                                $('.modal').css('max-height', $(window).height() * 0.9);
+                                $('.modal-body').css('overflow-y', 'auto');
+                            },
+                                   columns: [
+                {
+                    data: null,
+                    title: "Sr No",
+                    render: function(data, type, row, meta) {
+                        return meta.row + 1;
+                    },
+                    className: "text-center",
+                    orderable: false
+                },
+                {
+                    data: null,
+                    title: "Action",
+                    className: "text-center nowrap",
+                    orderable: false,
+                    render: function(data, type, row) {
+                        return `
+                        <div class="d-flex justify-content-center gap-1">
+                            <button class="btn btn-sm btn-primary item-edit" title="Edit" data-id="${row.ItemID}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>`;
+                    }
+                },
+                    { data: "ItemCode", title: "Item Code" },
+                { data: "ItemName", title: "Item Name" },
+                { data: "EanCode", title: "EAN Code" },
+                { data: "UomCode", title: "UOM Code" },
+                { data: "ItmGrpNam", title: "Item Group" },
+                { data: "HSNCode", title: "HSN" },
+                {
+                    data: "SaleItem",
+                    title: "Sale Item",
+                    render: function(data) {
+                        return data === "Y" ? "Yes" : "No";
+                    }
+                },
+                {
+                        data: "InvItem",
+                    title: "Inv Item",
+                    render: function(data) {
+                        return data === "Y" ? "Yes" : "No";
+                    }
+                },
+                {
+                    data: "PurItem",
+                    title: "Pur Item",
+                    render: function(data) {
+                        return data === "Y" ? "Yes" : "No";
+                    }
+                },
+                { data: "TaxCode", title: "Tax Code" },
+                {
+                    data: "TypeOfSupp",
+                    title: "Type Of Supply",
+                    render: function(data) {
+                        return data === "G" ? "Goods" :
+                               data === "S" ? "Service" : "Capital Goods";
+                    }
+                },
+                {
+                    data: "IsActive",
+                    title: "Status",
+                    render: function(data) {
+                        return data === "A" ? "Active" : "Inactive";
+                    }
+                },
+                {
+                        data: "IsActiveFrmDate",
+                    title: "Active From",
+                    render: function(data) {
+                        return data ? data : '';
+                    }
+                },
+                {
+                        data: "IsActiveToDate",
+                    title: "Active To",
+                    render: function(data) {
+                        return data ? data : '';
+                    }
+                }
+            ] ,    responsive: true,
+                                dom: '<"top"lf>rt<"bottom"ip><"clear">',
+                                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                                language: {
+                                    lengthMenu: "Show _MENU_ entries",
+                                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                                    infoFiltered: "(filtered from _MAX_ total entries)"
+                                },
+                                createdRow: function(row, data, dataIndex) {
+                                    $(row).attr('data-id', data.ItemID);
+                                }
+                            });
+                        }
+                   //Item Search
+                    var $activeInput = null;
+                    $(document).on('input', "#txtItemCode,#txtItemName", function () {
+                            var $input = $(this);
+                            $activeInput = $(this);
+                        var value = $input.val().toLowerCase().replace(/_/g, ' ');
+                        var suggestions = [];
+                        // Check if the suggestion container already exists, if not, create it
+                        var suggestionContainerId = 'ItemSuggestions-' + $input.closest('tr').index();
+                        if (!$('#' + suggestionContainerId).length) {
+                            $('<div id="' + suggestionContainerId + '" class="suggestions-container"></div>').appendTo('body');
+                        }
+                        // Get the container element
+                        var $suggestionContainer = $('#' + suggestionContainerId);
+                        $suggestionContainer.empty(); // Clear previous suggestions
+                        // Check if ItemDetail exists and is an array
+                        if (Array.isArray(ItemData) && ItemData.length > 0) {
+                            if (value.length > 0) {
+                                var searchTokens = value.split(/\s+/);
+                                // Filter suggestions based on universal search (match all tokens)
+                                    suggestions = ItemData.filter(function (data) {
+                                    if (data && typeof data === 'object') {
+                                            var code = (data.ItemCode || '').toLowerCase();
+                                                var name = (data.ItemName || '').toLowerCase();
+                                        var allTokens = code.split(/\s+|[_-]+/).concat(name.split(/\s+|[_-]+/));
+                                        return searchTokens.every(function (token) {
+                                            return allTokens.some(function (itemToken) {
+                                                return itemToken.includes(token);
+                                            });
+                                        });
+                                    }
+                                    return false;
+                                }).sort(function (a, b) {
+                                            return a.ItemName.localeCompare(b.ItemName);
+                                }).slice(0, 50); // Limit to 20 results
+                            }
+                            // Show suggestions if any
+                            if (suggestions.length > 0) {
+                                suggestions.forEach(function (data) {
+                                    $suggestionContainer.append(
+                                                `<div class="suggestion-item itemset"  data-code="${data.ItemCode || ''}" data-id="${data.ItemID || ''}" data-name="${data.ItemName || ''}">
+                                                <span class="item-code"><b>${data.ItemCode || ''}</b></span> -
+                                                <span class="item-name"><b>${data.ItemName || ''}</b></span>
+                                        </div>`
+                                    );
+                                });
+                                // Calculate the offset of the input field and position the suggestion box below it
+                                var offset = $input.offset();
+                                $suggestionContainer.css({
+                                    top: offset.top + $input.outerHeight(),
+                                    left: offset.left,
+                                    width: $input.outerWidth(),
+                                    position: 'absolute',
+                                    "z-index": 1000,
+                                }).show();
+                            } else {
+                                $suggestionContainer.hide();
+                            }
+                        } else {
+                            console.error("Item Data is not defined or is empty");
+                            $suggestionContainer.hide();
+                        }
+                    });
+                        $(document).on('click', function (e) {
+                            if (!$(e.target).closest('.suggestions-container, .Item').length) {
+                                $('.suggestions-container').hide();
+                            }
+                        });
+                        $(document).on('click', '.itemset', function () {
+                            var selectedCode = $(this).data('code');
+                            var selectedName = $(this).data('name');
+                            var id = $(this).data('id');
+                                $("#txtItemCode").val(selectedCode);
+                                $("#txtItemName").val(selectedName);
+                                $("#txtItemCode").attr("data-id",id );
+                                        loadItemForEdit(id)
+                                        loadPriceSetupForEdit(id)
+                                                LoadWhs(id)
+                            setButtonsState(true)
+                            $("#DocumentEntry").val(id)
+                            $(".suggestions-container").hide();
+                        });
+                        // Format date for display
+                        function formatDate(dateString) {
+                            if (!dateString) return '';
+                            const date = new Date(dateString);
+                            return date.toLocaleDateString();
+                        }
+                
+                // Reset form
+                function resetForm() {
+                    $('#txtItemCode, #txtEanCode, #txtItemName').val('');
+                    $(' #ddlUomCode, #ddlItemGroup, #ddlHsnSacCode, #ddlGstRate, #ddlItemStatus, #Weight1').val('');
+                    $('#ddlItemType').val('I');
+                    $('#ddlItemStatus').val('A');
+                    $('#ddlTypeOfSupply').val('G');
+                    $('#dtItemActiveFrom, #dtItemActiveTo').val('');
+                    $("#DocumentEntry").val("")
+                    $("#SalesItem, #InventoryItem, #PurchasingItem").prop('checked', true);
+                    $("#txtItemCode").attr('data-id',"");
+                        $('#btnDelete').prop("disabled",true);
+                        $('#btnUpdate').prop("disabled",true);
+                            $('#btnSave').prop("disabled",false);
+                        LoadWhs()
+                    AddDefaultRow();
+                    LoadNewItemCode();
+
+                }
+                // Load item data for editing
+                function loadItemForEdit(itemId) {
+                    $.ajax({
+                        type: "GET",
+                        url: '@Url.Action("GETITEMBYID", "Master")',
+                        data: { id: itemId },
+                        success: function(item) {
+                            var item = item[0];
+                            if (item) {
+                                $('#txtItemCode').val(item.ItemCode);
+                                $('#txtItemCode').attr("data-id",itemId);
+                                $('#txtEanCode').val(item.EanCode);
+                                $('#txtItemName').val(item.ItemName);
+                                $('#ddlItemType').val(item.ItemTyp);
+                                $('#ddlUomCode').val(item.UomCode);
+                                    $('#ddlItemGroup').val(item.ItmGrpNam);
+                                $('#ddlHsnSacCode').val(item.HSNCode).attr('data-id', item.HSNID);
+
+                                $('#ddlGstRate option').filter(function() {
+                                    return $(this).text() === item.TaxCode;
+                                }).prop('selected', true);
+
+
+                                $('#ddlTypeOfSupply').val(item.TypeOfSupp);
+                                    $('#Weight1').val(item.Weight1);
+                                $('#ddlItemStatus').val(item.IsActive === "Active" ? "A" : "I");
+
+                                // Format dates properly
+                                $('#dtItemActiveFrom').val(formatDateForInput(item.IsActiveFrmDate));
+                                $('#dtItemActiveTo').val(formatDateForInput(item.IsActiveToDate));
+                                $("#SalesItem").prop('checked', item.SaleItem == 'Y');
+                                $("#InventoryItem").prop('checked', item.InvItem == 'Y');
+                                $("#PurchasingItem").prop('checked', item.PurItem == 'Y');
+                                $('#btnUpdate').show()
+                                    $('#itemListModal').modal("hide")
+
+                            }
+                        },
+                        error: function(xhr) {
+                            Notify('error', 'Error', xhr.responseText || 'Error loading item');
+                        }
+                    });
+                    }
+                function loadPriceSetupForEdit(itemId) {
+                        $.ajax({
+                            type: "GET",
+                            url: '@Url.Action("GETPRICESETUPBYID", "Master")',
+                            data: { id: itemId },
+                            success: function(data) {
+                                if (data) {
+                                    $("#Pricesetuptbl tbody").html("");
+                                    var index = 1;
+                                    for(var i = 0; i < data.length; i++) {
+
+                                        var item = data[i];
+                                        var selected = "";
+                                        if(item.IsActive == "I") {
+                                            selected = "selected";
+                                        }
+                                        var disabled ="";
+                                        var readonly ="";
+                                        if(i ===0){  // Changed from i=1 to i===1
+                                            disabled ="disabled"
+                                            readonly ="readonly"
+                                        }
+                                        var row = `
+                                            <tr data-id="${item.PriceSetID}">
+                                                <td nowrap class='index'>${index}</td>
+                                                        <td nowrap class='ConversionC'><input readonly data-id='${item.UOMID}' ${readonly} class="form-control form-control-sm ConversionCode text-end" type="text" value="${item.UomCode}"/></td>
+                                                    <td nowrap><input class="form-control form-control-sm ConversionQty text-end" type="number" value="${item.ConveQty}" /></td>
+                                                <td nowrap data-id='${item.BaseUomID}' class='Uom'>${item.BaseUomName}</td>
+                                                <td nowrap class='MRP'><input class="MRPINP form-control form-control-sm text-end" type="number" value="${item.MRP}" /></td>
+                                                <td nowrap class='Discount'><input class="DiscountINP form-control form-control-sm text-end" type="number" value="${item.Discount}" /></td>
+                                                <td nowrap class='Rate'><input class="RateINP form-control form-control-sm text-end" type="number" value="${item.NetAmount}" /></td>
+                                                <td nowrap class="text-center IsActive"><select class='form-control form-control-sm text-center'><option value='A'>Active</option><option value='I' ${selected}>In Active</option></select></td>
+                                                <td nowrap class="text-center"><button  ${disabled} class='btn btn-sm btn-outline-danger price_setup_delete'><i class='bi bi-trash'></i></button></td>
+                                            </tr>`;
+                                        $("#Pricesetuptbl tbody").append(row);
+                                        index++; // Increment the index
+                                    }
+                                }
+                            },
+                            error: function(xhr) {
+                                Notify('error', 'Error', xhr.responseText || 'Error loading item');
+                            }
+                        });
+               }
+               $(document).on("input", ".MRPINP, .Discount, .Rate", function () {
+                   var row = $(this).closest("tr");
+                   rowcalculation(row);
+               });
+
+               function rowcalculation(row) {
+                   var Mrp = parseFloat(row.find(".MRPINP").val()) || 0;
+                   var Discount = parseFloat(row.find(".DiscountINP").val()) || 0;
+                   var Rate = parseFloat(row.find(".RateINP").val()) || 0;
+                   // If Discount is changed → calculate Rate
+                   if ($(document.activeElement).hasClass("DiscountINP")) {
+                       var newrate = Mrp - (Mrp * Discount / 100);
+                       row.find(".RateINP").val(newrate.toFixed(2));
+                   }
+                   // If Rate is changed → calculate Discount
+                   if ($(document.activeElement).hasClass("RateINP")) {
+                       var newdiscount = ((Mrp - Rate) / Mrp) * 100;
+                       row.find(".DiscountINP").val(newdiscount.toFixed(2));
+                   }
+                   // If MRP changes → update Rate based on Discount
+                   if ($(document.activeElement).hasClass("MRPINP")) {
+                       var updatedRate = Mrp - (Mrp * Discount / 100);
+                       row.find(".RateINP").val(updatedRate.toFixed(2));
+                   }
+               }
+                // Helper function to format date for input fields
+                function formatDateForInput(dateString) {
+                    if (!dateString) return '';
+                    // Assuming date comes in format "dd/MM/yyyy"
+                    const parts = dateString.split('/');
+                    if (parts.length === 3) {
+                        return `${parts[2]}-${parts[1]}-${parts[0]}`; // Convert to yyyy-MM-dd
+                    }
+                    return dateString;
+                }
+                // Save or Update Item
+                 function SAVEITEM(flag) {
+                    var itemId = $('#txtItemCode').attr('data-id')
+                    const itemData = {
+                        ItemID: itemId.toString()||null,
+                        ItemCode: $('#txtItemCode').val().trim(),
+                        EanCode: $('#txtEanCode').val().trim(),
+                        ItemName: $('#txtItemName').val().trim(),
+                        ItemTyp: $('#ddlItemType').val(),
+                        Weight1: $('#Weight1').val(),
+                        UomID: $('#ddlUomCode option:selected').attr("data-id"),
+                        ItmGrpID: $('#ddlItemGroup option:selected').attr("data-id"),
+                        HSNID: $('#ddlHsnSacCode').attr("data-id"),
+                        TaxCodeId: $('#ddlGstRate option:selected').attr("data-id"),
+                        TypeOfSupp: $('#ddlTypeOfSupply').val(),
+                        IsActive: $('#ddlItemStatus').val(),
+                        IsActiveFrmDate: $('#dtItemActiveFrom').val()|| "",
+                        IsActiveToDate: $('#dtItemActiveTo').val()|| "",
+                        SaleItem: $("#SalesItem").is(":checked") ? "Y" : "N",
+                        InvItem: $("#InventoryItem").is(":checked") ? "Y" : "N",
+                        PurItem: $("#PurchasingItem").is(":checked") ? "Y" : "N"
+                    };
+
+                    const PriceSetup = [];
+                    $("#Pricesetuptbl tbody tr").each(function() {
+                        var $row = $(this);
+                        var UomCode = $row.find("td .ConversionCode").val().trim(); 
+                        if (UomCode) {
+                            var obj = {
+                                PriceSetID:$row.attr("data-id") ||null, 
+                                ItemID: "",     
+                                UomID: $row.find(".ConversionCode").attr("data-id") || "",
+                                ConversionCode: UomCode,
+                                ConveQTY: $row.find(".ConversionQty").val() || "0",
+                                BaseUomCode: $row.find(".Uom").text() || "",
+                                BaseUomID: $row.find(".Uom").attr("data-id") || "",
+                                MRP: $row.find(".MRP input").val() || "0",
+                                Discount: $row.find(".Discount input").val() || "0",
+                                NetAmount: $row.find(".Rate input").val() ||"0",
+                                IsActive: $row.find(".IsActive select").val() || "false"
+                            };
+
+                            PriceSetup.push(obj);
+                        }
+                    });
+                    const WhsDetails =[];
+                    $("#whstable tbody tr").each(function() {
+                            var $row = $(this);
+                            var obj = {
+                                    InvtDetId:$row.attr("data-id").toString() ||null,
+                                    ItemId:$('#txtItemCode').data('id').toString() || null,
+                                    WhsId: $row.find(".WhsName").attr("data-id") || "",
+                                    MinStock: $row.find(".minqty input").val() || "0",
+                                    MaxStock: $row.find(".maxqty input").val() || "0",
+                                    WhsLocked: $row.find(".islock input").is(":checked") ? "Y" : "N"
+                            };
+                            WhsDetails.push(obj);
+                        })
+                    // Validation
+                    if (!itemData.ItemName) {
+                        Notify('warning', 'Validation', 'Item Name is required');
+                        return;
+                    }
+                    if (!itemData.ItemTyp) {
+                        Notify('warning', 'Validation', 'Item Type is required');
+                        return;
+                    }
+                    if (!itemData.UomID) {
+                        Notify('warning', 'Validation', 'UOM Code is required');
+                        return;
+                    }
+                    if (!itemData.ItmGrpID) {
+                        Notify('warning', 'Validation', 'Item Group is required');
+                        return;
+                    }
+                        if (!itemData.HSNID) {
+                        Notify('warning', 'Validation', 'HSN is required');
+                        return;
+                    }
+                    var url ="";
+                    if(flag == 'update'){
+                        url= '@Url.Action("UPDATEITEM", "Master")'
+                    }else{ 
+                        url= '@Url.Action("CREATEITEM", "Master")'
+                    };
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                                data: JSON.stringify({itemData:itemData,PriceSetup:PriceSetup,WhsDetails:WhsDetails}),
+                        success: function (response) {
+                            if (response.success) {
+                                    Notify('success', 'Success', `Item ${flag === 'update' ? 'updated' : 'created'} successfully`);
+                                     resetForm()
+                                     loadItemMasterTable(); // Reload the table
+                                     LoadNewItemCode();
+                                     $("#DocumentEntry").val(response.itemId)
+                                     $('#addFilesButton').click();
+                            } else {
+                                Notify('error', 'Error', response.message || `Error  To Save Item `);
+                            }
+                        },
+                        error: function(xhr) {
+                            Notify('error', 'Error', xhr.responseText || `Error  To Save Item `);
+                        }
+                    });
+                }
+
+                // Delete Item
+                function deleteItem(itemId) {
+                    if (confirm('Are you sure you want to delete this item?')) {
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Action("DELETEITEM", "Master")',
+                                    data: { ItemID: itemId },
+                            success: function(response) {
+                                if (response.success) {
+                                    Notify('success', 'Success', 'Item deleted successfully');
+                                        loadItemMasterTable();
+                                             $('#btnReset').click();
+
+                                } else {
+                                    Notify('error', 'Error', response.message || 'Failed to delete item');
+                                }
+                            },
+                            error: function(xhr) {
+                                Notify('error', 'Error', xhr.responseText || 'Error deleting item');
+                            }
+                        });
+                    }
+                } 
+               function deletePriceSetup(id) {
+                  
+                    if (confirm('Are you sure you want to delete this item?')) {
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Action("DELETEPPRICESETUP", "Master")',
+                            data: { ItemID: id },
+                            success: function(response) {
+                                if (response.success) {
+                                         loadPriceSetupForEdit($("#txtItemCode").attr('data-id'))
+                                         Notify('success', 'Success', 'Item deleted successfully');
+                                } else {
+                                    Notify('error', 'Error', response.message || 'Failed to delete item');
+                                }
+                            },
+                            error: function(xhr) {
+                                Notify('error', 'Error', xhr.responseText || 'Error deleting item');
+                            }
+                        });
+                    }
+                }
+
+                // Event Handlers
+                 $(document).on('click', '.item-edit', function() {
+                    const itemId = $(this).data('id');
+                     $("#txtItemCode").attr('data-id', itemId);
+                     $("#DocumentEntry").val(itemId)
+                    loadItemForEdit(itemId);
+                    loadPriceSetupForEdit(itemId);
+                    LoadWhs(itemId)
+                    setButtonsState(true)
+                });
+              
+
+                $(document).on('click', '.item-delete', function() {
+                    const itemId = $(this).closest('tr').data('id');
+                    deleteItem(itemId);
+                        resetForm()
+                });
+
+                $('#btnSave').click(function() {
+                    SAVEITEM("create");
+                });
+                $('#btnUpdate').click(function() {
+                    SAVEITEM("update");
+                });
+                $('#btnDelete').click(function() {
+                    deleteItem($("#txtItemCode").attr('data-id'));
+                });
+
+               $('#btnReset').click(function() {
+                     setButtonsState(true)
+                     resetForm();
+                     AddDefaultRow();
+                     setButtonsState(false)
+                    
+                });
+                function setButtonsState(editMode) {
+                    $('#btnSave').prop('disabled', editMode);
+                    $('#btnUpdate').prop('disabled', !editMode);
+                    $('#btnDelete').prop('disabled', !editMode);
+                }
+            
+            }
+            //Bulk Ipload 
+            {
+                    const dropzone = document.getElementById('excelDropzone');
+                    const fileInput = document.getElementById('excelFile');
+                    const fileInfo = document.getElementById('fileInfo');
+                    const fileName = fileInfo.querySelector('.file-name');
+                    const processBtn = document.getElementById('btnProcessUpload');
+                    const removeFileBtn = fileInfo.querySelector('.remove-file');
+
+                    // Handle drag over
+                    dropzone.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        dropzone.classList.add('drag-over');
+                    });
+
+                    // Handle drag leave
+                    dropzone.addEventListener('dragleave', () => {
+                        dropzone.classList.remove('drag-over');
+                    });
+
+                    // Handle drop
+                    dropzone.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        dropzone.classList.remove('drag-over');
+
+                        if (e.dataTransfer.files.length) {
+                            const file = e.dataTransfer.files[0];
+                            if (isValidExcelFile(file)) {
+                                handleFileSelection(file);
+                            } else {
+                                Notify('error', 'Invalid File', 'Please upload a valid Excel file (.xlsx or .xls)');
+                            }
+                        }
+                    });
+
+                    // Handle file input change
+                    fileInput.addEventListener('change', (e) => {
+                        if (fileInput.files.length) {
+                            const file = fileInput.files[0];
+                            if (isValidExcelFile(file)) {
+                                handleFileSelection(file);
+                            } else {
+                                Notify('error', 'Invalid File', 'Please upload a valid Excel file (.xlsx or .xls)');
+                                fileInput.value = '';
+                            }
+                        }
+                    });
+
+                    // Handle remove file
+                    removeFileBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        resetFileInput();
+                    });
+
+                    // Check if file is Excel
+                    function isValidExcelFile(file) {
+                        const validTypes = [
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            'application/vnd.ms-excel'
+                        ];
+                        const validExtensions = ['.xlsx', '.xls'];
+                        const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+
+                        return validTypes.includes(file.type) ||
+                               validExtensions.includes(fileExtension);
+                    }
+
+                    // Handle selected file
+                    function handleFileSelection(file) {
+                        fileName.textContent = file.name;
+                        fileInfo.classList.remove('d-none');
+                        processBtn.disabled = false;
+
+                        // If coming from file input, we don't need to do anything else
+                        // If coming from drag and drop, we need to set the file input
+                        if (fileInput.files.length === 0) {
+                            // Create a new DataTransfer object and add the file
+                            const dataTransfer = new DataTransfer();
+                            dataTransfer.items.add(file);
+                            fileInput.files = dataTransfer.files;
+                        }
+                    }
+
+                    // Reset file input
+                    function resetFileInput() {
+                        fileInput.value = '';
+                        fileInfo.classList.add('d-none');
+                        processBtn.disabled = true;
+                    }
+                    // Dynamic template generation
+                    $('#bulkUploadModal').on('click', '.btn-download-template', function(e) {
+                        e.preventDefault();
+                        generateTemplate();
+                    });
+
+                    function generateTemplate() {
+                        // Create a new workbook
+                        const workbook = XLSX.utils.book_new();
+
+                        // 1. Create ItemMaster sheet
+                        const itemMasterData = [
+                            {
+                                ItemCode: "ITM001",
+                                EanCode: "00001",
+                                ItemName: "Sample Product 1",
+                                ItemTyp: "I",
+                                UomCode: "NOS",
+                                ItmGrpName: "Item",
+                                HSNCode: "10.10.10.10",
+                                PurItem: "Y",
+                                SaleItem: "Y",
+                                InvItem: "Y",
+                                TaxCode: "GST5%",
+                                TypeOfSupp: "G",
+                                IsActiveFrmDate: "2023-01-01",
+                                IsActiveToDate: "2023-12-31",
+                                Weight1: 1.5
+                            }
+                        ];
+                        const itemMasterWS = XLSX.utils.json_to_sheet(itemMasterData);
+                        XLSX.utils.book_append_sheet(workbook, itemMasterWS, "ItemMaster");
+
+                        // 2. Create PriceSetup sheet
+                        const priceSetupData = [
+                            {
+                                ItemCode: "ITM001",
+                                ConversionCode: "NOS",
+                                ConversionQty: 1,
+                                BaseUom: "NOS",
+                                MRP: 100,
+                                Discount: 10,
+                                NetAmount: 90,
+                            },
+                            {
+                                ItemCode: "ITM001",
+                                ConversionCode: "PCS",
+                                ConversionQty: 10,
+                                BaseUom: "NOS",
+                                MRP: 900,
+                                Discount: 50,
+                                NetAmount: 850,
+                            }
+                        ];
+                        const priceSetupWS = XLSX.utils.json_to_sheet(priceSetupData);
+                        XLSX.utils.book_append_sheet(workbook, priceSetupWS, "PriceSetup");
+
+                        // 3. Create Inventory sheet
+                        const inventoryData = [
+                            {
+                                ItemCode: "ITM001",
+                                WhsCode: "WHS01",
+                                MinStock: 10,
+                                MaxStock: 100,
+                                MinOrder: 100,
+                                WhsLocked: "Y",
+                                ItemCost: 80,
+                                Stock: 50
+                            },
+                            {
+                                ItemCode: "ITM001",
+                                WhsCode: "WHS02",
+                                MinStock: 5,
+                                MaxStock: 50,
+                                MinOrder: 50,
+                                WhsLocked: "N",
+                                ItemCost: 80,
+                                Stock: 20
+                            }
+                        ];
+                        const inventoryWS = XLSX.utils.json_to_sheet(inventoryData);
+                        XLSX.utils.book_append_sheet(workbook, inventoryWS, "Inventory");
+
+                        // Generate Excel file and trigger download
+                        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+                        saveAsExcelFile(excelBuffer, 'ItemMaster_Template.xlsx');
+                    }
+
+                    function saveAsExcelFile(buffer, fileName) {
+                        const data = new Blob([buffer], { type: 'application/octet-stream' });
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(data);
+                        link.download = fileName;
+                        link.click();
+
+                        // Clean up
+                        setTimeout(() => {
+                            window.URL.revokeObjectURL(link.href);
+                        }, 100);
+                    }
+                // Show bulk upload modal
+                $('#btnBulkUpload').click(function() {
+                    $('#bulkUploadModal').modal('show');
+                });
+                // Process the uploaded file
+                $('#btnProcessUpload').click(function() {
+                    const fileInput = $('#excelFile')[0];
+                    if (!fileInput.files.length) {
+                        Notify('warning', 'Validation', 'Please select an Excel file');
+                        return;
+                    }
+
+                    const file = fileInput.files[0];
+                    processExcelFile(file);
+                });
+
+                function processExcelFile(file) {
+                    $('#uploadProgress').removeClass('d-none');
+                    updateProgress(10, 'Reading file...');
+
+                    const reader = new FileReader();
+    
+                    reader.onload = function(e) {
+                        try {
+                            updateProgress(30, 'Processing data...');
+            
+                            const data = new Uint8Array(e.target.result);
+                            const workbook = XLSX.read(data, { type: 'array' });
+            
+                            // Process ItemMaster sheet
+                            const itemMasterSheet = workbook.Sheets['ItemMaster'];
+                            const itemMasterJson = XLSX.utils.sheet_to_json(itemMasterSheet);
+            
+                            // Process PriceSetup sheet
+                            const priceSetupSheet = workbook.Sheets['PriceSetup'];
+                            const priceSetupJson = XLSX.utils.sheet_to_json(priceSetupSheet);
+            
+                            // Process Inventory sheet
+                            const inventorySheet = workbook.Sheets['Inventory'];
+                            const inventoryJson = XLSX.utils.sheet_to_json(inventorySheet);
+            
+                            // Group data by item code
+                            const groupedData = groupDataByItem(itemMasterJson, priceSetupJson, inventoryJson);
+            
+                            updateProgress(70, 'Validating data...');
+            
+                            // Validate data before sending
+                            if (validateBulkData(groupedData)) {
+                                updateProgress(90, 'Sending to server...');
+                                sendBulkDataToServer(groupedData);
+                            }
+                        } catch (error) {
+                            console.error(error);
+                            Notify('error', 'Processing Error', 'Error processing Excel file: ' + error.message);
+                            $('#uploadProgress').addClass('d-none');
+                        }
+                    };
+    
+                    reader.onerror = function() {
+                        Notify('error', 'File Error', 'Error reading the file');
+                        $('#uploadProgress').addClass('d-none');
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+
+                function groupDataByItem(itemMaster, priceSetup, inventory) {
+                    const groupedData = {};
+                    // Create item entries
+                    itemMaster.forEach(item => {
+                        groupedData[item.ItemCode] = {
+                            itemData: {
+                                ItemCode: item.ItemCode,
+                                EanCode: item.EanCode.toString(),
+                                ItemName: item.ItemName,
+                                ItemTyp: item.ItemTyp,
+                                UomCode: item.UomCode,
+                                ItmGrpName: item.ItmGrpName,
+                                HSNCode: item.HSNCode,
+                                PurItem: item.PurItem,
+                                SaleItem: item.SaleItem,
+                                InvItem: item.InvItem,
+                                TaxCode: item.TaxCode,
+                                TypeOfSupp: item.TypeOfSupp,
+                                IsActive: "A",
+                                IsActiveFrmDate: item.IsActiveFrmDate,
+                                IsActiveToDate: item.IsActiveToDate,
+                                Weight1: item.Weight1
+                            },
+                            priceSetups: [],
+                            inventoryDetails: []
+                        };
+                    });
+    
+                    // Add price setups
+                    priceSetup.forEach(price => {
+                        if (groupedData[price.ItemCode]) {
+                            groupedData[price.ItemCode].priceSetups.push({
+                                ConversionCode: price.ConversionCode,
+                                ConveQTY: price.ConversionQty,
+                                BaseUom: price.BaseUom,
+                                MRP: price.MRP,
+                                Discount: price.Discount,
+                                NetAmount: price.NetAmount,
+                                IsActive: "A"
+                            });
+                        }
+                    });
+    
+                    // Add inventory details
+                    inventory.forEach(inv => {
+                        if (groupedData[inv.ItemCode]) {
+                            groupedData[inv.ItemCode].inventoryDetails.push({
+                                WhsCode: inv.WhsCode,
+                                MinStock: inv.MinStock,
+                                MaxStock: inv.MaxStock,
+                                MinOrder: inv.MinOrder,
+                                WhsLocked: inv.WhsLocked,
+                                ItemCost: inv.ItemCost,
+                                Stock: inv.Stock
+                            });
+                        }
+                    });
+    
+                    return Object.values(groupedData);
+                }
+
+                function validateBulkData(data) {
+                    let isValid = true;
+                    const errors = [];
+    
+                    data.forEach((item, index) => {
+                        // Validate required fields
+                        if (!item.itemData.ItemCode || !item.itemData.ItemName || !item.itemData.UomCode) {
+                            errors.push(`Row ${index + 1}: ItemCode, ItemName, and UomCode are required`);
+                            isValid = false;
+                        }
+        
+                        // Validate at least one price setup
+                        if (item.priceSetups.length === 0) {
+                            errors.push(`Item ${item.itemData.ItemCode}: At least one price setup is required`);
+                            isValid = false;
+                        }
+                    });
+    
+                    if (!isValid) {
+                        Notify('error', 'Validation Errors', errors.join('<br>'));
+                    }
+    
+                    return isValid;
+                }
+
+                function sendBulkDataToServer(data) {
+                    // Convert to format expected by your controller
+                    const payload = {
+                        items: data.map(item => ({
+                            itemData: item.itemData,
+                            priceSetups: item.priceSetups,
+                            inventoryDetails: item.inventoryDetails
+                        }))
+                    };
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("ITEMBULKUPLOAD", "Master")',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(payload),
+                        success: function(response) {   
+                            if (response.success) {
+                                updateProgress(100, 'Upload complete!');
+                                setTimeout(() => {
+                                    $('#bulkUploadModal').modal('hide');
+                                    $('#uploadProgress').addClass('d-none');
+                                        Notify('success', 'Success', `${response.message}`);
+                                        loadItemMasterTable(); 
+                                }, 1000);
+                            } else {
+                                Notify('error', 'Upload Error', response.message || 'Error processing bulk upload');
+                                $('#uploadProgress').addClass('d-none');
+                            }
+                        },
+                        error: function(xhr) {
+                            Notify('error', 'Server Error', xhr.responseText || 'Error sending data to server');
+                            $('#uploadProgress').addClass('d-none');
+                        }
+                    });
+                }
+                function updateProgress(percent, message) {
+                    const $progressBar = $('#uploadProgress .progress-bar');
+                    $progressBar.css('width', percent + '%').attr('aria-valuenow', percent);
+                    $progressBar.text(message);
+                }
+            
+            }
+    });
+</script>

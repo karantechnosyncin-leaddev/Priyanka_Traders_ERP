@@ -1,0 +1,400 @@
+﻿@{
+
+    var role = Context.Session.GetString("Role");
+}
+<!-- Button Master Form Section -->
+<section id="buttonMasterSection">
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title">
+                    <i class="bi bi-toggle-on"></i> Button Master
+                </h3>
+            </div>
+            <div class="card-body">
+                <form id="buttonMasterForm">
+                    <input type="hidden" id="BtnID" name="BtnID">
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="BtnName" class="form-label">Button Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-input-cursor-text"></i></span>
+                                <input type="text" class="form-control" id="BtnName" name="BtnName" required maxlength="50">
+                                <div class="invalid-feedback">Please provide a button name (2-50 characters).</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="Icon" class="form-label">Icon Class <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-icons"></i></span>
+                                <input type="text" class="form-control" id="Icon" name="Icon" required maxlength="50">
+                                <div class="invalid-feedback">Please provide a valid icon class (2-50 characters).</div>
+                            </div>
+                            <small class="text-muted">Example: "bi bi-save" for Bootstrap Icons</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ColorClass" class="form-label">Color Class <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-palette"></i></span>
+                                <select class="form-select" id="ColorClass" name="ColorClass" required>
+                                    <option value="">Select Color</option>
+                                    <option value="btn-primary">Primary (Blue)</option>
+                                    <option value="btn-secondary">Secondary (Gray)</option>
+                                    <option value="btn-success">Success (Green)</option>
+                                    <option value="btn-danger">Danger (Red)</option>
+                                    <option value="btn-warning">Warning (Yellow)</option>
+                                    <option value="btn-info">Info (Cyan)</option>
+                                    <option value="btn-light">Light</option>
+                                    <option value="btn-dark">Dark</option>
+                                    <!-- Outline buttons -->
+                                    <option value="btn-outline-primary">Outline Primary (Blue)</option>
+                                    <option value="btn-outline-secondary">Outline Secondary (Gray)</option>
+                                    <option value="btn-outline-success">Outline Success (Green)</option>
+                                    <option value="btn-outline-danger">Outline Danger (Red)</option>
+                                    <option value="btn-outline-warning">Outline Warning (Yellow)</option>
+                                    <option value="btn-outline-info">Outline Info (Cyan)</option>
+                                    <option value="btn-outline-light">Outline Light</option>
+                                    <option value="btn-outline-dark">Outline Dark</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a color class.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4" @if (role != "A" && role != "D") { <text> hidden</text>}>
+                            <label for="Role" class="form-label">Role</label>
+                            <select class="form-select" id="Role" required>
+                                @if (role == "A" || role == "D")
+                                {
+                                    <option value="B">Admin/Erp User</option>
+                                    <option value="A">Admin</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback">Role is required.</div>
+                        </div>
+                        <div class="col-md-6" hidden>
+                            <label for="idattr" class="form-label">ID Attribute</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                                <input type="text" class="form-control" id="idattr" name="idattr" maxlength="100">
+                                <div class="invalid-feedback">Maximum 100 characters allowed.</div>
+                            </div>
+                            <small class="text-muted">Optional HTML id attribute for the button</small>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <button type="button" id="btnPreview" class="btn btn-secondary">
+                                    <i class="bi bi-eye"></i> Preview Button
+                                </button>
+                                <div id="buttonPreview" class="mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3 text-end">
+                        <div class="col-md-12">
+                            <button type="button" id="btnSave" class="btn btn-success">
+                                <i class="bi bi-save"></i> Save
+                            </button>
+                            <button type="button" id="btnDelete" class="btn btn-danger" disabled>
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                            <button type="reset" id="btnReset" class="btn btn-warning">
+                                <i class="bi bi-arrow-counterclockwise"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="table-responsive mt-4">
+                    <table id="buttonMasterTable" class="table table-striped table-hover">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Button Name</th>
+                                <th>Icon</th>
+                                <th>Color</th>
+                                <th hidden>ID Attribute</th>
+                                <th>Preview</th>
+                                <th>Role</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- jQuery CRUD Operations -->
+<script>
+    $(document).ready(function() {
+        // Initialize form validation
+        function validateForm() {
+            let isValid = true;
+            const btnName = $('#BtnName').val().trim();
+            const icon = $('#Icon').val().trim();
+            const colorClass = $('#ColorClass').val();
+            const idattr = $('#idattr').val().trim();
+
+            // Validate Button Name (2-50 characters)
+            if (btnName.length < 2 || btnName.length > 50) {
+                $('#BtnName').addClass('is-invalid');
+                isValid = false;
+            } else {
+                $('#BtnName').removeClass('is-invalid');
+            }
+
+            // Validate Icon (2-50 characters)
+            if (icon.length < 2 || icon.length > 50) {
+                $('#Icon').addClass('is-invalid');
+                isValid = false;
+            } else {
+                $('#Icon').removeClass('is-invalid');
+            }
+
+            // Validate Color Class
+            if (!colorClass) {
+                $('#ColorClass').addClass('is-invalid');
+                isValid = false;
+            } else {
+                $('#ColorClass').removeClass('is-invalid');
+            }
+
+            // Validate ID Attribute (if provided)
+            // if (idattr.length > 100) {
+            //     $('#idattr').addClass('is-invalid');
+            //     isValid = false;
+            // } else {
+            //     $('#idattr').removeClass('is-invalid');
+            // }
+
+            return isValid;
+        }
+
+        // Load all buttons
+        function loadButtons() {
+            $.ajax({
+                url: '@Url.Action("GETBUTTONS", "DevUtility")',
+                type: 'GET',
+                beforeSend: function() {
+                    // Show loading indicator if needed
+                },
+                success: function(response) {
+                    if (response && response.length > 0) {
+                        var tableBody = $('#buttonMasterTable tbody');
+                        tableBody.empty();
+
+                        $.each(response, function(index, button) {
+                            var idAttrHtml = button.idattr ? `<code>${button.idattr}</code>` : '<span class="text-muted">None</span>';
+                            var previewButton = `<button class="btn btn-sm ${button.ColorClass}" ${button.idattr ? `id="${button.idattr}"` : ''}>
+                                <i class="${button.Icon}"></i> ${button.BtnName}
+                            </button>`;
+
+                            var row = `<tr data-id="${button.BtnID}">
+                                <td>${button.BtnName || ''}</td>
+                                <td><code>${button.Icon || ''}</code></td>
+                                <td><code>${button.ColorClass || ''}</code></td>
+                                <td hidden>${idAttrHtml}</td>
+                                <td>${previewButton}</td>
+                                <td>${button.Role}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary btn-edit" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </td>
+                            </tr>`;
+                            tableBody.append(row);
+                        });
+                    } else {
+                        Notify('warning', 'No Data', 'No button records found.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading buttons';
+                    Notify('error', 'Error', errorMessage);
+                }
+            });
+        }
+
+        // Preview button
+        $('#btnPreview').click(function() {
+            if (!validateForm()) {
+                Notify('warning', 'Validation Error', 'Please correct the form errors before previewing.');
+                return;
+            }
+
+            const btnName = $('#BtnName').val().trim();
+            const icon = $('#Icon').val().trim();
+            const colorClass = $('#ColorClass').val();
+            const idattr = $('#idattr').val().trim();
+
+            var previewButton = `<button class="btn ${colorClass}" ${idattr ? `id="${idattr}"` : ''}>
+                <i class="${icon}"></i> ${btnName}
+            </button>`;
+
+            $('#buttonPreview').html(previewButton);
+        });
+
+        // Save/Update button
+        $('#btnSave').click(function() {
+            if (!validateForm()) {
+                Notify('warning', 'Validation Error', 'Please correct the form errors before saving.');
+                return;
+            }
+
+            // Create a JavaScript object from the form data
+            var formData = {
+                BtnID: $('#BtnID').val(),
+                BtnName: $('#BtnName').val().trim(),
+                Icon: $('#Icon').val().trim(),
+                ColorClass: $('#ColorClass').val(),
+                Role: $('#Role').val(),
+                idattr: $('#idattr').val().trim()
+            };
+
+            var isEdit = formData.BtnID !== '';
+            $.ajax({
+                type:  'POST',
+                url: '@Url.Action("CREATEBTN", "DevUtility")',
+                contentType: "application/json",
+                data: JSON.stringify(formData),
+                beforeSend: function() {
+                    $('#btnSave').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Processing...');
+                },
+                success: function(response) {
+                    if (response && response.success) {
+                        Notify('success', 'Success', response.message || (isEdit ? 'Button updated successfully!' : 'Button created successfully!'));
+                        $('#buttonMasterForm')[0].reset();
+                        $('#BtnID').val('');
+                        $('#btnDelete').prop('disabled', true);
+                        $('#buttonPreview').empty();
+                        loadButtons()
+                    } else {
+                        Notify('warning', 'Warning', response.message || 'Operation completed but with warnings.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error saving button';
+                    Notify('error', 'Error', errorMessage);
+                },
+                complete: function() {
+                    $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
+                }
+            });
+        });
+
+        // Delete button
+        $('#btnDelete').click(function() {
+             deleteDoc()
+        });
+         function deleteDoc(){
+          var id = $('#BtnID').val();
+            if(!id){
+                Notify('error', 'Document Entry is required for deletion','');
+                return;
+            }
+             Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("DELETEBTN", "DevUtility")',
+                        type: 'POST',
+                        data: { id: $("#BtnID").val() },
+                        beforeSend: function() {
+                            $('#btnDelete').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Deleting...');
+                        },
+                        success: function(response) {
+                            if (response && response.success) {
+                                Notify('success', 'Success', response.message || 'Document deleted successfully!');
+                                loadButtons();
+                                $('#buttonMasterForm')[0].reset();
+                                $('#BtnID').val('');
+                                $('#buttonPreview').empty();
+                            } else {
+                                Notify('warning', 'Warning', response.message || 'Document deleted successfully!');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error deleting Document';
+                            Notify('error', 'Error', errorMessage);
+                        },
+                        complete: function() {
+                            $('#btnDelete').prop('disabled', false).html('<i class="bi bi-trash"></i> Delete');
+                        }
+                    });
+                }
+            });
+        }
+        // Edit button
+        $(document).on('click', '.btn-edit', function() {
+            var buttonId = $(this).closest('tr').data('id');
+            if (!buttonId) {
+                Notify('warning', 'Warning', 'No button ID found for editing.');
+                return;
+            }
+
+            $.ajax({
+                 url: '@Url.Action("GETBUTTONSBYID", "DevUtility")',
+                data: { id: buttonId },
+                type: 'GET',
+                beforeSend: function() {
+                    // Show loading indicator if needed
+                },
+                success: function(response) {
+                    response =response[0]
+                    if (response) {
+                        $('#BtnID').val(response.BtnID);
+                        $('#BtnName').val(response.BtnName);
+                        $('#Icon').val(response.Icon);
+                        $('#ColorClass').val(response.ColorClass);
+                        $('#idattr').val(response.idattr || '');
+                        $('#btnDelete').prop('disabled', false);
+                        $('#Role').val(response.Role)
+                        // Update preview
+                        var previewButton = `<button class="btn ${response.ColorClass}" ${response.idattr ? `id="${response.idattr}"` : ''}>
+                            <i class="${response.Icon}"></i> ${response.BtnName}
+                        </button>`;
+                        $('#buttonPreview').html(previewButton);
+
+                        $('html, body').animate({ scrollTop: 0 }, 'slow');
+                    } else {
+                        Notify('warning', 'Warning', 'No data returned for this button.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading button data';
+                    Notify('error', 'Error', errorMessage);
+                }
+            });
+        });
+
+        // Reset form
+        $('#btnReset').click(function() {
+            $('#BtnID').val('');
+            $('#btnDelete').prop('disabled', true);
+            $('.is-invalid').removeClass('is-invalid');
+            $('#buttonPreview').empty();
+        });
+
+        // Real-time validation
+        $('#BtnName, #Icon, #idattr').on('input', function() {
+            $(this).removeClass('is-invalid');
+        });
+       loadButtons()
+    });
+</script>

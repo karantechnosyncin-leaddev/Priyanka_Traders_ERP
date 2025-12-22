@@ -1,0 +1,1042 @@
+﻿<div class="container-fluid p-2">
+    <div class="card shadow-lg m-2">
+        <!-- Card Header -->
+        <div class="card-header bg-white text-black">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h3 class="card-title mb-0">
+                        <i class="bi bi-cash"></i> Account Statement
+                    </h3>
+                </div>
+                <div class="col-md-6 d-flex justify-content-end gap-1">
+                    <button id="btnPdf11" class="btn btn-outline-danger rounded-2" data-title="Account Statement">
+                        <i class="bi bi-file-pdf me-1"></i> PDF
+                    </button>
+                    <button id="btnExcel11" class="btn btn-outline-success  rounded-2" data-title="Account Statement">
+                        <i class="bi bi-file-earmark-excel me-1"></i> EXCEL
+                    </button>
+                    <button id="btnCSV1" class="btn btn-outline-success  rounded-2" data-title="Account Statement">
+                        <i class="bi bi-file-earmark-excel me-1"></i> CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- Form -->
+            <!-- ===================== FORM ===================== -->
+            <form id="ReportForm">
+                <input id="ID" name="CustomerID" hidden />
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label for="LedgerCode" class="form-label">Customer</label>
+                        <div class="input-group">
+                            <input id="LedgerCode" class="form-control" type="text" data-id="" data-code="" placeholder="Type customer name/code" />
+                        </div>
+                    </div>
+                    <div class="col-md-3" hidden>
+                        <input id="MobileNo" class="form-control" type="text" placeholder="MobileNo" />
+                        <input id="Address1" class="form-control" type="text" placeholder="Address1" />
+                        <input id="Address2" class="form-control" type="text" placeholder="Address2" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="FromDate" class="form-label">From Date</label>
+                        <input type="date" class="form-control datepicker" id="FromDate" name="FromDate">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="ToDate" class="form-label">To Date</label>
+                        <input type="date" class="form-control datepicker" id="ToDate" name="ToDate">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12 text-end">
+                        <button id="btnFind" type="button" class="btn btn-primary me-2 mb-1">
+                            <i class="bi bi-search"></i> Find
+                        </button>
+                        <button id="btnReset" type="button" class="btn btn-secondary me-2 mb-1">
+                            <i class="bi bi-arrow-clockwise"></i> Reset
+                        </button>
+                        <button id="btnFormSettings" class="btn btn-primary me-2 mb-1" type="button" data-bs-toggle="modal" data-bs-target="#formSettingsModal" title="Form Settings">
+                            <i class="bi bi-gear-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="table-responsive" style="height:650px; overflow-y:auto;">
+                        <table id="mainitemtable" class="table table-bordered table-hover w-100 m-0" style="table-layout:auto; white-space:nowrap;">
+                            <thead class=" text-white sticky-top"></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="formSettingsModal" tabindex="-1" aria-labelledby="formSettingsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+        <!-- modal-fullscreen-sm-down makes modal full screen on small devices -->
+        <div class="modal-content shadow-sm border-0 rounded-3">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="formSettingsLabel">
+                    <i class="bi bi-gear-fill me-1"></i> Form Settings
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body p-2">
+                <div class="table-responsive" style="max-height: 60vh; overflow-y: auto;">
+                    <table class="table table-bordered table-hover table-sm" id="formSettingsTable">
+                        <thead class="table sticky-top bg-light">
+                            <tr>
+                                <th scope="col">SR No</th>
+                                <th scope="col">Name</th>
+                                <th hidden scope="col">dName</th>
+                                <th class="text-center" scope="col">Is Visible</th>
+                                <th hidden scope="col">ObjType</th>
+                                <th hidden scope="col">ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dynamic rows added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="saveFormSettings">Save</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+$(function () {
+    $('.datepicker').val(new Date().toISOString().split('T')[0]);
+    var BPPartnerData = [];
+    // Load BP Partners
+    function loadBPPartner() {
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GETBPPARTNER", "Reports")',
+            contentType: "application/json; charset=utf-8",
+            data: { type: "" },
+            cache: false,
+            success: function (data) {
+                console.log(data)
+                BPPartnerData = data || [];
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+                Notify('error', 'Error', xhr.responseText || 'Error loading BP Partners');
+            }
+        });
+    }
+    loadBPPartner();
+    // ---------------- Autocomplete for LedgerCode ----------------
+    $(document).on('input', "#LedgerCode", function () {
+        var $input = $(this);
+        var value = $input.val().toLowerCase().trim();
+        var suggestionContainerId = 'LedgerSuggestions';
+
+        if (!$('#' + suggestionContainerId).length) {
+            $('<div id="' + suggestionContainerId + '" class="suggestions-container"></div>').appendTo('body');
+        }
+        var $suggestionContainer = $('#' + suggestionContainerId).empty();
+
+        if (Array.isArray(BPPartnerData) && BPPartnerData.length > 0 && value.length > 0) {
+            var searchTokens = value.split(/\s+/);
+
+            var suggestions = BPPartnerData.filter(function (data) {
+                var code = (data.Code || '').toLowerCase();
+                var name = (data.GroupName || '').toLowerCase();
+                var allTokens = code.split(/\s+|[_-]+/).concat(name.split(/\s+|[_-]+/));
+                return searchTokens.every(function (token) {
+                    return allTokens.some(function (itemToken) {
+                        return itemToken.includes(token);
+                    });
+                });
+            }).slice(0, 30);
+
+            if (suggestions.length > 0) {
+                suggestions.forEach(function (data) {
+                    $suggestionContainer.append(`
+                    <div class="suggestion-item ledger-set"
+                        data-code="${data.Code || ''}"
+                        data-id="${data.ID || ''}"
+                        data-name="${data.GroupName || ''}"
+                        data-mobile="${data.MobileNo || ''}"
+                        data-address1="${data.Address1 || ''}"
+                        data-address2="${data.Address2 || ''}">
+                        <b>${data.Code || ''}</b> - ${data.GroupName || ''} - ${data.MobileNo || ''}
+                    </div>
+                `);
+                });
+
+                var offset = $input.offset();
+                $suggestionContainer.css({
+                    top: offset.top + $input.outerHeight(),
+                    left: offset.left,
+                    width: $input.outerWidth(),
+                    position: 'absolute',
+                    "z-index": 1000,
+                }).show();
+            } else {
+                $suggestionContainer.hide();
+            }
+        }
+    });
+    // ---------------- Autocomplete for MobileNo ----------------
+    $(document).on('input', "#MobileNo", function () {
+        var $input = $(this);
+        var value = $input.val().trim();
+        var suggestionContainerId = 'MobileSuggestions';
+
+        if (!$('#' + suggestionContainerId).length) {
+            $('<div id="' + suggestionContainerId + '" class="suggestions-container"></div>').appendTo('body');
+        }
+        var $suggestionContainer = $('#' + suggestionContainerId).empty();
+
+        if (Array.isArray(BPPartnerData) && BPPartnerData.length > 0 && value.length > 0) {
+            var suggestions = BPPartnerData.filter(c => (c.MobileNo || '').includes(value)).slice(0, 30);
+
+            if (suggestions.length > 0) {
+                suggestions.forEach(function (data) {
+                    $suggestionContainer.append(`
+                        <div class="suggestion-item ledger-set"
+                            data-code="${data.Code || ''}"
+                            data-id="${data.ID || ''}"
+                            data-name="${data.GroupName || ''}"
+                            data-mobile="${data.MobileNo || ''}">
+                            ${data.MobileNo || ''} - ${data.GroupName || ''}-${data.Code || ''}
+                        </div>
+                    `);
+                });
+
+                var offset = $input.offset();
+                $suggestionContainer.css({
+                    top: offset.top + $input.outerHeight(),
+                    left: offset.left,
+                    width: $input.outerWidth(),
+                    position: 'absolute',
+                    "z-index": 1000,
+                }).show();
+            } else {
+                $suggestionContainer.hide();
+            }
+        }
+    });
+    // ---------------- Handle selection (both LedgerCode & Mobile) ----------------
+    $(document).on('click', '.ledger-set', function () {
+        var ledgerCode = $(this).data('code');
+        var groupName = $(this).data('name');
+        var id = $(this).data('id');
+        var mobile = $(this).data('mobile');
+        var address1 = $(this).data('address1'); 
+        var address2 = $(this).data('address2'); 
+        $("#LedgerCode").val(groupName).attr("data-code", ledgerCode).attr("data-id", id);
+        $("#MobileNo").val(mobile || "");
+        $("#Address1").val(address1 || "");   
+        $("#Address2").val(address2 || "");   
+        $("#ID").val(id);
+        $("#ItemName").val("");
+
+        $('.suggestions-container').hide();
+    });
+    // ---------------- Users Autocomplete ----------------
+    let UserData = [];
+    let UserMap = new Map();
+    function loadUserMasterTable() {
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GETUSERS", "Auth")', // Replace with actual controller
+            contentType: "application/json; charset=utf-8",
+            success: function(data) {
+                UserData = Array.isArray(data) ? data : [];
+                // Fill Map for fast lookup
+                UserData.forEach(u => UserMap.set(u.Username, u));
+            },
+            error: function(xhr) { alert("Error loading users"); }
+        });
+    }
+    loadUserMasterTable();
+    function setupUserAutocomplete() {
+        const $input = $("#Username");
+
+        $input.on('input', function() {
+            const term = $(this).val().toLowerCase();
+            const suggestions = UserData
+                .filter(u => (u.Username).toLowerCase().includes(term))
+                .slice(0, 20);
+
+            let $container = $('#UserSuggestions');
+            if (!$container.length) {
+                $container = $('<div id="UserSuggestions" class="suggestions-container"></div>').appendTo('body');
+            }
+
+            $container.empty();
+
+            if (suggestions.length > 0) {
+                suggestions.forEach(u => {
+                    $container.append(`<div class="suggestion-item" data-name="${u.Username}">${u.Username}</div>`);
+                });
+
+                const offset = $input.offset();
+                $container.css({
+                    top: offset.top + $input.outerHeight(),
+                    left: offset.left,
+                    width: $input.outerWidth(),
+                    position: 'absolute',
+                    zIndex: 1000,
+                    background: '#fff',
+                    border: '1px solid #ccc',
+                    maxHeight: '200px',
+                    overflowY: 'auto'
+                }).show();
+            } else {
+                $container.hide();
+            }
+        });
+
+        // Set Username in input and UserID in hidden field on click
+        $(document).on('click', '.suggestion-item', function() {
+            const name = $(this).data('name');
+            const user = UserMap.get(name);
+
+            if (user) {
+                $("#Username").val(user.Username);  // Display name
+                $("#UserID").val(user.UserID);      // Hidden field (create <input type="hidden" id="UserID" /> in form)
+            }
+            $('#UserSuggestions').hide();
+        });
+
+        // Hide suggestions when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('#Username, #UserSuggestions').length) {
+                $('#UserSuggestions').hide();
+            }
+        });
+    }
+    // Call the function
+    setupUserAutocomplete();
+       var FormData = [];
+    var BindData = {};
+    // 🔹 Get initial config
+    getConfigData("ACS");
+    // 🔹 Button click: get filtered data
+    $("#btnReset").on("click", function () {
+        $("#ID").val("");
+        $("#LedgerCode").val("");
+        $("#MobileNo").val("");
+        $("#Username").val("");
+        $("#UserID").val("");
+        $("#ItemName").val("");
+        $("#ItemID").val("");
+
+        $("#Basedon").val("A");
+        $("#DocNum").val("");
+        $("#DocStatus").val("");
+        $('.datepicker').val(new Date().toISOString().split('T')[0]);
+        LoadReport()
+    });
+    $("#btnFind").on("click", function () {
+        LoadReport()
+    });
+    function LoadReport() {
+          const LedgerCode = $("#ID").val();
+          const FromDate = $("#FromDate").val();
+          const ToDate = $("#ToDate").val();
+          $.ajax({
+              url: '@Url.Action("GETACCOUNTDATA", "Reports")',
+              type: 'GET',
+              data: { LedgerCode,FromDate, ToDate },
+              success: function (response) {
+                  BindData = response;
+                  if (response && response.success) {
+                      bindTable(response.data, FormData);
+                      FormSettingsTable(FormData, response.data[0] || response);
+                  } else if (response) {
+                      bindTable(response, FormData);
+                      FormSettingsTable(FormData, response[0] || response);
+                  } else {
+                      Notify('error', 'No records found', '');
+                  }
+              },
+              error: function (xhr) {
+                  console.error("Error fetching filtered data:", xhr.responseText);
+              }
+          });
+    }
+    LoadReport()
+    function bindTable(data, formData) {
+        console.log(formData);
+        console.log(data);
+        const $table = $('#mainitemtable');
+
+        // Destroy DataTable safely
+        if ($.fn.DataTable.isDataTable($table)) {
+            $table.DataTable().clear().destroy();
+        }
+
+        let $thead = $table.find('thead');
+        let $tbody = $table.find('tbody');
+        let $tfoot = $table.find('tfoot');
+        if ($thead.length === 0) $thead = $('<thead>').appendTo($table);
+        if ($tbody.length === 0) $tbody = $('<tbody>').appendTo($table);
+        if ($tfoot.length === 0) $tfoot = $('<tfoot>').appendTo($table);
+
+        $thead.empty();
+        $tbody.empty();
+        $tfoot.empty();
+
+        if (!data || data.length === 0) {
+            Notify('error', 'No records found', '');
+            return;
+        }
+
+        // 🔹 Use only first row Opening (not sum of all)
+        let obBalance = parseFloat(data[0]['Opening']) || 0;
+
+        // Determine columns to show (skip 'Opening')
+        let columns = [];
+        data.forEach(item => {
+            Object.keys(item).forEach(key => {
+                if (key !== 'Opening' && !columns.includes(key)) columns.push(key);
+            });
+        });
+
+        // 🔹 OB Balance row aligned with last two columns
+        const obBalanceRow = `<tr>
+        <th colspan="${columns.length - 2}"></th>
+        <th>OB Balance:</th>
+        <th>${obBalance.toFixed(2)}</th>
+    </tr>`;
+        $thead.append(obBalanceRow);
+
+        // Table header
+        let headerRow = '<tr>';
+        columns.forEach(key => {
+            headerRow += `<th class="col-${key}">${key}</th>`;
+        });
+        headerRow += '</tr>';
+        $thead.append(headerRow);
+
+        // Body rows
+        data.forEach(item => {
+            let row = '';
+            columns.forEach(key => {
+                let value = item[key] ?? '-';
+
+                // 🔹 Remove time from any date field
+                if ((key.toLowerCase().includes("date") || key.toLowerCase().includes("postingdate") || key.toLowerCase().includes("duedate")) && value !== '-') {
+                    // Check if format is dd-mm-yyyy hh:mm:ss
+                    let parts = value.split(" ");
+                    value = parts[0]; // just keep the date part
+                }
+
+                row += `<td class="col-${key}">${value}</td>`;
+            });
+            $tbody.append(`<tr>${row}</tr>`);
+        });
+
+        // 🔹 Footer row (Totals)
+        let footerRow = '<tr>';
+        let debitColIdx = columns.findIndex(c => c.toLowerCase().includes('debit'));
+
+        columns.forEach((key, idx) => {
+            if (idx === debitColIdx - 1) {
+                footerRow += `<th>Total</th>`;
+            } else if (key.toLowerCase().includes("debit")) {
+                let totalDebit = data.reduce((sum, item) => sum + (parseFloat(item[key]) || 0), 0);
+                footerRow += `<th><b>${totalDebit.toFixed(2)}</b></th>`;
+            } else if (key.toLowerCase().includes("credit")) {
+                let totalCredit = data.reduce((sum, item) => sum + (parseFloat(item[key]) || 0), 0);
+                footerRow += `<th><b>${totalCredit.toFixed(2)}</b></th>`;
+            } else if (key.toLowerCase().includes("balance")) {
+                let finalBalance = data.length > 0 ? data[data.length - 1][key] : '-';
+                footerRow += `<th><b>${finalBalance}</b></th>`;
+            } else {
+                footerRow += `<th></th>`;
+            }
+        });
+
+        footerRow += '</tr>';
+        $tfoot.append(footerRow);
+
+        // Initialize DataTable
+        $table.DataTable({
+            paging: false,
+            searching: false,
+            info: false,
+            dom: '<"top"i>rt<"bottom"lp><"clear">'
+        });
+    }
+    // 🔹 Fetch ReportConfiguration
+    function getConfigData(objType) {
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GETCONDIGDATA", "Reports")',
+            data: { ObjType: objType },
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                FormData = response || [];
+                FormSettingsTable(response, null);
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX error:', error);
+            }
+        });
+    }
+       // 🔹 Dynamic FormSettings table
+    function FormSettingsTable(response, BindDataRow) {
+        const $tbody = $('#formSettingsTable tbody');
+        $tbody.empty();
+
+        const isIdField = (fieldName) => {
+            // Match any field name containing 'id' case-insensitive
+            return /id$/i.test(fieldName) || /inlastid/i.test(fieldName)|| /inlastID/i.test(fieldName);
+        };
+
+        if (response && response.length > 0) {
+            // Use ReportConfiguration
+            response.forEach((item, index) => {
+                const srNo = index + 1;
+                const fieldName = item.DName || '';
+                const checked = item.IsVisible === "Y"; // Only visible fields checked
+                const disabled = isIdField(fieldName) ? "disabled" : "";
+
+                $tbody.append(`
+                    <tr>
+                        <td>${srNo}</td>
+                        <td>${item.Name || ''}</td>
+                        <td hidden>${fieldName}</td>
+                        <td class="text-center">
+                            <div class="form-check form-switch d-inline-block">
+                                <input class="form-check-input toggle-switch" type="checkbox"
+                                       data-dname="${fieldName}" ${checked ? "checked" : ""} ${disabled}>
+                            </div>
+                        </td>
+                        <td hidden>
+                            <input type="text" class="form-control form-control-sm objType-cell" value="${item.ObjType || ''}" readonly>
+                        </td>
+                        <td hidden>
+                            <input type="text" class="form-control form-control-sm ID-cell" value="${item.ID || ''}" readonly>
+                        </td>
+                    </tr>
+                `);
+            });
+        } else if (BindDataRow) {
+            // Generate dynamically from BindDataRow keys
+            Object.keys(BindDataRow).forEach((key, index) => {
+                const srNo = index + 1;
+                const displayName = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
+                const checked = !isIdField(key); // Only non-ID fields checked by default
+                const disabled = isIdField(key) ? "disabled" : "";
+
+                $tbody.append(`
+                    <tr>
+                        <td>${srNo}</td>
+                        <td>${displayName}</td>
+                        <td hidden>${key}</td>
+                        <td class="text-center">
+                            <div class="form-check form-switch d-inline-block">
+                                <input class="form-check-input toggle-switch" type="checkbox"
+                                       data-dname="${key}" ${checked ? "checked" : ""} ${disabled}>
+                            </div>
+                        </td>
+                        <td hidden>
+                            <input type="text" class="form-control form-control-sm objType-cell" value="ACS" readonly>
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+
+        $('.toggle-switch').off('change').on('change', function () {
+            const dname = $(this).data('dname');
+            const isChecked = $(this).is(':checked');
+            if (isChecked) {
+                $(`#mainitemtable .col-${dname}`).removeClass('d-none');
+            } else {
+                $(`#mainitemtable .col-${dname}`).addClass('d-none');
+            }
+        });
+
+    }
+    ///-----Post Setting----------------///
+      $('#saveFormSettings').on('click', function() {
+            const tableData = [];
+            $('#formSettingsTable tbody tr').each(function() {
+                const $row = $(this);
+                const srNo = $row.find('td:eq(0)').text().trim();
+                const name = $row.find('td:eq(1)').text().trim();
+                 const DName = $row.find('td:eq(2)').text().trim();
+                const isVisible = $row.find('.toggle-switch').is(':checked') ? 'Y' : 'N';
+                const objType = $row.find('.objType-cell').val();
+                  const ID = $row.find('.ID-cell').val();
+
+                tableData.push({
+                    SrNo: srNo,
+                    Name: name,
+                    DName: DName,
+                    IsVisible: isVisible,
+                    ObjType: objType,
+                    ID: ID
+                });
+            });
+            // Example AJAX POST
+            $.ajax({
+                 url: '@Url.Action("ADDCOLCONFIGURATION", "Reports")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(tableData),
+                success: function(response) {
+                    Notify('success', 'Success', 'Settings saved successfully!');
+                    $('#formSettingsModal').modal('hide'); // close modal
+                },
+                error: function (xhr) {
+                    Notify("error", "Error", xhr.responseText || "Error loading items");
+                }
+            });
+      });
+      // 🔹 Load Company Data
+    // ============================
+       var company = [];
+     loadCompanies();
+      function loadCompanies() {
+            $.ajax({
+                url: '@Url.Action("GETCOMPANY", "Master")',
+                type: 'GET',
+                success: function(response) {
+                    if (response && response.length) {
+                        // Clear previous data if needed
+                        company = []; // optional: clear old data
+                        // Push all response items into company array
+                        response.forEach(function(item) {
+                            company.push(item);
+                        });
+
+                        console.log(company); // now company array has all items
+                    } else {
+                        Notify('warning', 'No Data', 'No company records found.');
+                    }
+                },
+                error: function(xhr) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading company data';
+                    Notify('error', 'Error', errorMessage);
+                }
+            });
+        }
+      ////--PDF / CSV / EXCEL EXPORT SECTION--////
+      {
+            window.jsPDF = window.jspdf.jsPDF;
+            // ==== Buttons ====
+            $('#btnPdf11').click(function () {
+                exportToPDF($(this).data("title"));
+            });
+            $('#btnExcel11').click(function () {
+                exportToExcel($(this).data("title"));
+            });
+            $('#btnCSV1').click(function () {
+                exportToCSV($(this).data("title"));
+            });
+            // ==== Get Table Data (used for export) ====
+            function getTableDataForExport() {
+                const $table = $('#mainitemtable');
+                const headers = [];
+                const visibleIndices = [];
+
+                // Collect visible headers from last row of thead
+                $table.find('thead tr:last th').each(function (index) {
+                    const $th = $(this);
+                    if (!$th.hasClass('d-none')) {
+                        headers.push($th.text().trim());
+                        visibleIndices.push(index);
+                    }
+                });
+
+                // Collect body data
+                const rows = [];
+                $table.find('tbody tr').each(function () {
+                    const row = {};
+                    $(this).find('td').each(function (index) {
+                        if (!visibleIndices.includes(index)) return;
+                        const headerIndex = visibleIndices.indexOf(index);
+                        const header = headers[headerIndex];
+                        let value = $(this).text().trim();
+                        if (!isNaN(value) && value !== '') value = parseFloat(value).toFixed(2);
+                        row[header] = value;
+                    });
+                    rows.push(row);
+                });
+
+                // Footer (totals)
+                const footRow = {};
+                $table.find('tfoot tr:last th').each(function (index) {
+                    const header = headers[index] || `Col${index}`;
+                    let value = $(this).text().trim();
+                    if (!isNaN(value) && value !== '') value = parseFloat(value).toFixed(2);
+                    footRow[header] = value;
+                });
+                if (Object.keys(footRow).length > 0) rows.push(footRow);
+
+                return { headers, rows };
+            }
+            // ==== PDF Export ====
+        ////    function exportToPDF(title) {
+        ////    const { jsPDF } = window.jspdf;
+        ////    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+        ////    const pageWidth = doc.internal.pageSize.getWidth();
+        ////    const pageHeight = doc.internal.pageSize.getHeight();
+        ////    const margin = 10;
+
+        ////    let startY = margin + 10;
+
+        ////    // ==== Company Info ====
+        ////    const com = company[0] || {};
+        ////    doc.setFontSize(14).setFont(undefined, 'bold');
+        ////    doc.text(com.ComName || '', pageWidth / 2, startY, { align: 'center' });
+        ////    startY += 7;
+
+        ////    doc.setFontSize(11).setFont(undefined, 'normal');
+        ////    doc.text(com.ComAddre || '', pageWidth / 2, startY, { align: 'center' });
+        ////    startY += 6;
+        ////    doc.text(`${com.City || ''} - ${com.PinCode || ''}`, pageWidth / 2, startY, { align: 'center' });
+
+        ////    // === Line below header ===
+        ////    startY += 4;
+        ////    doc.setDrawColor(0);
+        ////    doc.setLineWidth(0.5);
+        ////    doc.line(margin + 2, startY, pageWidth - (margin + 2), startY);
+
+        ////    // ==== Customer + Address + Mobile ====
+        ////    startY += 8;
+        ////    const customerName = $('#LedgerCode').val() || '-';
+        ////    const address1 = $('#Address1').val() || '';
+        ////    const address2 = $('#Address2').val() || '';
+        ////    const mobileNo = $('#MobileNo').val() || '';
+        ////    doc.setFontSize(12).setFont(undefined, 'bold');
+        ////    doc.text(customerName, pageWidth / 2, startY, { align: 'center' });
+        ////    startY += 6;
+        ////    doc.setFontSize(10).setFont(undefined, 'normal');
+        ////    let combinedInfo = '';
+        ////    if (address2 || address1) {
+        ////        combinedInfo += address2;
+        ////        if (address1) combinedInfo += ' ' + address1;
+        ////    }
+        ////    if (mobileNo) {
+        ////        if (combinedInfo) combinedInfo += ' / ';
+        ////        combinedInfo += mobileNo;
+        ////    }
+        ////    doc.text(combinedInfo || '-', pageWidth / 2, startY, { align: 'center' });
+
+        ////    // ==== From and To dates ====
+        ////    startY += 6;
+        ////    const fromDate = $('#FromDate').val() || '-';
+        ////    const toDate = $('#ToDate').val() || '-';
+        ////    doc.setFontSize(10).setFont(undefined, 'normal');
+        ////    const labelWidth = 12;
+        ////    const padLabel = (label) => label.padEnd(labelWidth, ' ');
+        ////    doc.text(`${padLabel('From Date')}:-  ${fromDate}`, margin + 5, startY);
+        ////    startY += 5;
+        ////    doc.text(`${padLabel('To  Date')}  :-  ${toDate}`, margin + 5, startY);
+
+        ////    // ==== Table Data ====
+        ////    const { headers, rows } = getTableDataForExport();
+        ////    const $firstHeadRow = $('#mainitemtable thead tr:first');
+        ////    const obRow = [];
+        ////    $firstHeadRow.find('th').each(function () { obRow.push($(this).text().trim()); });
+        ////    while (obRow.length < headers.length) obRow.unshift('');
+        ////    const tableY = startY + 8;
+
+        ////    // Prepare head: OB row + normal header
+        ////    const firstPageHead = [obRow, headers];
+        ////    const tableBody = rows.map(r => headers.map(h => r[h] || ''));
+
+        ////    doc.autoTable({
+        ////        startY: tableY,
+        ////        head: firstPageHead,
+        ////        body: tableBody,
+        ////        theme: 'grid',
+        ////        styles: { fontSize: 8, cellPadding: 2, valign: 'middle', halign: 'right', lineWidth: 0.1, lineColor: [0, 0, 0] },
+        ////        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center' },
+        ////        columnStyles: headers.reduce((acc, h, i) => {
+        ////            acc[i] = { halign: isNaN(rows[0][h]) ? 'left' : 'right' };
+        ////            return acc;
+        ////        }, {}),
+        ////        showHead: 'firstPage', // only show OB Balance + headers on first page
+        ////        showFoot: 'lastPage',
+
+        ////        didParseCell: function (data) {
+        ////            // === OB Balance Row (first header row) ===
+        ////            if (data.section === 'head' && data.row.index === 0) {
+        ////                if (data.table.pageNumber === 1) {
+        ////                    const totalCells = data.table.columns.length;
+        ////                    if (data.column.index >= totalCells - 2) {
+        ////                        data.cell.styles.lineWidth = 0.7; // bold border
+        ////                        data.cell.styles.lineColor = [0, 0, 0];
+        ////                        data.cell.styles.fontStyle = 'bold';
+        ////                        data.cell.styles.textColor = [0, 0, 0];
+        ////                        data.cell.styles.halign = (data.column.index === totalCells - 1) ? 'right' : 'left';
+        ////                    } else {
+        ////                        data.cell.styles.lineWidth = 0;
+        ////                    }
+        ////                }
+        ////            }
+
+        ////            // === Normal Header Row (second header row) ===
+        ////            if (data.section === 'head' && data.row.index === 1) {
+        ////                data.cell.styles.halign = 'center';
+        ////                data.cell.styles.lineWidth = 0.1;
+        ////                data.cell.styles.lineColor = [0, 0, 0];
+        ////            }
+        ////        },
+
+        ////        margin: { left: margin + 5, right: margin + 5 },
+        ////    });
+
+        ////    const tableEndY = doc.lastAutoTable.finalY + 5;
+
+        ////    // ==== Outer Square Border & Page Numbers ====
+        ////    const totalPages = doc.getNumberOfPages();
+        ////    for (let i = 1; i <= totalPages; i++) {
+        ////        doc.setPage(i);
+
+        ////        // Outer square border
+        ////        const startX = margin + 2;
+        ////        const startYBorder = 2;
+        ////        const width = pageWidth - 2 * (margin + 2);
+        ////        const height = pageHeight - 8; // leave extra space at bottom for page number outside
+        ////        doc.setLineWidth(0.5);
+        ////        doc.setDrawColor(0);
+        ////        doc.rect(startX, startYBorder, width, height);
+
+        ////        // Page number: left side, **outside the square**
+        ////        doc.setFontSize(9);
+        ////        doc.setFont(undefined, 'normal');
+        ////        const pageNumberY = startYBorder + height + 4; // 4mm below the rectangle
+        ////        doc.text(`Page ${i} / ${totalPages}`, margin + 2, pageNumberY, { align: 'left' });
+        ////    }
+
+
+        ////    // === Save PDF ===
+        ////    doc.save(`${title}_${new Date().toISOString().slice(0, 10)}.pdf`);
+        ////}
+
+        // ==== PDF Export ====
+        function exportToPDF(title) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 10;
+
+            let startY = margin + 10;
+
+            // ==== Company Info ====
+            const com = company[0] || {};
+            doc.setFontSize(14).setFont(undefined, 'bold');
+            doc.text(com.ComName || '', pageWidth / 2, startY, { align: 'center' });
+            startY += 7;
+
+            doc.setFontSize(11).setFont(undefined, 'normal');
+            doc.text(com.ComAddre || '', pageWidth / 2, startY, { align: 'center' });
+            startY += 6;
+            doc.text(`${com.City || ''} - ${com.PinCode || ''}`, pageWidth / 2, startY, { align: 'center' });
+
+            // === Line below header touching outer border ===
+            startY += 4;
+            const outerBorderMargin = 5; // same as outer rectangle
+            doc.setDrawColor(0);
+            doc.setLineWidth(0.5);
+            doc.line(outerBorderMargin, startY, pageWidth - outerBorderMargin, startY);
+
+            // ==== Customer + Address + Mobile ====
+            startY += 8;
+            const customerName = $('#LedgerCode').val() || '-';
+            const address1 = $('#Address1').val() || '';
+            const address2 = $('#Address2').val() || '';
+            const mobileNo = $('#MobileNo').val() || '';
+            doc.setFontSize(12).setFont(undefined, 'bold');
+            doc.text(customerName, pageWidth / 2, startY, { align: 'center' });
+            startY += 6;
+            doc.setFontSize(10).setFont(undefined, 'normal');
+            let combinedInfo = '';
+            if (address2 || address1) {
+                combinedInfo += address2;
+                if (address1) combinedInfo += ' ' + address1;
+            }
+            if (mobileNo) {
+                if (combinedInfo) combinedInfo += ' / ';
+                combinedInfo += mobileNo;
+            }
+            doc.text(combinedInfo || '-', pageWidth / 2, startY, { align: 'center' });
+
+            // ==== From and To dates ====
+            startY += 6;
+            const fromDate = $('#FromDate').val() || '-';
+            const toDate = $('#ToDate').val() || '-';
+            doc.setFontSize(10).setFont(undefined, 'normal');
+            const labelWidth = 12;
+            const padLabel = (label) => label.padEnd(labelWidth, ' ');
+            doc.text(`${padLabel('From Date')}:-  ${fromDate}`, margin + 5, startY);
+            startY += 5;
+            doc.text(`${padLabel('To  Date')}  :-  ${toDate}`, margin + 5, startY);
+
+            // ==== Table Data ====
+            const { headers, rows } = getTableDataForExport();
+            const $firstHeadRow = $('#mainitemtable thead tr:first');
+            const obRow = [];
+            $firstHeadRow.find('th').each(function () { obRow.push($(this).text().trim()); });
+            while (obRow.length < headers.length) obRow.unshift('');
+            const tableBody = [obRow, ...rows.map(r => headers.map(h => r[h] || ''))];
+            const tableY = startY + 8;
+            const totalPagesExp = "{total_pages_count_string}";
+
+            doc.autoTable({
+                startY: tableY,
+                head: [headers],
+                body: tableBody,
+                theme: 'grid',
+                styles: {
+                    fontSize: 8,
+                    cellPadding: 2,
+                    valign: 'middle',
+                    halign: 'right',
+                    lineWidth: 0.1,
+                    lineColor: [0, 0, 0]
+                },
+                headStyles: {
+                    fillColor: [255, 255, 255],
+                    textColor: [0, 0, 0],
+                    fontStyle: 'bold',
+                    halign: 'center'
+                },
+                columnStyles: headers.reduce((acc, h, i) => {
+                    acc[i] = { halign: isNaN(rows[0][h]) ? 'left' : 'right' };
+                    return acc;
+                }, {}),
+                didParseCell: function (data) {
+                    if (data.section === 'body' && data.row.index === 0) {
+                        // OB row styling
+                        data.cell.styles.fontStyle = 'bold';
+                        data.cell.styles.halign = 'center';
+                        data.cell.styles.lineWidthTop = 0.5;
+                        data.cell.styles.lineWidthBottom = 0.5;
+                    }
+                },
+                margin: { left: margin + 5, right: margin + 5 },
+                showHead: 'everyPage',
+                didDrawPage: function (data) {
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const pageHeight = doc.internal.pageSize.getHeight();
+                    const startX = outerBorderMargin;
+                    const startYBorder = outerBorderMargin;
+                    const width = pageWidth - 2 * outerBorderMargin;
+                    const height = pageHeight - 12; 
+                    doc.setLineWidth(0.5);
+                    doc.setDrawColor(0);
+                    doc.rect(startX, startYBorder, width, height);
+                    doc.setFontSize(9);
+                    doc.setFont(undefined, 'normal');
+                    const pageNumberY = startYBorder + height + 4;
+                    doc.text(`Page ${doc.internal.getCurrentPageInfo().pageNumber} / ${totalPagesExp}`, margin, pageNumberY, { align: 'left' });
+                }
+            });
+
+            // Replace total pages placeholder
+            if (typeof doc.putTotalPages === 'function') {
+                doc.putTotalPages(totalPagesExp);
+            }
+
+            // === Save PDF ===
+            doc.save(`${title}_${new Date().toISOString().slice(0, 10)}.pdf`);
+        }
+            // ==== Excel Export ====
+            function exportToExcel(title) {
+                const { headers, rows } = getTableDataForExport();
+
+                // OB Balance row - align with last 2 columns
+                const $firstHeadRow = $('#mainitemtable thead tr:first');
+                const obRow = [];
+                $firstHeadRow.find('th').each(function () {
+                    obRow.push($(this).text().trim());
+                });
+
+                while (obRow.length < headers.length) obRow.unshift(''); // empty cells before OB
+
+                // Prepare final data
+                const data = [obRow, headers, ...rows.map(r => headers.map(h => r[h] || ''))];
+
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+                // Optional: auto width for better look
+                const colWidths = headers.map((h, i) => {
+                    let maxLength = h.length;
+                    rows.forEach(r => {
+                        const val = r[h] ? r[h].toString() : '';
+                        if (val.length > maxLength) maxLength = val.length;
+                    });
+                    return { wch: maxLength + 2 };
+                });
+                ws['!cols'] = colWidths;
+
+                XLSX.writeFile(wb, `${title}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+            }
+            // ==== CSV Export ====
+            function exportToCSV(title) {
+                const { headers, rows } = getTableDataForExport();
+
+                // OB Balance row
+                const $firstHeadRow = $('#mainitemtable thead tr:first');
+                const obRow = [];
+                $firstHeadRow.find('th').each(function () {
+                    obRow.push($(this).text().trim());
+                });
+                while (obRow.length < headers.length) obRow.unshift('');
+
+                // Combine rows
+                let csv = '';
+                csv += obRow.join(',') + '\n';      // OB row
+                csv += headers.join(',') + '\n';    // column headers
+
+                rows.forEach(row => {
+                    const values = headers.map(h => {
+                        let val = row[h] || '';
+                        if (typeof val === 'string' && val.includes(',')) val = `"${val.replace(/"/g, '""')}"`;
+                        return val;
+                    });
+                    csv += values.join(',') + '\n';
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = $('<a>', {
+                    href: url,
+                    download: `${title}_${new Date().toISOString().slice(0, 10)}.csv`
+                }).appendTo('body');
+                link[0].click();
+                setTimeout(() => { link.remove(); URL.revokeObjectURL(url); }, 100);
+            }
+
+        }
+
+   });
+
+</script>
+
+

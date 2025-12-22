@@ -1,0 +1,583 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechnoSync - ERP & Software Solutions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #FF3301;
+            --secondary-color: #656565;
+            --dark-color: #222;
+            --light-color: #f8f9fa;
+        }
+
+        /* Loading animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 51, 1, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @@keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #e62e00;
+            border-color: #e62e00;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 51, 1, 0.3);
+        }
+
+        /* Hero section */
+        .hero-section {
+            background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(248,248,248,1) 100%);
+            padding: 120px 0 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-title span {
+            color: var(--primary-color);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+
+        .hero-image {
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @@keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-shape {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(255,51,1,0.05) 0%, rgba(255,51,1,0.01) 100%);
+            z-index: 1;
+        }
+
+        .shape-1 {
+            top: -300px;
+            right: -300px;
+            animation: pulse 8s infinite alternate;
+        }
+
+        .shape-2 {
+            bottom: -200px;
+            left: -200px;
+            animation: pulse 10s infinite alternate;
+        }
+
+        @@keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            height: 100%;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255, 51, 1, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        .feature-text {
+            color: var(--secondary-color);
+            font-size: 0.95rem;
+        }
+
+        /* Services Section */
+        .services-section {
+            padding: 100px 0;
+            background-color: #f9f9f9;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+        }
+
+        .section-title p {
+            color: var(--secondary-color);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+            margin-bottom: 30px;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .service-img {
+            height: 200px;
+            background-color: rgba(255, 51, 1, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 50px;
+        }
+
+        .service-content {
+            padding: 25px;
+        }
+
+        .service-title {
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        .service-text {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+        .service-features {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 25px;
+        }
+
+        .service-features li {
+            padding: 5px 0;
+            color: var(--secondary-color);
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .service-features li:before {
+            content: "\f00c";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            color: var(--primary-color);
+            position: absolute;
+            left: 0;
+        }
+
+        /* Animated elements */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive adjustments */
+        @@media (max-width: 1200px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+        }
+
+        @@media (max-width: 992px) {
+            .hero-title {
+                font-size: 2.8rem;
+            }
+            .hero-image {
+                margin-top: 50px;
+            }
+            .section-title h2 {
+                font-size: 2.2rem;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.2rem;
+            }
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            .section-title h2 {
+                font-size: 1.8rem;
+            }
+            .services-section {
+                padding: 60px 0;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .hero-title {
+                font-size: 1.8rem;
+            }
+            .hero-section {
+                padding: 80px 0 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="Addcontent">
+
+        <!-- Loading animation -->
+        <div class="loading-overlay">
+            <div class="loading-spinner"></div>
+        </div>
+
+        <!-- Hero Section -->
+        <section class="hero-section p-3">
+            <div class="hero-shape shape-1"></div>
+            <div class="hero-shape shape-2"></div>
+            <div class="container mt-4">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <div class="hero-content">
+                            <h1 class="hero-title fade-in">Transform Your Business With <span style="color:#656565!important">TechnoSync </span> <span>ERP</span></h1>
+                            <p class="hero-subtitle fade-in">Streamline operations, boost productivity, and drive growth with our comprehensive ERP solution designed for modern businesses.</p>
+                            <div class="d-flex gap-3 fade-in">
+                                <a href="https://technosync.in" target="_blank" class="text-decoration-none btn btn-primary">Visit Our Site</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="hero-image fade-in">
+                            <img src="~/img/Techno Logo/TechnoSync_Final Logo_1.jpg" alt="ERP Dashboard" class="img-fluid">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="feature-card fade-in">
+                            <div class="feature-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h3 class="feature-title">Real-time Analytics</h3>
+                            <p class="feature-text">Get actionable insights with our powerful analytics dashboard that updates in real-time.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card fade-in">
+                            <div class="feature-icon">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <h3 class="feature-title">Automated Workflows</h3>
+                            <p class="feature-text">Reduce manual work with intelligent automation that streamlines your business processes.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card fade-in">
+                            <div class="feature-icon">
+                                <i class="fas fa-cloud"></i>
+                            </div>
+                            <h3 class="feature-title">Cloud Integration</h3>
+                            <p class="feature-text">Access your data anywhere with our secure cloud platform and mobile applications.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section class="services-section">
+            <div class="container">
+                <div class="section-title fade-in">
+                    <h2>Our Software Development Services</h2>
+                    <p>Comprehensive technology solutions to drive your business forward</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 mb-2 mt-2">
+                        <div class="service-card fade-in">
+                            <div class="service-img">
+                                <i class="fas fa-laptop-code"></i>
+                            </div>
+                            <div class="service-content">
+                                <h3 class="service-title">Custom Software Development</h3>
+                                <p class="service-text">Tailor-made software solutions designed to address your specific business needs and challenges.</p>
+                                <ul class="service-features">
+                                    <li>Web Application Development</li>
+                                    <li>Mobile App Development</li>
+                                    <li>Desktop Software Solutions</li>
+                                    <li>Cross-Platform Applications</li>
+                                    <li>UI/UX Focused Design</li>
+                                </ul>
+                                <a href="https://technosync.in/solutionswebuild.html" class="btn btn-primary">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 mb-2 mt-2">
+                        <div class="service-card fade-in">
+                            <div class="service-img">
+                                <i class="fas fa-plug"></i>
+                            </div>
+                            <div class="service-content">
+                                <h3 class="service-title">API Integration Services</h3>
+                                <p class="service-text">Seamlessly connect your systems with third-party services and platforms through robust API integrations.</p>
+                                <ul class="service-features">
+                                    <li>REST & SOAP API Integration</li>
+                                    <li>Third-Party Service Integration</li>
+                                    <li>Payment Gateway Integration</li>
+                                    <li>Legacy System Modernization</li>
+                                    <li>Real-time Data Synchronization</li>
+                                </ul>
+                                <a href="https://technosync.in/solutionswebuild.html" class="btn btn-primary">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 mb-2 mt-2">
+                        <div class="service-card fade-in">
+                            <div class="service-img">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="service-content">
+                                <h3 class="service-title">Database Management</h3>
+                                <p class="service-text">Optimize your data storage, retrieval, and management with our expert database solutions.</p>
+                                <ul class="service-features">
+                                    <li>Database Design & Architecture</li>
+                                    <li>Performance Optimization</li>
+                                    <li>Data Migration Services</li>
+                                    <li>Backup & Recovery Solutions</li>
+                                    <li>Data Security Implementation</li>
+                                </ul>
+                                <a href="https://technosync.in/solutionswebuild.html" class="btn btn-primary">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 mb-2 mt-2">
+                        <div class="service-card fade-in">
+                            <div class="service-img">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="service-content">
+                                <h3 class="service-title">Cybersecurity Solutions</h3>
+                                <p class="service-text">Protect your business data and applications with comprehensive security measures.</p>
+                                <ul class="service-features">
+                                    <li>Security Audits & Assessments</li>
+                                    <li>Vulnerability Testing</li>
+                                    <li>Data Encryption Services</li>
+                                    <li>Compliance Management</li>
+                                    <li>24/7 Security Monitoring</li>
+                                </ul>
+                                <a href="https://technosync.in/solutionswebuild.html" class="btn btn-primary">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 mb-2 mt-2">
+                        <div class="service-card fade-in">
+                            <div class="service-img">
+                                <i class="fas fa-server"></i>
+                            </div>
+                            <div class="service-content">
+                                <h3 class="service-title">Cloud Services & DevOps</h3>
+                                <p class="service-text">Leverage the power of cloud computing and streamline your development processes.</p>
+                                <ul class="service-features">
+                                    <li>Cloud Migration Services</li>
+                                    <li>CI/CD Pipeline Implementation</li>
+                                    <li>Containerization & Orchestration</li>
+                                    <li>Infrastructure as Code</li>
+                                    <li>Performance Monitoring</li>
+                                </ul>
+                                <a href="https://technosync.in/solutionswebuild.html" class="btn btn-primary">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 mb-2 mt-2">
+                        <div class="service-card fade-in">
+                            <div class="service-img">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <div class="service-content">
+                                <h3 class="service-title">Maintenance & Support</h3>
+                                <p class="service-text">Ensure your systems run smoothly with our comprehensive maintenance and support services.</p>
+                                <ul class="service-features">
+                                    <li>24/7 Technical Support</li>
+                                    <li>Software Updates & Upgrades</li>
+                                    <li>Bug Fixing & Troubleshooting</li>
+                                    <li>Performance Optimization</li>
+                                    <li>User Training & Documentation</li>
+                                </ul>
+                                <a href="https://technosync.in/solutionswebuild.html" class="btn btn-primary">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+</div>
+
+    <script>
+        window.addEventListener('load', function () {
+            const loadingOverlay = document.querySelector('.loading-overlay');
+            loadingOverlay.style.opacity = '0';
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+            }, 500);
+
+            // Scroll effect for navbar
+            window.addEventListener('scroll', function () {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+
+            // Trigger animations when elements come into view
+            const animateOnScroll = function () {
+                const elements = document.querySelectorAll('.fade-in');
+
+                elements.forEach(element => {
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const windowHeight = window.innerHeight;
+
+                    if (elementPosition < windowHeight - 100) {
+                        element.classList.add('visible');
+                    }
+                });
+            };
+
+            // Run once on page load
+            animateOnScroll();
+
+            // Run on scroll
+            window.addEventListener('scroll', animateOnScroll);
+        });
+       $(document).ready(function () {
+            $.ajax({
+                url: '@Url.Action("GETERPAD", "Advertisement")',
+                method: 'GET',
+                contentType: 'application/json',
+                success: function (response) {
+                    if (response !== "") {
+                        var responce = JSON.parse(response);
+                        $("#Addcontent").html(responce[0].HtmlContent)
+                    }
+                },
+                error: function(xhr) {
+                    Notify('error', 'Error', xhr.responseText );
+                }
+            });
+        });
+    </script>
+</body>
+</html>

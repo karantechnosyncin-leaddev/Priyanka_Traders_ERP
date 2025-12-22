@@ -1,0 +1,458 @@
+﻿
+<div class="container py-4">
+    <div class="text-center">
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card table-card mt-2 shadow-sm">
+                <div class="card-header bg-white">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h5 class="webtitle mb-0"><b>Tax Master</b></h5>
+                        </div>
+                        <div class="col-md-6 d-flex justify-content-end">
+                           
+                        </div>
+                    </div>
+                </div>
+                <div class="card-block">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" id="taxTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="create-tax-tab" data-bs-toggle="tab" data-bs-target="#create-tax" type="button" role="tab">Tax Type Setup</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="all-tax-tab" data-bs-toggle="tab" data-bs-target="#all-tax" type="button" role="tab">All Tax Type Setups</button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content p-3 border border-top-0 rounded-bottom">
+                        <!-- Create Tax Tab -->
+                        <div class="tab-pane fade show active" id="create-tax" role="tabpanel">
+                            <form id="Tax_type_form" class="mt-3">
+                                <div class="row mb-3">
+                                    <div class="col-md-6 d-flex align-items-center">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="IsActive" checked>
+                                            <label class="form-check-label" for="IsActive">Active</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <input name="TaxTypeId" id="TaxTypeId" type="hidden" />
+                                        <label for="TaxTypeCode" class="form-label">Tax Type Code</label>
+                                        <input name="TaxTypeCode" id="TaxTypeCode" type="text" maxlength="100"
+                                               class="form-control form-control-sm" placeholder="Tax Type code" />
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="TaxTypePer" class="form-label">Tax Type %</label>
+                                        <input name="TaxTypePer" id="TaxTypePer" type="number" maxlength="200"
+                                               class="form-control form-control-sm" placeholder="%" />
+                                    </div>
+                                </div>
+                                <!-- Action Buttons -->
+                                <div class="row mt-4">
+                                    <div class="col-12 text-end">
+                                       
+                                        @if (ViewBag.BtnAuth != null)
+                                        {
+                                            <!-- Button Rendering Logic -->
+                                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                                            {
+                                                var btnName = item["BtnName"]?.ToString().Trim();
+                                                var btnauth = item["Auth"]?.ToString();
+                                                var icon = item["Icon"]?.ToString();
+                                                var ColorClass = item["ColorClass"]?.ToString();
+
+                                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                                {
+                                                    switch (btnName)
+                                                    {
+                                                        case "Save":
+                                                            <button type="button" id="btnSave"  data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2">
+                                                                <i class="@icon"></i>@btnName
+                                                            </button>
+                                                            break;
+                                                        case "Update":
+                                                            <button id="btnUpdate" data-action="update" type="button" class="btn @ColorClass mb-1  me-2" style="display:none; ">
+                                                                <i class="@icon"></i> @btnName
+                                                            </button>
+                                                            break;
+                                                        case "Delete":
+                                                            <button type="button" id="btnDelete"  data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2" style="display:none; ">
+                                                                <i class="@icon"></i>@btnName
+                                                            </button>
+                                                            break;
+                                                        case "Reset":
+                                                            <button type="reset" id="btnReset"  class="btn @ColorClass mb-1   me-2">
+                                                                <i class="@icon"></i> Reset
+                                                            </button>
+                                                            break;
+                                                        default:
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="alert alert-primary" role="alert">
+
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- All Tax Types Tab -->
+                        <div class="tab-pane fade" id="all-tax" role="tabpanel">
+                            <div class=" mt-3">
+                                <table class="table table-bordered table-striped  table-hover w-100" id="Table">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th nowrap>Tax Code</th>
+                                            <th nowrap>Tax Percentage</th>
+                                            <th nowrap>Status</th>
+                                            <th nowrap>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Data will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Excel Modal -->
+<div class="modal fade" id="excelModal" tabindex="-1" aria-labelledby="excelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="excelModalLabel">Excel Sheet Data</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive" style="max-height: 500px;">
+                    <table class="table table-bordered table-striped table-hover w-100" id="excelTable">
+                        <!-- Excel data will be loaded here -->
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .card-option li {
+            display: inline-block;
+            margin-left: 5px;
+        }
+
+        #Tax_type_form .col-md-3 {
+            margin-bottom: 15px;
+        }
+
+        .form-check {
+            margin-bottom: 15px;
+        }
+
+        #Upload_Xls, #ViewExcel {
+            margin-top: 5px;
+        }
+
+        #btnDelete, #btnUpdate,
+        #btnSave, #btnReset {
+            width: 100% !important;
+            margin-bottom: 5px;
+        }
+    }
+
+    /* Consistent with previous UI */
+    .nav-tabs .nav-link {
+        font-weight: 500;
+    }
+
+    .table-card {
+        border-radius: 5px;
+    }
+
+    .card-header {
+        border-bottom: 1px solid rgba(0,0,0,.125);
+    }
+
+    .webtitle {
+        color: #333;
+        font-weight: 600;
+    }
+
+    .full-card, .minimize-card, .reload-card {
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .full-card:hover, .minimize-card:hover, .reload-card:hover {
+            background-color: #f8f9fa;
+        }
+</style>
+
+
+<script>
+    $(document).ready(function () {
+        // Global variables
+        const formId = "#Tax_type_form";
+        const tableId = "#Table";
+        const excelModalId = "#excelModal";
+        const excelTableId = "#excelTable";
+        const importFileId = "#Import";
+
+        // Toggle loader
+        function toggleLoader() {
+            $(".Loader1").toggleClass('d-none');
+        }
+
+        // Initialize form and table
+        function init() {
+            hideButtons();
+            loadTableData();
+            setupEventListeners();
+        }
+
+        // Hide action buttons initially
+        function hideButtons() {
+            $("#btnSave").show();
+            $("#btnDelete").hide();
+            $("#btnUpdate").hide();
+        }
+
+        // Show edit/delete buttons
+        function showEditButtons() {
+            $("#btnSave").hide();
+            $("#btnDelete").show();
+            $("#btnUpdate").show();
+        }
+
+        // Load table data
+        function loadTableData() {
+            $.ajax({
+                url: '@Url.Action("GETAXMASTER", "Master")',
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    applyDatatable(response);
+                },
+                error: function (error) {
+                    Notify("error", error.responseText, "Error");
+                    console.error('Error:', error.responseText);
+                }
+            });
+        }
+
+           // Apply DataTable to table
+            function applyDatatable(jsonData) {
+                if ($.fn.DataTable.isDataTable(tableId)) {
+                    $(tableId).DataTable().destroy();
+                }
+
+                $(tableId).DataTable({
+                    data: jsonData,
+                    columns: [
+                        { data: "TaxTypeCode", title: "Tax Code" },
+                        { data: "TaxTypePer", title: "Tax Percentage", render: $.fn.dataTable.render.number(',', '.', 2) },
+                        {
+                            data: "IsActive",
+                            title: "Status",
+                            render: function(data) {
+                                return data === "Y" ? "Active" : "Inactive";
+                            }
+                        },
+                        {
+                            data: null,
+                            title: "Actions",
+                            className:"text-center",
+                            render: function(data, type, row) {
+                                return `<i class="bi bi-pen table_edit  mr-1 cursor-pointer btn btn-outline-primary"></i>
+                                        <i class="bi bi-trash table_delete mr-2 cursor-pointer btn btn-outline-danger"></i>`;
+                            }
+                        }
+                    ],
+                    responsive: true,
+                    dom: 'lfrtip', // 'l' - length changing input control
+                    lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                    language: {
+                        lengthMenu: "Show _MENU_ entries",
+                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                        infoEmpty: "Showing 0 to 0 of 0 entries",
+                        infoFiltered: "(filtered from _MAX_ total entries)"
+                    }
+                });
+            }
+
+        // Validate form
+        function validateForm() {
+            let isValid = true;
+            const mandatoryFields = ["TaxTypeCode", "TaxTypePer"];
+
+            mandatoryFields.forEach(field => {
+                const value = $(`#${field}`).val().trim();
+                if (!value) {
+                    $(`#${field}`).addClass("border-danger");
+                    isValid = false;
+                    Notify("warning", `Please fill ${field} details`, "Warning");
+                } else {
+                    $(`#${field}`).removeClass("border-danger");
+                }
+            });
+
+            return isValid;
+        }
+
+        // Get form data
+        function getFormData() {
+            return {
+                TaxTypeId: $("#TaxTypeId").val(),
+                TaxTypeCode: $("#TaxTypeCode").val().trim(),
+                TaxTypePer: $("#TaxTypePer").val(),
+                IsActive: $("#IsActive").is(":checked") ? "Y" : "N"
+            };
+        }
+
+        // Save form data
+        function saveFormData() {
+            if (!validateForm()) return;
+
+            var formData = getFormData();
+            $.ajax({
+                url: '@Url.Action("ADDTAXMASTER", "Master")',
+                type: 'POST',
+                dataType: 'json',
+                data: formData,
+                success: function (response) {
+                    if (response.success) {
+                        Notify("success", "Tax type saved successfully", response.message);
+                        $(formId)[0].reset();
+                        loadTableData();
+                        hideButtons();
+                    }
+                },
+                error: function (error) {
+                    Notify("error", error.responseText, "Error");
+                    console.error('Error:', error.responseText);
+                }
+            });
+        }
+
+        // Update form data
+        function updateFormData() {
+            if (!validateForm()) return;
+
+            const formData = getFormData();
+            $.ajax({
+                url: '@Url.Action("UPDATETAXMASTER", "Master")',
+                type: 'POST',
+                dataType: 'json',
+                data: formData,
+                success: function (response) {
+                    if (response) {
+                        $(formId)[0].reset();
+                        loadTableData();
+                        hideButtons();
+                        Notify("success", "Tax type updated successfully", "Success");
+                    }
+                },
+                error: function (error) {
+                    Notify("error", error.responseText, "Error");
+                    console.error('Error:', error.responseText);
+                }
+            });
+        }
+
+        // Delete record
+        function deleteRecord(id) {
+             $.ajax({
+                url: '@Url.Action("DELETETAXMASTER", "Master")',
+                type: 'POST',
+                dataType: 'json',
+                data: { Id: id },
+                success: function (response) {
+                    if (response) {
+                        $(formId)[0].reset();
+                        loadTableData();
+                        hideButtons();
+                        Notify("success", "Tax type deleted successfully", "Success");
+                    }
+                },
+                error: function (error) {
+                    Notify("error", error.responseText, "Error");
+                    console.error('Error:', error.responseText);
+                }
+            });
+        }
+
+        // Bind row data to form
+        function bindRowData($row) {
+            const rowData = $(tableId).DataTable().row($row).data();
+
+            $("#TaxTypeId").val(rowData.TaxTypeId);
+            $("#TaxTypeCode").val(rowData.TaxTypeCode);
+            $("#TaxTypePer").val(rowData.TaxTypePer);
+            $("#IsActive").prop("checked", rowData.IsActive === "Y");
+
+            showEditButtons();
+            $("#create-tax-tab").click();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Form buttons
+            $("#btnSave").click(saveFormData);
+            $("#btnUpdate").click(updateFormData);
+            $("#btnDelete").click(() => deleteRecord($("#TaxTypeId").val()));
+            $("#btnReset").click(function() {
+                $(formId)[0].reset();
+                hideButtons();
+            });
+
+            // Table actions
+            $(document).on("click", ".table_edit", function () {
+                const $row = $(this).closest("tr");
+                $row.addClass("active");
+                bindRowData($row);
+            });
+
+            $(document).on("click", ".table_delete", function () {
+                const $row = $(this).closest("tr");
+                const rowData = $(tableId).DataTable().row($row).data();
+                deleteRecord(rowData.TaxTypeId);
+            });
+
+            // Remove error class when user starts typing
+            $("input").on("input", function() {
+                $(this).removeClass("border-danger");
+            });
+        }
+
+        // Initialize the application
+        init();
+    });
+</script>

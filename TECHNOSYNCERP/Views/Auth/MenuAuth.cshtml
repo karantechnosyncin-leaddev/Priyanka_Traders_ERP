@@ -1,0 +1,327 @@
+﻿<div class="container">
+    <h2 class="mb-4 text-center mt-3">Menu Auth</h2>
+    <div class="card shadow rounded mt-3">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="userSelect" class="lable">Select User</label>
+                    <div class="form-group">
+                        <select class="form-control" id="userSelect">
+                            <option value="">Select User</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-9 text-end display-flex align-content-center mt-2">
+
+                    @if (ViewBag.BtnAuth != null)
+                    {
+                        <!-- Button Rendering Logic -->
+                        @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                        {
+                            var btnName = item["BtnName"]?.ToString().Trim();
+                            var btnauth = item["Auth"]?.ToString();
+                            var icon = item["Icon"]?.ToString();
+                            var ColorClass = item["ColorClass"]?.ToString();
+
+                            if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                            {
+                                switch (btnName)
+                                {
+                                    case "Save":
+                                        <button type="button" id="btnSave" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2">
+                                            <i class="@icon"></i>@btnName
+                                        </button>
+                                        break;
+                                    @*case "Delete":
+                                        <button type="button" id="btnDelete" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2" disabled>
+                                            <i class="@icon"></i>@btnName
+                                        </button>
+                                        break;*@
+                                    case "Reset":
+                                        <button type="reset" id="btnReset" class="btn @ColorClass mb-1   me-2">
+                                            <i class="@icon"></i> Reset
+                                        </button>
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-primary" role="alert">
+
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="menuContainer">
+        <!-- Dynamic menu cards will be inserted here -->
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        let menuData = [];
+        let userData = [];
+
+        // Load menu data
+        function loadMenu() {
+            if($("#userSelect").val())
+            {
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("GETUSERSAUTH", "Auth")',
+                    data:{userId:$("#userSelect").val()},
+                    contentType: "application/json; charset=utf-8",
+                    cache: true,
+                    success: function (data) {
+                        if(data.length) {
+                            menuData = data;
+                            renderMenu();
+                        }
+                    },
+                    error: function (xhr) {
+                        const errorMessage = xhr.responseJSON?.error || 'Error loading menu';
+                        Notify('error', 'Error', errorMessage);
+                    }
+                });
+            }else{
+                $("#btnReset").click();
+            }
+        }
+        $("#userSelect").change(function() {
+            menuData = [];
+            loadMenu();
+        }); 
+        // Load users
+        function loadUsers() {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GETUSERS", "Auth")',
+                contentType: "application/json; charset=utf-8",
+                cache: true,
+                success: function (data) {
+                    if(data.length) {
+                        userData = data;
+                        populateUserDropdown();
+                    }
+                },
+                error: function (xhr) {
+                    const errorMessage = xhr.responseJSON?.error || 'Error loading users';
+                    Notify('error', 'Error', errorMessage);
+                }
+            });
+        }
+
+        // Populate user dropdown
+        function populateUserDropdown() {
+            const $select = $('#userSelect');
+            $select.empty();
+            $select.append('<option value="">Select User</option>');
+
+            userData.forEach(user => {
+                $select.append(`<option value="${user.UserID}">${user.Username}</option>`);
+            });
+        }
+        // Helper function to generate consistent color from string
+   
+            function getRandomColor() {
+        // Random hue (0-360), saturation (70-100%), lightness (50-70%)
+        const h = Math.floor(Math.random() * 360);
+        const s = Math.floor(Math.random() * 30) + 70; // 70-100%
+        const l = Math.floor(Math.random() * 20) + 50;  // 50-70%
+        return `hsl(${h}, ${s}%, ${l}%)`;
+    }
+        // Render menu structure
+        function renderMenu() {
+              const $container = $('#menuContainer');
+                $container.empty();
+
+                // Get parent menus (where ParentID = 0)
+                if(menuData.length > 0) {
+                    const parentMenus = menuData.filter(menu => menu.ParentID === "0");
+                    // Sort parent menus by MenuOrderID
+                    parentMenus.sort((a, b) => parseInt(a.MenuOrderID) - parseInt(b.MenuOrderID));
+
+                    parentMenus.forEach(parentMenu => {
+                        // Generate color for this menu
+                        const headerColor = getRandomColor()
+
+                        // Create card for each parent menu with dynamic color
+                        const $card = $(`
+                        <div class='col-md-4'>
+                            <div class="card shadow rounded mt-3">
+                                <div class="card-header text-white" style="background-color: ${headerColor}">
+                                    <div class="row">
+                                        <div class="col-md-6 d-flex">
+                                            <div class="form-group me-2">
+                                                <input type="checkbox" class="checkall parent-checkbox" id="parent_${parentMenu.MenuID}"
+                                                    data-menuid="${parentMenu.MenuID}" ${parentMenu.Auth === 'Y' ? 'checked' : ''} />
+                                            </div>
+                                            <label for="parent_${parentMenu.MenuID}"  class="lable ">${parentMenu.MenuName}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body" id="childContainer_${parentMenu.MenuID}">
+                                    <div class="row"></div>
+                                </div>
+                            </div>
+                        </div>
+                        `);
+
+                        $container.append($card);
+
+                        // Rest of your existing code remains the same...
+                        const childMenus = menuData.filter(menu => menu.ParentID === parentMenu.MenuID);
+                        childMenus.sort((a, b) => parseInt(a.MenuOrderID) - parseInt(b.MenuOrderID));
+
+                        const $childRow = $(`#childContainer_${parentMenu.MenuID} .row`);
+
+                        childMenus.forEach(childMenu => {
+                            $childRow.append(`
+                                <div class="col-md-6 d-flex mb-2">
+                                    <div class="form-group me-2">
+                                        <input type="checkbox" class="child-checkbox" id="child_${childMenu.MenuID}"
+                                            data-parentid="${parentMenu.MenuID}" data-menuid="${childMenu.MenuID}"
+                                            ${childMenu.Auth === 'Y' ? 'checked' : ''} />
+                                    </div>
+                                    <label for="child_${childMenu.MenuID}" class="lable ">${childMenu.MenuName}</label>
+                                </div>
+                            `);
+                        });
+
+                        if (childMenus.length === 0) {
+                            $childRow.append('<div class="col-12 text-muted">No submenus available</div>');
+                        }
+                    });
+                    // Add event handlers for child checkboxes
+                    $('.child-checkbox').change(function() {
+                        const parentId = $(this).data('parentid');
+                        const menuId = $(this).data('menuid');
+                        const isChecked = $(this).is(':checked');
+
+                        // Update the Auth property in menuData
+                        menuData.forEach(menu => {
+                            if (menu.MenuID === menuId) {
+                                menu.Auth = isChecked ? 'Y' : 'N';
+                            }
+                        });
+
+                        const allChildren = $(`.child-checkbox[data-parentid="${parentId}"]`);
+                        const checkedChildren = allChildren.filter(':checked');
+                        const parentCheckbox = $(`#parent_${parentId}`);
+
+                        if (isChecked) {
+                            // If any child is checked, check the parent
+                            parentCheckbox.prop('checked', true);
+                            // Update parent Auth in menuData
+                            menuData.forEach(menu => {
+                                if (menu.MenuID === parentId) {
+                                    menu.Auth = 'Y';
+                                }
+                            });
+                        } else {
+                            // If all children are unchecked, uncheck the parent
+                            if (checkedChildren.length === 0) {
+                                parentCheckbox.prop('checked', false);
+                                // Update parent Auth in menuData
+                                menuData.forEach(menu => {
+                                    if (menu.MenuID === parentId) {
+                                        menu.Auth = 'N';
+                                    }
+                                });
+                            }
+                        }
+                    });
+                        // Add event handler for parent checkboxes
+                        $('.parent-checkbox').change(function() {
+                            const parentId = $(this).data('menuid');
+                            const isChecked = $(this).is(':checked');
+                            const allChildren = $(`.child-checkbox[data-parentid="${parentId}"]`);
+                            // Update all children's checked state
+                            allChildren.prop('checked', isChecked);
+
+                            // Find parent menu item in menuData
+                            const parentMenu = menuData.find(menu => menu.MenuID === parentId);
+                            if (parentMenu) {
+                                parentMenu.Auth = isChecked ? 'Y' : 'N';
+                            }
+
+                            // Update children Auth in menuData
+                            allChildren.each(function() {
+                                const menuId = $(this).data('menuid');
+                                const childMenu = menuData.find(menu => menu.MenuID === menuId);
+                                if (childMenu) {
+                                    childMenu.Auth = isChecked ? 'Y' : 'N';
+                                }
+                            });
+
+                            // If needed, trigger change event on children (but be careful of loops)
+                            // allChildren.trigger('change');
+                        });
+                                }else{
+              $('#menuContainer').html("")
+            }
+        }
+
+        // Save button click handler
+        $('#btnSave').click(function() {
+            const userId = $('#userSelect').val();
+            if (!userId) {
+                Notify('error', 'Error', 'Please select a user');
+                return;
+            }
+
+            // Get all checked menu items
+            const checkedMenus = [];
+            $('input[type="checkbox"]').each(function() {
+                let Auth ="N";
+                if($(this).is(":checked")){
+                    Auth ="Y";
+                }else{
+                    Auth ="N";
+                }
+               checkedMenus.push(
+               {
+                       MenuId: $(this).attr('data-menuid'),
+                  Auth: Auth,
+                  UserId: $("#userSelect").val(),
+                });
+            });
+            console.log(checkedMenus)
+              $.ajax({
+                type: "POST",
+                url: '@Url.Action("SAVEAUTH", "Auth")', // Add userId here
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    Data: checkedMenus ,UserId :$("#userSelect").val()// Match the parameter name expected by backend
+                }),
+                success: function(response) {
+                    if(response.success){
+                        Notify('success', 'Success', response.message);
+                    }else{
+                        Notify('error', 'Error',response.message);
+                    }
+                },
+                error: function(xhr) {
+                    const errorMessage = xhr.responseJSON?.error || 'Error saving menu permissions';
+                    Notify('error', 'Error', errorMessage);
+                }
+            });
+        });
+
+        // Reset button click handler
+        $('#btnReset').click(function() {
+            $('input[type="checkbox"]').prop('checked', false);
+            $("#userSelect").val("")
+        });
+
+        // Load data when page loads
+        loadUsers();
+    });
+</script>

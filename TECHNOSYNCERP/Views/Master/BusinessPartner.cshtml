@@ -1,0 +1,2539 @@
+﻿<style>
+    /* Custom responsive styles */
+    .nav-pills .nav-link {
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .tab-content {
+        padding: 1rem;
+    }
+
+    @@media (max-width: 768px) {
+        .nav-pills {
+            flex-direction: row !important;
+            overflow-x: auto;
+            white-space: nowrap;
+            margin-bottom: 1rem;
+        }
+
+            .nav-pills .nav-link {
+                display: inline-block;
+                margin-bottom: 0;
+                margin-right: 0.5rem;
+            }
+
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start !important;
+        }
+
+            .card-header button {
+                margin-top: 0.5rem;
+                width: 100%;
+            }
+
+        .form-label {
+            font-size: 0.85rem;
+        }
+
+        .btn {
+            margin-bottom: 0.5rem;
+            width: 100%;
+        }
+
+        .d-flex.justify-content-end {
+            justify-content: flex-start !important;
+        }
+
+        .otherdetails {
+            margin-top: 1rem !important;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .row.g-3 > [class^="col-"] {
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-dialog {
+            margin: 0.5rem;
+        }
+
+        .table-responsive {
+            font-size: 0.8rem;
+        }
+
+        .btn-group {
+            flex-wrap: wrap;
+        }
+
+            .btn-group .btn {
+                margin-bottom: 0.5rem;
+            }
+    }
+
+    /* Better spacing for form elements */
+    .form-control, .form-select {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Improved table responsiveness */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Button group responsiveness */
+    .btn-group-responsive {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    /* Modal adjustments */
+    .modal-body {
+        padding: 1rem;
+    }
+
+    /* Address form improvements */
+    #addressFormContainer {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 0.25rem;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="card p-2 rounded shadow-sm">
+                <div class="row align-items-center">
+                    <div class="col-md-6 mb-2 mb-md-0">
+                        <h3 id="doctitle"><b>Business Partner</b></h3>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-md-end flex-wrap btn-group-responsive">
+                            @if (ViewBag.BtnAuth != null)
+                            {
+                                @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                                {
+                                    var btnName = item["BtnName"]?.ToString().Trim();
+                                    var btnauth = item["Auth"]?.ToString();
+                                    var icon = item["Icon"]?.ToString();
+                                    var ColorClass = item["ColorClass"]?.ToString();
+                                    if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                    {
+                                        switch (btnName)
+                                        {
+                                            case "Find":
+                                                <button id="btnFind" data-bs-toggle="modal" data-bs-target="#receiptListModal" class="btn @ColorClass mb-1 ">
+                                                    <i class="@icon"></i> @btnName
+                                                </button>
+                                                break;
+                                            case "Attachments":
+                                                <button id="Attachments" data-bs-toggle="modal" data-bs-target="#Attachment" class="btn @ColorClass mb-1 ">
+                                                    <i class="@icon"></i> @btnName
+                                                </button>
+                                                break;
+                                            case "Export":
+                                                <div class="btn-group">
+                                                    <button id="btnPdf" class="btn btn-outline-danger">
+                                                        <i class="bi bi-file-pdf me-1"></i> PDF
+                                                    </button>
+                                                    <button id="btnExcel" class="btn btn-outline-success">
+                                                        <i class="bi bi-file-earmark-excel me-1"></i> EXCEL
+                                                    </button>
+                                                    <button id="btnCSV" class="btn btn-outline-success">
+                                                        <i class="bi bi-file-earmark-excel me-1"></i> CSV
+                                                    </button>
+                                                </div>
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <div class="alert alert-primary w-100" role="alert">
+                                    
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 mt-3">
+            <div class="card otherdetails">
+                <div class="card-header bg-primary text-white d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                    <span><i class="bi bi-list-ul"></i> Business Partner Details</span>
+                </div>
+                <div class="card-body" id="ledgerDetailsForm">
+                    <form id="ledgerForm">
+                        <input type="hidden" id="ledgerID">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4 col-12">
+                                <label for="LedgerType" class="form-label">Ledger Type</label>
+                                <select class="form-select" id="LedgerType">
+                                    <option value="C">Customer</option>
+                                    <option value="S">Supplier</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <label for="groupName" class="form-label">Name *</label>
+                                <input type="text" class="form-control" id="groupName" required>
+                                <div class="invalid-feedback">Please provide a name.</div>
+                            </div>
+                            <div class="col-md-4 col-12 d-flex align-items-end">
+                                <label class="form-check-label" for="isActive">Is Active</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input float-end" type="checkbox" id="isActive" checked>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-12 " hidden>
+                                <label for="parentLedger" class="form-label">Parent Ledger</label>
+                                <select class="form-select" id="parentLedger" id="baseID">
+                                    <option value="0">-- Root Ledger --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 col-12 " hidden>
+                                <label for="Postable" class="form-label">Postable</label>
+                                <select class="form-select" id="Postable">
+                                    <option value="A">Active</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-2 col-12 mb-3 mb-md-0">
+                            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                                <button class="nav-link active" id="v-pills-home-tab" data-bs-toggle="pill" data-bs-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">General</button>
+                                <button class="nav-link" id="v-pills-profile-tab" data-bs-toggle="pill" data-bs-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false">Address Info</button>
+                                <button class="nav-link" id="v-pills-messages-tab" data-bs-toggle="pill" data-bs-target="#v-pills-messages" type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false">Payment Terms</button>
+                                <button class="nav-link" id="v-pills-settings-tab" data-bs-toggle="pill" data-bs-target="#v-pills-settings" type="button" role="tab" aria-controls="v-pills-settings" aria-selected="false">Bank Info</button>
+                                <button class="nav-link" id="v-pills-accounting-tab" data-bs-toggle="pill" data-bs-target="#v-pills-accounting" type="button" role="tab" aria-controls="v-pills-accounting" aria-selected="false">Tax Details</button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-10 col-12">
+                            <div class="tab-content p-3 border rounded" id="v-pills-tabContent">
+                                <!-- General Tab -->
+                                <div class="tab-content p-3 border rounded" id="v-pills-tabContent">
+                                    <!-- General Tab -->
+                                    <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab" tabindex="0">
+                                        <div class="row g-3">
+                                            <div class="col-md-4 col-12">
+                                                <label for="Code" class="form-label">Code</label>
+                                                <input type="text" class="form-control" id="Code">
+                                            </div>
+                                            <div class="col-md-4 col-12">
+                                                <label for="MobileNo" class="form-label">Mobile</label>
+                                                <input type="number" class="form-control" id="MobileNo" maxlength="10" oninput="setMaxLength(this, 10)">
+                                            </div>
+                                            <div class="col-md-4 col-12">
+                                                <label for="Phone" class="form-label">Phone</label>
+                                                <input type="number" class="form-control" id="Phone" maxlength="12" oninput="setMaxLength(this, 12)">
+                                            </div>
+                                            <div class="col-md-6 col-12">
+                                                <label for="Email" class="form-label">Email</label>
+                                                <input type="email" class="form-control" id="Email" name="Email" maxlength="100" oninput="setMaxLength(this, 100)">
+                                                <div class="invalid-feedback">Please provide a valid email address.</div>
+                                            </div>
+                                            <div class="col-md-6 col-12">
+                                                <label for="Website" class="form-label">Website</label>
+                                                <input type="text" class="form-control" id="Website">
+                                            </div>
+                                            <div class="col-md-6 col-12">
+                                                <label for="ContactPerson" class="form-label">Contact Person</label>
+                                                <input type="text" class="form-control" id="ContactPerson">
+                                            </div>
+                                            <div class="col-md-6 col-12">
+                                                <label for="CPMobileNumber" class="form-label">Contact Person Mo No</label>
+                                                <input type="text" class="form-control" id="CPMobileNumber" maxlength="10" oninput="setMaxLength(this, 10)">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Address Info Tab -->
+                                    <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab" tabindex="0">
+                                        <div class="row mb-3">
+                                            <div class="col-12 d-flex flex-column flex-sm-row justify-content-between gap-2">
+                                                <button type="button" class="btn btn-primary" id="addNewAddressBtn">
+                                                    <i class="bi bi-plus-circle"></i> Add New Address
+                                                </button>
+                                                <button type="button" class="btn btn-success" id="addSameAsBillingBtn">
+                                                    <i class="bi bi-files"></i> Add Same as Bill To
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-12">
+                                                <div class="table-responsive">
+                                                    <table class="table  table-hover" id="addressTable">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>Type</th>
+                                                                <th>Address Id</th>
+                                                                <th>Address Line 1</th>
+                                                                <th>City</th>
+                                                                <th>State</th>
+                                                                <th>Postal Code</th>
+                                                                <th>Country</th>
+                                                                <th>GSTIN</th>
+                                                                <th hidden>GSTTYPE</th>
+                                                                <th>Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <!-- Address rows will be added here dynamically -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-3" id="addressFormContainer" style="display: none;">
+                                            <div class="col-12">
+                                                <h5 class="border-bottom pb-2">Add/Edit Address</h5>
+                                            </div>
+
+                                            <input type="hidden" id="addmainid">
+
+                                            <div class="col-md-6 col-12">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="addressType" id="billToRadio" value="BillTo" checked>
+                                                    <label class="form-check-label" for="billToRadio">
+                                                        Bill To Address
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="addressType" id="shipToRadio" value="ShipTo">
+                                                    <label class="form-check-label" for="shipToRadio">
+                                                        Ship To Address
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="addisActive" checked>
+                                                    <label class="form-check-label" for="addisActive">Is Active</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12">
+                                                <div class="row g-2">
+                                                    <div class="col-12">
+                                                        <label for="AddId" class="form-label">Address Id</label>
+                                                        <input type="text" class="form-control" id="AddId">
+                                                    </div>
+                                                    <div class="col-md-6 col-12">
+                                                        <label for="Address1" class="form-label">Address Line 1</label>
+                                                        <input type="text" class="form-control" id="Address1">
+                                                    </div>
+                                                    <div class="col-md-6 col-12">
+                                                        <label for="Address2" class="form-label">Address Line 2</label>
+                                                        <input type="text" class="form-control" id="Address2">
+                                                    </div>
+                                                    <div class="col-md-6 col-12">
+                                                        <label for="City" class="form-label">City</label>
+                                                        <input type="text" class="form-control" id="City">
+                                                    </div>
+                                                    <div class="col-md-6 col-12">
+                                                        <label for="PostalCode" class="form-label">Pin Code</label>
+                                                        <input type="text" class="form-control" id="PinCode">
+                                                    </div>
+                                                    <div class="col-md-6 col-12">
+                                                        <label for="GSTIN" class="form-label">GSTIN</label>
+                                                        <input type="text" class="form-control" id="ADDGSTIN">
+                                                    </div>
+                                                    <div class="col-md-6 col-12">
+                                                        <label for="GSTINTYP" class="form-label">GST Type</label>
+                                                        <select class="form-select" id="ADDGSTINTYP">
+                                                            <option value="">Select</option>
+                                                            <option>Casual Taxable Person</option>
+                                                            <option>Composition Levy</option>
+                                                            <option>Government Department or PSU</option>
+                                                            <option>Non Resident Taxable Person</option>
+                                                            <option>Regular/TDS/ISD</option>
+                                                            <option>UN Agency or Embassy</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6 col-12">
+                                                        <label for="Country" class="form-label">Country</label>
+                                                        <select class="form-select Country" id="Country"></select>
+                                                    </div>
+                                                    <div class="col-md-6 col-12">
+                                                        <label for="State" class="form-label">State/Province</label>
+                                                        <select class="form-select State" id="State"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 text-end mt-3">
+                                                <button type="button" class="btn btn-outline-secondary me-2" id="cancelAddressBtn">
+                                                    Cancel
+                                                </button>
+                                                <button type="button" class="btn btn-primary" id="saveAddressBtn">
+                                                    Add To List
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Payment Terms Tab -->
+                                    <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab" tabindex="0">
+                                        <div class="row ">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="PaymentTerms" class="form-label">Credit Days</label>
+                                                <div class="input-group">
+                                                    <select class="form-select" id="PaymentTerms">
+                                                        <option selected>Select Terms</option>
+                                                    </select>
+                                                    <button class="btn btn-primary" type="button" id="ap" data-bs-target='#paymentTermsModal' data-bs-toggle='modal'><i class="bi bi-plus"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="CreditLimit" class="form-label">Credit Limit</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
+                                                    <input type="number" class="form-control" id="CreditLimit">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Banking Tab -->
+                                    <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab" tabindex="0">
+                                        <div class="card">
+                                            <div class="card-header bg-white border-bottom-0 py-3 d-flex flex-column flex-md-row justify-content-between align-items-center">
+                                                <h5 class="mb-2 mb-md-0">Bank Accounts</h5>
+                                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBankModal">
+                                                    <i class="fas fa-plus me-2"></i>Add Bank Account
+                                                </button>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover align-middle" id="bankAccountsTable">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>Bank Name</th>
+                                                                <th>Account Name</th>
+                                                                <th>Account Number</th>
+                                                                <th>IFSC Code</th>
+                                                                <th>UPI ID</th>
+                                                                <th>Status</th>
+                                                                <th>Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <!-- Data will be loaded here dynamically -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Accounting Tab -->
+                                    <div class="tab-pane fade" id="v-pills-accounting" role="tabpanel" aria-labelledby="v-pills-settings-tab" tabindex="0">
+                                        <div class="row g-3">
+                                            <div class="col-md-4 col-12 " hidden>
+                                                <label for="GSTIN" class="form-label">GSTIN</label>
+                                                <input type="text" class="form-control" id="GSTIN">
+                                            </div>
+                                            <div class="col-md-4 col-12" hidden>
+                                                <label for="GSTINTYP" class="form-label">GST Type</label>
+                                                <select class="form-select" id="GSTINTYP">
+                                                    <option value="">Select</option>
+                                                    <option>Casual Taxable Person</option>
+                                                    <option>Composition Levy</option>
+                                                    <option>Government Department or PSU</option>
+                                                    <option>Non Resident Taxable Person</option>
+                                                    <option>Regular/TDS/ISD</option>
+                                                    <option>UN Agency or Embassy</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 col-12">
+                                                <label for="PAN" class="form-label">PAN</label>
+                                                <input type="text" class="form-control" maxlength="10" id="PAN">
+                                            </div>
+                                            <div class="col-md-4 col-12">
+                                                <label for="TDSApplicable" class="form-label">TDS Applicable</label>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox" id="TDSApplicable">
+                                                    <label class="form-check-label" for="TDSApplicable"></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-12 TDSApplicablediv" style="display:none">
+                                                <label for="AssesseeTyp" class="form-label">Assessee Type</label>
+                                                <select class="form-select" id="AssesseeTyp">
+                                                    <option value="">Select</option>
+                                                    <option value="C">Company</option>
+                                                    <option value="O">Other</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 col-12 TDSApplicablediv" style="display:none">
+                                                <label for="TDSCode" class="form-label">TDS Code</label>
+                                                <select class="form-select" id="TDSCode">
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="d-flex flex-wrap justify-content-end gap-2">
+                                @if (ViewBag.BtnAuth != null)
+                                {
+                                    <!-- Button Rendering Logic -->
+                                    @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                                    {
+                                        var btnName = item["BtnName"]?.ToString().Trim();
+                                        var btnauth = item["Auth"]?.ToString();
+                                        var icon = item["Icon"]?.ToString();
+                                        var ColorClass = item["ColorClass"]?.ToString();
+
+                                        if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                        {
+                                            switch (btnName.Trim())
+                                            {
+                                                case "Save":
+                                                    <button id="btnSave" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2">
+                                                        <i class="@icon"></i>@btnName
+                                                    </button>
+                                                    break;
+                                                @*case "Update":
+                                                    <button id="btnUpdate" data-action="update" class="btn @ColorClass mb-1  me-2" disabled>
+                                                        <i class="@icon"></i> @btnName
+                                                    </button>
+                                                    break;*@
+                                                @*  case "Park":
+                                                       <button id="btnPark"  class="btn @ColorClass mb-1  me-2" >
+                                                           <i class="@icon"></i> @btnName
+                                                       </button>
+                                                       break;
+                                                    case "Resume":
+                                                       <button id="btnResume"  class="btn @ColorClass mb-1  me-2" >
+                                                           <i class="@icon"></i> @btnName
+                                                       </button>
+                                                       break; *@
+                                                @*case "Print":
+                                                    <button id="btnPrint" data-action="create" data-item-id="" class="btn @ColorClass mb-1   me-2" disabled>
+                                                        <i class="@icon"></i>@btnName
+                                                    </button>
+                                                    break;*@
+                                                case "Delete":
+                                                    <button id="btnDelete" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2" disabled>
+                                                        <i class="@icon"></i>@btnName
+                                                    </button>
+                                                    break;
+                                                case "Reset":
+                                                    <button id="btnReset" class="btn @ColorClass mb-1   me-2">
+                                                        <i class="@icon"></i> Reset
+                                                    </button>
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="alert alert-primary" role="alert">
+                                        
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Terms Modal -->
+<div class="modal fade" id="paymentTermsModal" aria-hidden="true" aria-labelledby="paymentTermsModalLabel" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h1 class="modal-title fs-5" id="paymentTermsModalLabel">Payment Terms Master</h1>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn btn-success" id="addNewTermBtn">
+                            <i class="bi bi-plus-circle"></i> Add New Term
+                        </button>
+                    </div>
+                </div>
+
+                <!-- List View -->
+                <div class="table-responsive" id="termsListView">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Term Name</th>
+                                <th>Credit Days</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Add/Edit Form (hidden by default) -->
+                <div class="card d-none" id="termFormContainer">
+                    <div class="card-body">
+                        <form id="paymentTermForm">
+                            <input type="hidden" id="termId">
+                            <div class="row mb-3">
+                                <div class="col-md-6 col-12">
+                                    <label for="termName" class="form-label">Term Name</label>
+                                    <input type="text" class="form-control" id="termName" required>
+                                </div>
+                                <div class="col-md-6 col-12">
+                                    <label for="creditDays" class="form-label">Credit Days</label>
+                                    <input type="number" class="form-control" id="creditDays" min="0" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="termDescription" class="form-label">Description</label>
+                                <textarea class="form-control" id="termDescription" rows="2"></textarea>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="isActiveterm" checked>
+                                <label class="form-check-label" for="isActive">Active</label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="d-flex justify-content-between w-100">
+                    <button type="button" class="btn btn-secondary" id="cancelFormBtn" style="display: none;">
+                        Cancel
+                    </button>
+                    <div>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="saveTermBtn" style="display: none;">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Bank Account Modal -->
+<div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title" id="addBankModalLabel">Add Bank Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="bankAccountForm">
+                    <input type="hidden" id="BankID" name="BankID" value="">
+                    <div class="row g-3">
+                        <div class="col-md-6 col-12">
+                            <label for="BankName" class="form-label">Bank Name <span class="text-danger">*</span></label>
+                            <select class="form-select" id="BankName" name="BankName" required>
+                                <option selected value="">Select Bank</option>
+                                <!-- Banks will be loaded dynamically -->
+                            </select>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <label for="BankAcctName" class="form-label">Beneficiary Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="BankAcctName" name="BankAcctName" required>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <label for="BankAcctNo" class="form-label">Account Number <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="BankAcctNo" name="BankAcctNo" required>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <label for="IFSCCode" class="form-label">IFSC Code <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="IFSCCode" name="IFSCCode" required>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <label for="UPIID" class="form-label">UPI ID</label>
+                            <input type="text" class="form-control" id="UPIID" name="UPIID">
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <label for="IsActive" class="form-label">Status</label>
+                            <select class="form-select" id="IsActive" name="IsActive">
+                                <option value="A" selected>Active</option>
+                                <option value="I">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveBankBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ledger Search Modal -->
+<div class="modal fade" id="receiptListModal" tabindex="-1" aria-labelledby="ledgerListLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ledgerListModalLabel">Customer Search</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive ">
+                    <table class="table table-bordered table-striped table-hover w-100" id="ledegerSearchTable">
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function setMaxLength(el, max) {
+        el.setAttribute('maxlength', max);
+        if (el.value.length > max) {
+            el.value = el.value.slice(0, max);
+        }
+
+        if (el.type === 'number') {
+            el.value = el.value.replace(/\D/g, '').slice(0, max);
+        }
+    }
+    $(document).ready(function () {
+            function GetNextCardcode(flag){
+                $.ajax({
+                        type: "GET",
+                        url: '@Url.Action("GETNEXTLEDGERCODE", "Master")',
+                        contentType: "application/json; charset=utf-8",
+                        data: { flag: flag },
+                        cache: false,
+                    success: function (data) {
+                            if (data && data.length) {
+                                $("#Code").val(data[0].NextLedgerCode);
+                            } else {
+                                Notify('error', 'Failed to get next ledger code', '');
+                            }
+                        },
+                        error: function(xhr) {
+                            const errorMessage = xhr.responseText || "Failed to load ledger data";
+                            Notify('error', errorMessage, '');
+                        },
+                        complete: function() {
+                        }
+                });
+            }
+            $("#LedgerType").change(function () {
+                var val = $(this).val()
+                GetNextCardcode(val)
+            })
+        // LedgerCode Search
+          var BPPartnerData=null;
+          function loadBPPartnerTable() {
+              $.ajax({
+                  type: "GET",
+                  url: '@Url.Action("GETBPPARTNER", "Production")',
+                  contentType: "application/json; charset=utf-8",
+                  data: { type: $("#LedgerType").val() },
+                  cache: false,
+                  success: function(data) {
+                      BPPartnerData = [];
+                      BPPartnerData = data;
+                      applyBPPartnerDatatable(data);
+                  },
+                  error: function(xhr) {
+                      Notify('error', 'Error', xhr.responseText || 'Error loading BP Partners');
+                  }
+              });
+          }
+        loadBPPartnerTable();
+        function applyBPPartnerDatatable(jsonData) {
+
+            const tableId = '#ledegerSearchTable';
+            if ($.fn.DataTable.isDataTable(tableId)) {
+                $(tableId).DataTable().destroy();
+                $(tableId).empty(); // Clear the table
+            }
+            $(tableId).DataTable({
+                data: jsonData,
+                responsive: {
+                    details: {
+                        display: $.fn.dataTable.Responsive.display.modal({
+                            header: function (row) {
+                                return 'Details for ' + row.data().GroupName;
+                            }
+                        }),
+                        renderer: $.fn.dataTable.Responsive.renderer.tableAll({
+                            tableClass: 'table'
+                        })
+                    }
+                },
+                dom: 'lrtip', // Simpler controls
+                initComplete: function () {
+                    // Adjust modal height after table initialization
+                    $('.modal').css('max-height', $(window).height() * 0.9);
+                    $('.modal-body').css('overflow-y', 'auto');
+                },
+                columns: [
+                    {
+                        data: null,
+                        title: "Sr No",
+                        render: function (data, type, row, meta) {
+                            return meta.row + 1;
+                        },
+                        className: "text-center",
+                        orderable: false
+                    },
+                    {
+                        data: null,
+                        title: "Action",
+                        className: "text-center nowrap",
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return `
+                      <div class="d-flex justify-content-center gap-1">
+                          <button class="btn btn-sm btn-primary bp-edit" title="Edit" data-id="${row.ID}" data-code="${row.Code}" data-name="${row.GroupName}">
+                              <i class="bi bi-pencil"></i>
+                          </button>
+                      </div>`;
+                        }
+                    },
+                    { data: "Code", title: "Ledger Code" },
+                    { data: "GroupName", title: "Group Name" },
+                ],
+                responsive: true,
+                dom: '<"top"lf>rt<"bottom"ip><"clear">',
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                language: {
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)"
+                },
+                createdRow: function (row, data, dataIndex) {
+                    $(row).attr('data-id', data.ID);
+                }
+            });
+        }
+        var $activeInput = null;
+        $(document).on('input', "#groupName", function () {
+            var $input = $(this);
+            $activeInput = $(this);
+            var value = $input.val().toLowerCase().replace(/_/g, ' ');
+            var suggestions = [];
+
+            // Check if the suggestion container already exists, if not, create it
+            var suggestionContainerId = 'BPSuggestions-' + $input.closest('tr').index();
+            if (!$('#' + suggestionContainerId).length) {
+                $('<div id="' + suggestionContainerId + '" class="suggestions-container"></div>').appendTo('body');
+            }
+
+            // Get the container element
+            var $suggestionContainer = $('#' + suggestionContainerId);
+            $suggestionContainer.empty(); // Clear previous suggestions
+
+            // Check if BPPartnerData exists and is an array
+            if (Array.isArray(BPPartnerData) && BPPartnerData.length > 0) {
+                if (value.length > 0) {
+                    var searchTokens = value.split(/\s+/);
+                    // Filter suggestions based on universal search (match all tokens)
+                    suggestions = BPPartnerData.filter(function (data) {
+                        if (data && typeof data === 'object') {
+                            var code = (data.Code || '').toLowerCase();
+                            var name = (data.GroupName || '').toLowerCase();
+                            var allTokens = code.split(/\s+|[_-]+/).concat(name.split(/\s+|[_-]+/));
+                            return searchTokens.every(function (token) {
+                                return allTokens.some(function (itemToken) {
+                                    return itemToken.includes(token);
+                                });
+                            });
+                        }
+                        return false;
+                    }).sort(function (a, b) {
+                        return a.GroupName.localeCompare(b.GroupName);
+                    }).slice(0, 50); // Limit to 50 results
+                }
+                // Show suggestions if any
+                if (suggestions.length > 0) {
+                    suggestions.forEach(function (data) {
+                        $suggestionContainer.append(
+                            `<div class="suggestion-item bpset" data-code="${data.Code || ''}" data-id="${data.ID || ''}" data-name="${data.GroupName || ''}">
+                           <span class="ledger-code"><b>${data.Code || ''}</b></span> -
+                           <span class="group-name"><b>${data.GroupName || ''}</b></span>
+                       </div>`
+                        );
+                    });
+
+                    // Calculate the offset of the input field and position the suggestion box below it
+                    var offset = $input.offset();
+                    $suggestionContainer.css({
+                        top: offset.top + $input.outerHeight(),
+                        left: offset.left,
+                        width: $input.outerWidth(),
+                        position: 'absolute',
+                        "z-index": 1000,
+                    }).show();
+                } else {
+                    $suggestionContainer.hide();
+                }
+            } else {
+                console.error("BP Partner Data is not defined or is empty");
+                $suggestionContainer.hide();
+            }
+        });
+
+        //Ledger
+        {
+            $(document).on('click', '.bpset,.bp-edit', function () {
+                $("#receiptListModal").modal("hide")
+                var ledgerCode = $(this).data('code');
+                var groupName = $(this).data('name');
+                var id = $(this).data('id');
+                $("#Code").val(ledgerCode)
+                $("#ledgerID").val(id)
+                $("#groupName").val(groupName)
+                $("#Code").attr("data-code", ledgerCode)
+                LoadAddress(id)
+                loadBankAccounts(id);
+                GetLedgertab(id)
+                $('.suggestions-container').hide();
+            });
+            // Cached DOM elements
+            const $ledgerTree = $('#ledgerTree');
+            const $ledgerForm = $('#ledgerForm');
+            const $groupName = $('#groupName');
+            const $saveBtn = $('#btnSave');
+            const $saveBtnSpinner = $('#saveBtnSpinner');
+            const $deleteBtn = $('#btnDelete');
+            const $parentLedger = $('#parentLedger');
+            // Application state
+            const state = {
+                ledgerData: [],
+                currentLedger: null,
+                formMode: 'add',
+                isLoading: false,
+                dirtyLedgers: new Set(), // Track IDs of modified ledgers
+                newLedgers: new Set()    // Track IDs of new ledgers
+            };
+            // Initialize application
+            function init() {
+                    bindEvents();
+                    loadData();
+            }
+            init();
+
+            // Load data from server
+            function loadData() {
+                state.isLoading = true;
+                showLoadingState();
+
+                // Clear dirty flags when loading fresh data
+                state.dirtyLedgers.clear();
+                state.newLedgers.clear();
+
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("GETLEDGER", "Master")',
+                    contentType: "application/json; charset=utf-8",
+                    cache: false,
+                    success: function (data) {
+                        if (data && data.length) {
+                            state.ledgerData = data.map(ledger => ({
+                                ...ledger,
+                                ID: String(ledger.ID),
+                                BaseID: String(ledger.BaseID)
+                            }));
+                            renderLedgerTree();
+                            populateParentLedgerOptions();
+                        }
+                        resetForm();
+                    },
+                    error: function(xhr) {
+                        const errorMessage = xhr.responseText || "Failed to load ledger data";
+                        Notify('error', errorMessage, '');
+                    },
+                    complete: function() {
+                        state.isLoading = false;
+                        hideLoadingState();
+                    }
+                });
+            }
+            // Save only changed data to server
+            function saveData() {
+                    if (state.dirtyLedgers.size === 0) return;
+
+                    state.isLoading = true;
+                    $saveBtn.prop('disabled', true);
+                    $saveBtnSpinner.removeClass('d-none');
+
+                    // Get only changed/new ledgers
+                    var changedLedgers = state.ledgerData.filter(ledger =>
+                        state.dirtyLedgers.has(ledger.ID)
+                    ).map(ledger => ({
+                        ...ledger,
+                        IsNew: state.newLedgers.has(ledger.ID) // Mark new ledgers for backend
+                    }));
+                    changedLedgers[0].ID =$("#ledgerID").val() ||null;
+                    changedLedgers[0].Code =$("#Code").val() || null;
+                    changedLedgers[0].PhoneNo =$("#Phone").val();
+                    changedLedgers[0].MobileNo =$("#MobileNo").val() || null;
+                    changedLedgers[0].Email =$("#Email").val() || null;
+                    changedLedgers[0].WebSite =$("#Website").val() || null;
+                    changedLedgers[0].ContPer =$("#ContactPerson").val() || null;
+                    changedLedgers[0].ContMobiNo =$("#CPMobileNumber").val() || null;
+
+                    changedLedgers[0].CredID =$("#PaymentTerms").val() || null;
+                    changedLedgers[0].CredAmt =$("#CreditLimit").val() || null;
+
+                    changedLedgers[0].GSTIN =$("#GSTIN").val() || null;
+                    changedLedgers[0].GSTINTYP =$("#GSTINTYP").val() || null;
+                    changedLedgers[0].PANNO =$("#PAN").val() || null;
+                    changedLedgers[0].TDSApplicable =$("#TDSApplicable").is(":checked")?"Y":"N";
+                    changedLedgers[0].AssesseeTyp =$("#AssesseeTyp").val() || null;
+                    changedLedgers[0].TDSID =$("#TDSCode").val()  || null;
+
+                    var Address = [];
+                    var BankInfo = [];
+                    if($("#Postable").val()=="A"){
+                            $("#addressTable tbody tr").each(function(){
+                                var row=$(this);
+                                var Addressid =row.find(".addid").text()
+                                var mainid= row.data('id').toString()
+                                if(row.data('flag')=="N"){
+                                    mainid= null
+                                }
+                                if(Addressid){
+                                    var obj ={
+                                          AddID:mainid,
+                                          AddressID:Addressid,
+                                          AdresType:row.find('.type').data('type'),
+                                          LedgerID:null,
+                                          Address1:row.find(".address1").text(),
+                                          Address2:row.find(".address2").text(),
+                                          City:row.find(".city").text(),
+                                          PinCode:row.find(".postalCode").text(),
+                                          Stat_Id:row.find(".stateid").text(),
+                                          Coun_Id:row.find(".countryid").text(),
+                                          GSTIN:row.find(".addgst").text(),
+                                          GSTINTYP:row.find(".addgsttype").text(),
+                                          IsActive:row.find(".isactive").text() ,
+                                    }
+                                    Address.push(obj)
+                                }
+                            })
+                           if (Address.length === 0) {
+                             Address.push({
+                                AddID: null,
+                                AddressID: "BILL TO",
+                                AdresType: "B",
+                                LedgerID: null,
+                                Address1: "",
+                                Address2: "",
+                                City: "",
+                                PinCode: "",
+                                Stat_Id: $("#State").val(),
+                                Coun_Id: $("#Country").val(),
+                                GSTIN: "",
+                                GSTINTYP: "",
+                                IsActive: "A",
+                            });
+                             Address.push({
+                                AddID: null,
+                                AddressID: "SHIP TO",
+                                AdresType: "S",
+                                LedgerID: null,
+                                Address1: "",
+                                Address2: "",
+                                City: "",
+                                PinCode: "",
+                                Stat_Id: $("#State").val(),
+                                Coun_Id: $("#Country").val(),
+                                GSTIN: "",
+                                GSTINTYP: "",
+                                IsActive: "A",
+                            });
+                           }
+                            $("#bankAccountsTable tbody tr").each(function(){
+                                var row=$(this);
+                                if(row.data('bank-id')!==""){
+                                    var obj ={
+                                          ID: null,
+                                          BankID:row.data('bank-id').toString() || null,
+                                          LedgerID:null,
+                                          BankAcctName:row.find(".BankAcctName").text(),
+                                          BankAcctNo:row.find(".BankAcctNo").text(),
+                                          IFSCCode:row.find(".IFSCCode").text(),
+                                          UPIID:row.find(".UPIID").text(),
+                                          IsActive: row.find(".IsActiveCell").attr("data-active")
+                                    }
+                                    BankInfo.push(obj)
+                                }
+                            })
+                }
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("CREATELEDGER", "Master")',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify({
+                             Ledgers: changedLedgers,
+                             Address: Address,
+                             BankInfo: BankInfo
+                            }),
+                        success: function (data) {
+                            if (data.success) {
+                                Notify('success', data.message, '');
+                                // Clear dirty flags after successful save
+                                state.dirtyLedgers.clear();
+                                state.newLedgers.clear();
+                                $("#addressTable tbody").html("")
+                                $("#bankAccountsTable tbody").html("")
+                                $("#btnReset").click()
+
+                               //// If backend returns updated data, use it
+                               //if (data.updatedLedgers) {
+                               //    state.ledgerData = data.updatedLedgers.map(ledger => ({
+                               //        ...ledger,
+                               //        ID: String(ledger.ID),
+                               //        BaseID: String(ledger.BaseID)
+                               //    }));
+                               //    LoadAddress($("#ledgerID").val())
+                               //    loadBankAccounts($("#ledgerID").val())
+                               //    populateParentLedgerOptions();
+                               //}
+
+                            } else {
+                                Notify('error', data.message, '');
+                            }
+                        },
+                        error: function(xhr) {
+                            const errorMessage = xhr.responseText || "Failed to save ledger data";
+                            Notify('error', errorMessage, '');
+                        },
+                        complete: function() {
+                            state.isLoading = false;
+                            $saveBtn.prop('disabled', false);
+                            $saveBtnSpinner.addClass('d-none');
+                        }
+                    });
+                }
+            // Render the ledger tree
+            function renderLedgerTree() {
+                $ledgerTree.empty();
+
+                const rootLedgers = state.ledgerData.filter(ledger => ledger.BaseID === "0");
+
+                if (rootLedgers.length === 0) {
+                    $ledgerTree.append('<div class="text-muted">No ledgers found. Add a new ledger to create one.</div>');
+                    return;
+                }
+
+                const $ul = $('<ul class="list-group list-group-flush"></ul>');
+                rootLedgers.forEach(ledger => $ul.append(createLedgerNode(ledger)));
+                $ledgerTree.append($ul);
+            }
+            // Create a single ledger node
+            function createLedgerNode(ledger) {
+                const children = state.ledgerData.filter(l => l.BaseID === ledger.ID);
+                const hasChildren = children.length > 0;
+                let color ='';
+                if(ledger.Postable=="A"){
+                   color='text-success'
+                }
+                const $li = $(`
+                    <li class="list-group-item tree-item" data-id="${ledger.ID}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                ${hasChildren ? '<i class="bi bi-caret-down-fill me-1 toggle-children"></i>' : ''}
+                                <span class="ledger-name ${color}">${ledger.GroupName}</span>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary edit-item" data-id="${ledger.ID}" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </li>
+                `);
+
+                if (hasChildren) {
+                    const $childrenUl = $('<ul class="list-group list-group-flush ms-4"></ul>');
+                    children.forEach(child => $childrenUl.append(createLedgerNode(child)));
+                    $li.append($childrenUl);
+                }
+
+                return $li;
+            }
+            // Populate parent ledger dropdown
+            function populateParentLedgerOptions() {
+                $parentLedger.empty().append('<option value="0">-- Root Ledger --</option>');
+                state.ledgerData.forEach(ledger => {
+                        if(ledger.Postable =="T"){
+                          if (state.formMode !== 'edit' || ledger.ID !== state.currentLedger?.ID   ) {
+                            if (!isChildOf(ledger.ID, state.currentLedger?.ID)) {
+                                $parentLedger.append(`<option value="${ledger.ID}">${ledger.GroupName}</option>`);
+                            }
+                        }
+                    }
+                });
+                LoadDefault()
+            }
+            $("#LedgerType").change(function () {
+                LoadDefault()
+                loadBPPartnerTable()
+            })
+            function LoadDefault() {
+                 $.ajax({
+                     type: "GET",
+                     url: '@Url.Action("GETACTIVEBPLADGER", "Master")',
+                     data: { flag: $("#LedgerType").val()},
+                     contentType: "application/json; charset=utf-8",
+                     cache: false,
+                     success: function (data) {
+                         if (data && data.length) {
+                             $("#parentLedger").val(data[0].LegerID)
+                         }
+                     },
+                     error: function(xhr) {
+                         const errorMessage = xhr.responseText || "Failed to load ledger data";
+                         Notify('error', errorMessage, '');
+                     },
+                     complete: function() {
+                         state.isLoading = false;
+                         hideLoadingState();
+                     }
+                 });
+                            }
+            // Check if ledger is child of another
+            function isChildOf(ledgerID, parentID) {
+                if (!parentID) return false;
+
+                const ledger = state.ledgerData.find(l => l.ID === ledgerID);
+                if (!ledger) return false;
+
+                if (ledger.BaseID === parentID) return true;
+                if (ledger.BaseID !== "0") return isChildOf(ledger.BaseID, parentID);
+
+                return false;
+            }
+            // Reset form to add mode
+            function resetForm() {
+                state.formMode = 'add';
+                state.currentLedger = null;
+
+                $ledgerForm[0].reset();
+                $('#ledgerID').val('');
+                $('#isActive').prop('checked', true);
+                $parentLedger.val('0');
+                $deleteBtn.hide();
+
+                $('#formModeBadge')
+                    .text('Add Mode')
+                    .removeClass('bg-warning')
+                    .addClass('bg-light text-dark');
+
+                $('#saveBtnText').text('Save Ledger');
+                $('.is-invalid').removeClass('is-invalid');
+                $("#Phone").val("");
+                $("#MobileNo").val("");
+                $("#Email").val("");
+                $("#Website").val("");
+                $("#ContactPerson").val("");
+                $("#CPMobileNumber").val("");
+                $("#PaymentTerms").val("");
+                $("#CreditLimit").val("");
+                $("#GSTIN").val("");
+                $("#GSTINTYP").val("");
+                $("#ledgerSearch").val("");
+                $("#PAN").val("");
+                $("#TDSApplicable").prop("checked",false);
+                $("#AssesseeTyp").val("");
+                $("#TDSCode").val("");
+                $("#ledgerID").val("");
+                $("#addressTable tbody").html("");
+                $("#bankAccountsTable tbody").html("");
+                $(".TDSApplicablediv").hide();
+                loadBPPartnerTable()
+                GetNextCardcode("C")
+
+            }
+            // Load ledger into form for editing
+            function loadLedgerIntoForm(ledger) {
+                state.formMode = 'edit';
+                state.currentLedger = ledger;
+                $('#Postable').val(ledger.Postable);
+                $('#ledgerID').val(ledger.ID);
+                 $("#LedgerType").val(ledger.LedgerType);
+                $groupName.val(ledger.GroupName);
+                $('#isActive').prop('checked', ledger.IsActive === 'A' || ledger.IsActive === true);
+                $deleteBtn.show();
+
+                $('#formModeBadge')
+                    .text('Edit Mode')
+                    .removeClass('bg-light text-dark')
+                    .addClass('bg-warning');
+
+                $('#saveBtnText').text('Update Ledger');
+
+                populateParentLedgerOptions();
+                $parentLedger.val(ledger.BaseID || '0');
+
+                scrollToForm();
+            }
+            function scrollToForm() {
+                $('html, body').animate({
+                    scrollTop: $('#ledgerDetailsForm').offset().top - 20
+                }, 300);
+            }
+            // Save ledger (add or update)
+            function saveLedger() {
+                const groupName = $groupName.val().trim();
+                if (!groupName) {
+                    $groupName.addClass('is-invalid');
+                    return false;
+                }
+                $groupName.removeClass('is-invalid');
+
+                const ledger = {
+                    ID: $('#ledgerID').val() || generateNewId(),
+                    GroupName: groupName,
+                    BaseID: $parentLedger.val() || '0',
+                    IsActive: $('#isActive').is(':checked') ? 'A' : 'I',
+                    Postable: $('#Postable').val(),
+                    LedgerType: $('#LedgerType').val()
+                };
+
+                if (state.formMode === 'add') {
+                    state.ledgerData.push(ledger);
+                    state.dirtyLedgers.add(ledger.ID);
+                    state.newLedgers.add(ledger.ID);
+                } else {
+                    const index = state.ledgerData.findIndex(l => l.ID === ledger.ID);
+                    if (index !== -1) {
+                        state.ledgerData[index] = ledger;
+                        state.dirtyLedgers.add(ledger.ID);
+                    }
+                }
+
+                saveData();
+                return true;
+            }
+            // Generate new ID
+            function generateNewId() {
+                const maxId = Math.max(...state.ledgerData.map(l => parseInt(l.ID, 10)), 0);
+                return String(maxId + 1);
+            }
+            // Delete ledger
+            function deleteLedger() {
+                if (!state.currentLedger) return;
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '@Url.Action("DELETELEDGER", "Master")',
+                            type: 'POST',
+                            data: { id: state.currentLedger.ID },
+                            beforeSend: function() {
+                                $('#btnDelete').prop('disabled', true)
+                                    .html('<i class="bi bi-hourglass"></i> Deleting...');
+                            },
+                            success: function(response) {
+                                if (response?.success) {
+                                    Notify('success', 'Success', response.message || 'Ledger deleted!');
+                                    state.ledgerData = state.ledgerData.filter(l =>
+                                        l.ID !== state.currentLedger.ID &&
+                                        l.BaseID !== state.currentLedger.ID
+                                    );
+                                    renderLedgerTree();
+                                    resetForm();
+                                } else {
+                                    Notify('warning', 'Warning', response?.message || 'Delete failed');
+                                }
+                            },
+                            error: function(xhr) {
+                                const errorMessage = xhr.responseJSON?.message ||
+                                    xhr.responseText || 'Error deleting ledger';
+                                Notify('error', 'Error', errorMessage);
+                            },
+                            complete: function() {
+                                $('#btnDelete').prop('disabled', false)
+                                    .html('<i class="bi bi-trash"></i> Delete');
+                            }
+                        });
+                    }
+                });
+            }
+            // Bind event handlers
+            function bindEvents() {
+                // Form events
+                $ledgerForm.on('submit', e => e.preventDefault() && saveLedger());
+                $('#btnReset').click(resetForm);
+                $('#btnReset').click(loadData);
+                $('#cancelBtn').click(resetForm);
+                $saveBtn.click(saveLedger);
+                $deleteBtn.click(deleteLedger);
+                // Tree events using delegation
+                $ledgerTree.on('click', '.edit-item', function(e) {
+                    e.stopPropagation();
+                    const ledger = state.ledgerData.find(l => l.ID === $(this).data('id').toString());
+                    if (ledger) loadLedgerIntoForm(ledger);
+                        if (ledger.GroupName !== null &&
+                            /^\s*sundrycreditors\s*$/i.test(ledger.GroupName.replace(/\s+/g, '')) ||
+                            /^\s*sundrydebitors\s*$/i.test(ledger.GroupName.replace(/\s+/g, '')))
+                            {
+
+                            }else if(ledger.Postable=="A"){
+                                 LoadAddress(ledger.ID)
+                                 loadBankAccounts(ledger.ID);
+                                 GetLedgertab(ledger.ID)
+                            }else{
+                            }
+                });
+
+
+
+                $("#Postable").on('inpur','#groupName',function(){
+                  var val =$(this).val()
+                   if (val !== null &&
+                    /^\s*sundrycreditors\s*$/i.test(val.replace(/\s+/g, '')) ||
+                    /^\s*sundrydebitors\s*$/i.test(val.replace(/\s+/g, '')))
+                    {
+                    }
+                  else{
+                  }
+                })
+                $ledgerTree.on('click', '.tree-item > div:first-child', function(e) {
+                    if (!$(e.target).is('button, .bi-grip-vertical, .toggle-children')) {
+                        $(this).parent().find('> ul').toggle();
+                    }
+                });
+                $ledgerTree.on('click', '.toggle-children', function(e) {
+                    e.stopPropagation();
+                    $(this).toggleClass('bi-caret-down-fill bi-caret-right-fill')
+                        .closest('li').find('> ul').toggle();
+                });
+                // Search functionality
+                $('#ledgerSearch').on('input', function() {
+                    const term = $(this).val().toLowerCase();
+                    if (!term) return $ledgerTree.find('li').show();
+
+                    $ledgerTree.find('li').each(function() {
+                        const $li = $(this);
+                        const matches = $li.find('.ledger-name').text().toLowerCase().includes(term);
+                        $li.toggle(matches);
+                        if (matches) {
+                            $li.parents('li').show();
+                            $li.find('> ul').show();
+                        }
+                    });
+                });
+            }
+             function GetLedgertab(id){
+                  $.ajax({
+                     type: "GET",
+                     url: '@Url.Action("GETLEDGERBYID", "Master")',
+                     data:{id:id},
+                     contentType: "application/json; charset=utf-8",
+                     cache: false,
+                      success: function (data) {
+                         if (data && data.length) {
+                             var item = data[0];
+                             loadLedgerIntoForm(item);
+                                 $("#Code").val(data[0].Code);
+                                 $("#Phone").val(data[0].PhoneNo);
+                                 $("#MobileNo").val(data[0].MobileNo);
+                                 $("#Email").val(data[0].Email);
+                                 $("#Website").val(data[0].WebSite);
+                                 $("#ContactPerson").val(data[0].ContPer);
+                                 $("#CPMobileNumber").val(data[0].ContMobiNo);
+                                 $("#PaymentTerms").val(data[0].CredID);
+                                 $("#CreditLimit").val(data[0].CredAmt);
+                                 $("#GSTIN").val(data[0].GSTIN);
+                                 $("#GSTINTYP").val(data[0].GSTINTYP);
+                                 $("#PAN").val(data[0].PANNO);
+                                 if(data[0].TDSApplicable=='Y'){
+                                   $(".TDSApplicablediv").show();
+                                   $("#TDSApplicable").prop("checked",true);
+                             }
+                             $("#AssesseeTyp").val(data[0].AssesseeTyp.trim())
+                             loadTDS(data[0].AssesseeTyp.trim(), data[0].TDSID)
+                         }
+                     },
+                     error: function(xhr) {
+                         const errorMessage = xhr.responseText || "Failed to load ledger data";
+                         Notify('error', errorMessage, '');
+                     },
+                     complete: function() {
+                         state.isLoading = false;
+                         hideLoadingState();
+                     }
+                 });
+             }
+            // Loading state management
+            function showLoadingState() {
+                $('#loadingOverlay').removeClass('d-none');
+            }
+            function hideLoadingState() {
+                $('#loadingOverlay').addClass('d-none');
+            }
+        }
+
+    // Address Management System
+    {
+        $('input[name="addressType"]').change(function() {
+            $('#sameAsBillingContainer').toggle($(this).val() === 'ShipTo');
+            if ($(this).val() !== 'ShipTo') {
+                $('#SameAsBilling').prop('checked', false);
+            }
+        });
+        // Add new address button
+        $('#addNewAddressBtn').click(function() {
+            resetAddress();
+            $('#addressFormContainer').show();
+            $('html, body').animate({
+                scrollTop: $('#addressFormContainer').offset().top
+            }, 500);
+        });
+        // Cancel button
+        $('#cancelAddressBtn').click(function() {
+            $('#addressFormContainer').hide();
+        });
+        $('#saveAddressBtn').click(function () {
+                const addressType = $('input[name="addressType"]:checked').val();
+                const isSameAsBilling = addressType === 'ShipTo' && $('#SameAsBilling').is(':checked');
+
+                // Collect values
+                const ID = $('#addmainid').val();  // Hidden field for update tracking
+                const AddID = $('#AddId').val().trim();
+                const AdresType = addressType === 'BillTo' ? 'B' : 'S';
+                const Address1 = $('#Address1').val().trim();
+                const Address2 = $('#Address2').val().trim();
+                const City = $('#City').val().trim();
+                const StateName = $('#State option:selected').text();
+                const Stat_Id = $('#State').val();
+                const PinCode = $('#PinCode').val().trim();
+                const CountryName = $('#Country option:selected').text();
+                const Coun_Id = $('#Country').val();
+                const ADDGSTINTYP = $('#ADDGSTINTYP').val();
+                const ADDGSTIN = $('#ADDGSTIN').val();
+                const IsActive = $('#IsActive').is(":checked") ? "A" : "I";
+
+                const tbody = $('#addressTable tbody');
+
+                // ---------------- Validation ----------------
+                if (!addressType) {
+                    Notify('error', 'Validation Failed', 'Please select an address type (BillTo or ShipTo).');
+                    return;
+                }
+
+                // Validation for duplicates (only when adding a new row)
+                if (!ID) {
+                    if (AdresType === 'B') {
+                        const duplicateBillTo = tbody.find('tr').filter(function () {
+                            const rowType = $(this).find('.type').data('type');  // B or S
+                            const rowAddID = $(this).find('.addid').text().trim();
+                            return rowType === 'B' && rowAddID === AddID;
+                        }).length > 0;
+
+                        if (duplicateBillTo) {
+                            Notify('error', 'Duplicate BillTo Address ID', 'This Address ID already exists for a BillTo address.');
+                            $('#AddId').focus();
+                            return;
+                        }
+                    } else if (AdresType === 'S') {
+                        const duplicateShipTo = tbody.find('tr').filter(function () {
+                            const rowType = $(this).find('.type').data('type');  // B or S
+                            const rowAddID = $(this).find('.addid').text().trim();
+                            return rowType === 'S' && rowAddID === AddID;
+                        }).length > 0;
+
+                        if (duplicateShipTo) {
+                            Notify('error', 'Duplicate ShipTo Address ID', 'This Address ID already exists for a ShipTo address.');
+                            $('#AddId').focus();
+                            return;
+                        }
+                    }
+
+                    if (AdresType === 'B') {
+                        const existingBillTo = tbody.find('td.type[data-type="B"]').length;
+                        if (existingBillTo > 0) {
+                            Notify('error', 'Validation Failed', 'Only one BillTo address is allowed.');
+                            return;
+                        }
+                    }
+                }
+
+                // Other field validations
+                if (Address1 === '') {
+                    Notify('error', 'Validation Failed', 'Address Line 1 is required.');
+                    $('#Address1').focus();
+                    return;
+                }
+                if (City === '') {
+                    Notify('error', 'Validation Failed', 'City is required.');
+                    $('#City').focus();
+                    return;
+                }
+                if (!Stat_Id) {
+                    Notify('error', 'Validation Failed', 'Please select a state.');
+                    $('#State').focus();
+                    return;
+                }
+                if (PinCode === '') {
+                    Notify('error', 'Validation Failed', 'Pin Code is required.');
+                    $('#PinCode').focus();
+                    return;
+                }
+                if (!Coun_Id) {
+                    Notify('error', 'Validation Failed', 'Please select a country.');
+                    $('#Country').focus();
+                    return;
+                }
+
+                // ---------------- Update or Add ----------------
+                if (ID) {
+                    // Update existing row
+                    const row = tbody.find(`tr[data-id="${ID}"]`);
+                    row.find('.type')
+                        .attr('data-type', AdresType)
+                        .html(`${AdresType === 'B' ? 'BillTo' : 'ShipTo'} ${isSameAsBilling ? '<span class="badge bg-info ms-1">Linked</span>' : ''}`);
+                    row.find('.addid').text(AddID);
+                    row.find('.address1').text(Address1);
+                    row.find('.address2').text(Address2);
+                    row.find('.city').text(City);
+                    row.find('.state').text(StateName);
+                    row.find('.stateid').text(Stat_Id);
+                    row.find('.postalCode').text(PinCode);
+                    row.find('.country').text(CountryName);
+                    row.find('.countryid').text(Coun_Id);
+                    row.find('.isactive').text(IsActive);
+                    row.find('.addgsttype').text(ADDGSTINTYP);
+                    row.find('.addgst').text(ADDGSTIN);
+
+                    Notify('success', 'Address Updated', 'The address has been successfully updated.');
+                } else {
+                    // Add new row
+                    const newId = Date.now(); // Generate unique row ID
+                    const row = `
+                        <tr data-id="${newId}" data-flag="N" >
+                            <td class='type' data-type='${AdresType}'>${AdresType === 'B' ? 'BillTo' : 'ShipTo'}
+                                ${isSameAsBilling ? '<span class="badge bg-info ms-1">Linked</span>' : ''}
+                            </td>
+                            <td class='addid'>${AddID}</td>
+                            <td class='address1'>${Address1}</td>
+                            <td class='address2' hidden>${Address2}</td>
+                            <td class='city'>${City}</td>
+                            <td class='state'>${StateName}</td>
+                            <td class='stateid' hidden>${Stat_Id}</td>
+                            <td class='postalCode'>${PinCode}</td>
+                            <td class='country'>${CountryName}</td>
+                            <td class='addgst'>${ADDGSTIN}</td>
+                            <td class='addgsttype' hidden>${ADDGSTINTYP}</td>
+                            <td class='countryid' hidden>${Coun_Id}</td>
+                            <td class='isactive' hidden>${IsActive}</td>
+
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary edit-address" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger delete-address" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.append(row);
+                    Notify('success', 'Address Added', 'A new address has been successfully added.');
+                }
+                $('#addressFormContainer').hide();
+                resetAddress();
+            });
+        function resetAddress() {
+            $('#addmainid').val('');
+            $('#AddId').val('');
+            $('#Address1').val('');
+            $('#Address2').val('');
+            $('#City').val('');
+            $('#State').prop('selectedIndex', 0);  // Reset dropdown
+            $('#PinCode').val('');
+            $('#Country').prop('selectedIndex', 0); // Reset dropdown
+            $('#IsActive').prop('checked', false);  // Uncheck checkbox
+            $('#SameAsBilling').prop('checked', false);
+            $('input[name="addressType"]').prop('checked', false); // Uncheck BillTo/ShipTo
+        }
+        // Add same as billing button
+        $('#addSameAsBillingBtn').click(function () {
+            // Prompt for new Address ID
+            Swal.fire({
+                title: 'Enter New Address ID',
+                input: 'text',
+                inputLabel: 'Please enter a unique Address ID for this Ship To address',
+                inputPlaceholder: 'Enter Address ID',
+                showCancelButton: true,
+                confirmButtonText: 'Create Address',
+                cancelButtonText: 'Cancel',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'You need to enter an Address ID!';
+                    }
+
+                    // Check duplicate AddID in ShipTo rows
+                    const duplicateShipTo = $('#addressTable tbody tr').filter(function () {
+                        return $(this).find('.type').data('type') === 'S' &&
+                                $(this).find('.addid').text().trim() === value;
+                    }).length > 0;
+
+                    if (duplicateShipTo) {
+                        return 'This Address ID already exists for a ShipTo address!';
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const newAddID = result.value.trim();
+
+                    // --- Get BillTo row data ---
+                    const billToRow = $('#addressTable tbody tr').filter(function () {
+                        return $(this).find('.type').data('type') === 'B';
+                    });
+
+                    if (billToRow.length === 0) {
+                        Notify('error', 'No BillTo Address Found', 'You must add a BillTo address before creating a ShipTo copy.');
+                        return;
+                    }
+
+                    // Extract values from the BillTo row
+                    const Address1 = billToRow.find('.address1').text().trim();
+                    const Address2 = billToRow.find('.address2').text().trim();
+                    const City = billToRow.find('.city').text().trim();
+                    const StateName = billToRow.find('.state').text().trim();
+                    const Stat_Id = billToRow.find('.stateid').text().trim();
+                    const PinCode = billToRow.find('.postalCode').text().trim();
+                    const CountryName = billToRow.find('.country').text().trim();
+                    const Coun_Id = billToRow.find('.countryid').text().trim();
+                    const IsActive = billToRow.find('.isactive').text().trim();
+                    const ADDGSTINTYP = billToRow.find('.addgsttype').text().trim();
+                    const ADDGSTIN = billToRow.find('.addgst').text().trim();
+
+                    // --- Create new ShipTo row ---
+                    const tbody = $('#addressTable tbody');
+                    const row = `
+                        <tr data-id="" data-flag='N'>
+                            <td class='type' data-type='S'>ShipTo
+                                <span class="badge bg-info ms-1">Linked</span>
+                            </td>
+                            <td class='addid'>${newAddID}</td>
+                            <td class='address1'>${Address1}</td>
+                            <td class='address2' hidden>${Address2}</td>
+                            <td class='city'>${City}</td>
+                            <td class='state'>${StateName}</td>
+                            <td class='stateid' hidden>${Stat_Id}</td>
+                            <td class='postalCode'>${PinCode}</td>
+                            <td class='country'>${CountryName}</td>
+                            <td class='addgst'>${ADDGSTIN}</td>
+                            <td class='addgsttype' hidden>${ADDGSTINTYP}</td>
+                            <td class='countryid' hidden>${Coun_Id}</td>
+                            <td class='isactive' hidden>${IsActive}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary edit-address" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger delete-address" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+
+                    tbody.append(row);
+                    Notify('success', 'Address Added', 'A new linked Ship To address has been created.');
+                }
+            });
+        });
+        $(document).on("click", ".edit-address", function () {
+                const row = $(this).closest('tr'); // Get the clicked row
+                // Extract values from row
+                const addressType = row.find('.type').data('type'); // 'B' or 'S'
+                const AddID = row.find('.addid').text().trim();
+                const Address1 = row.find('.address1').text().trim();
+                const Address2 = row.find('.address2').text().trim();
+                const City = row.find('.city').text().trim();
+                const StateName = row.find('.state').text().trim();
+                const Stat_Id = row.find('.stateid').text().trim();
+                const PinCode = row.find('.postalCode').text().trim();
+                const CountryName = row.find('.country').text().trim();
+                const Coun_Id = row.find('.countryid').text().trim();
+                const IsActive = row.find('.isactive').text().trim();
+                const ADDGSTIN = row.find('.addgst').text().trim();
+                const ADDGSTINTYP = row.find('.addgsttype').text().trim();
+
+                // Bind values to form inputs
+                $('#AddId').val(AddID);
+                $('#Address1').val(Address1);
+                $('#Address2').val(Address2);
+                $('#City').val(City);
+                $('#State').val(Stat_Id).trigger('change'); // Set value and trigger dropdown refresh
+                $('#PinCode').val(PinCode);
+                $('#ADDGSTIN').val(ADDGSTIN);
+                $('#ADDGSTINTYP').val(ADDGSTINTYP);
+                $('#Country').val(Coun_Id).trigger('change');
+                $('#IsActive').prop("checked", IsActive === "A");
+
+                // Set the radio for BillTo / ShipTo
+                if (addressType === 'B') {
+                    $('input[name="addressType"][value="BillTo"]').prop('checked', true);
+                } else {
+                    $('input[name="addressType"][value="ShipTo"]').prop('checked', true);
+                }
+
+                // Store row reference or ID for update (optional)
+                $('#addmainid').val(row.data('id'));
+
+                // Show the form for editing
+                $('#addressFormContainer').show();
+            });
+        $(document).on("click", ".delete-address", function () {
+                const row = $(this).closest("tr");
+                const mainId = row.data("id"); // Get main ID of the row
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This address will be permanently deleted.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, delete it!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Perform AJAX call
+                            $.ajax({
+                            url: '@Url.Action("DELETELEDGERADDRESS", "Master")',
+                            type: 'POST',
+                            data: { id: mainId },
+                            success: function(response) {
+                                if (response.success) {
+                                    row.remove();
+                                    Notify('success', 'Address Deleted', 'The address has been successfully removed');
+                                }
+                            },
+                            error: function(xhr) {
+                                Swal.fire(
+                                    'Error!',
+                                    xhr.responseText,
+                                    'error'
+                                );
+                            }
+                        });
+                    }
+                });
+            });
+        function LoadAddress(id) {
+                if (id !== "") {
+                    $.ajax({
+                        url: '@Url.Action("GETADDRES", "Master")',
+                        type: 'GET',
+                        data: { id: id },
+                        success: function(response) {
+                            if (response && response.length > 0) {
+                                const tbody = $('#addressTable tbody');
+                                tbody.empty(); // Clear old rows
+
+                                response.forEach(address => {
+                                    const row = `
+                                        <tr data-id="${address.AddID}" data-flag='O'>
+                                            <td class='type' data-type='${address.AdresType}'>
+                                                ${address.AdresType === 'B' ? 'BillTo' : 'ShipTo'}
+                                            </td>
+                                            <td class='addid'>${address.AddressId }</td>
+                                            <td class='address1'>${address.Address1 || ''}</td>
+                                            <td class='address2' hidden>${address.Address2 || ''}</td>
+                                            <td class='city'>${address.City || ''}</td>
+                                            <td class='state' data-stateid=''>${address.StateName || ''}</td>
+                                            <td class='stateid' hidden>${address.Stat_Id}</td>
+                                            <td class='postalCode'>${address.PinCode || ''}</td>
+                                            <td class='country' data-countryid=''>${address.CountryName || ''}</td>
+                                            <td class='addgst'>${address.GSTIN || ''}</td>
+                                            <td class='addgsttype' hidden>${address.GSTINTYP || ''}</td>
+                                            <td class='countryid' hidden>${address.Coun_Id }</td>
+                                            <td class='isactive' hidden>${address.IsActive || 'I'}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary edit-address" title="Edit">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger delete-address" title="Delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                    tbody.append(row);
+                                });
+                            } else {
+                               // Notify('info', 'No Records', 'No addresses found for this ID.');
+                            }
+                        },
+                        error: function(xhr) {
+                            const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading addresses';
+                            Notify('error', 'Load Error', errorMessage);
+                        }
+                    });
+                }
+            }
+
+
+        // Load all countries for dropdown
+        function loadCountries() {
+            $.ajax({
+                url: '@Url.Action("GETCOUNTRY", "Master")',
+                type: 'GET',
+                success: function (response) {
+                    if (response && response.length > 0) {
+                        const dropdown = $('#Country');
+                        dropdown.empty();
+                        dropdown.append('<option value="">Select Country</option>');
+
+                        $.each(response, function(index, country) {
+                            dropdown.append($('<option></option>').val(country.Coun_Id).text(country.Name));
+                        });
+                        $('#Country').val("103")
+                    }
+                },
+                error: function(xhr) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading countries';
+                    Notify('error', 'Load Error', errorMessage);
+                }
+            });
+        }
+        // Load all states
+        function loadStates() {
+            $.ajax({
+                url: '@Url.Action("GETSTATE", "Master")',
+                type: 'GET',
+                success: function (response) {
+                    if (response && response.length > 0) {
+                        const dropdown = $('#State');
+                        dropdown.empty();
+                        dropdown.append('<option value="">Select State</option>');
+
+                        $.each(response, function(index, state) {
+                            dropdown.append($('<option></option>').val(state.Stat_Id).text(state.Name));
+                        });
+                        $('#State').val("18")
+                    }
+                },
+                error: function(xhr) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading states';
+                    Notify('error', 'Load Error', errorMessage);
+                }
+            });
+        }
+        loadCountries();
+        loadStates();
+    }
+
+    //Payment term
+    {
+                // Initialize modal elements
+                const modal = $('#paymentTermsModal');
+                const listView = $('#termsListView');
+                const formContainer = $('#termFormContainer');
+                const termForm = $('#paymentTermForm');
+                const saveBtn = $('#saveTermBtn');
+                const cancelBtn = $('#cancelFormBtn');
+                const addBtn = $('#addNewTermBtn');
+                const modalopen = $('#ap');
+
+                // Show form for adding new term
+                addBtn.on('click', function() {
+                    termForm.trigger('reset');
+                    $('#termId').val(''); // Clear ID for new entry
+                    $('#isActiveterm').prop('checked', true); // Default to active
+                    showFormView();
+                });
+
+                // Cancel button - return to list view
+                cancelBtn.on('click', showListView);
+                modalopen.on('click', refreshTermsList);
+
+                // Edit term button handler (event delegation for dynamic elements)
+                $(document).on('click', '.edit-term', function() {
+                    const termId = $(this).data('id');
+                    const row = $(this).closest('tr');
+
+                    // Show loading state
+                    $(this).html('<i class="bi bi-hourglass"></i>');
+
+                    $.ajax({
+                        url: '@Url.Action("GETTERMSBYID", "Master")',
+                        type: 'GET',
+                        data:{id:termId},
+                        dataType: 'json',
+                        success: function(response) {
+                            $('#termId').val(response[0].CredID);
+                            $('#termName').val(response[0].CredName);
+                            $('#creditDays').val(response[0].CredDays);
+                            $('#termDescription').val(response[0].Remark);
+                            if( response[0].IsActive=="A"){
+                                $('#isActiveterm').prop('checked',true);
+                            }else{
+                                $('#isActiveterm').prop('checked',false);
+                            }
+                            showFormView();
+                        },
+                        error: function(xhr) {
+                            showToast('Failed to load term: ' + xhr.responseJSON.message, 'error');
+                        },
+                        complete: function() {
+                            row.find('.edit-term').html('<i class="bi bi-pencil-square"></i>');
+                        }
+                    });
+                });
+
+                // Delete term button handler
+                $(document).on('click', '.delete-term', function() {
+                    const termId = $(this).data('id');
+                    const termName = $(this).closest('tr').find('td:eq(1)').text();
+                    const deleteBtn = $(this);
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: `You are about to delete "${termName}"`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            deleteBtn.html('<i class="bi bi-hourglass"></i>');
+
+                            $.ajax({
+                                url: '@Url.Action("DELETEPAYTERMS", "Master")',
+                                type: 'POST',
+                                data: { id: termId },
+                                success: function(response) {
+                                    if (response.success) {
+                                        deleteBtn.closest('tr').fadeOut(300, function() {
+                                            $(this).remove();
+                                        });
+                                        Swal.fire(
+                                            'Deleted!',
+                                            'The term has been deleted.',
+                                            'success'
+                                        );
+                                    }
+                                },
+                                error: function(xhr) {
+                                    Swal.fire(
+                                        'Error!',
+                                        xhr.responseText,
+                                        'error'
+                                    );
+                                },
+                                complete: function() {
+                                    deleteBtn.html('<i class="bi bi-trash"></i>');
+                                }
+                            });
+                        }
+                    });
+                });
+
+                // Save term handler
+                saveBtn.on('click', function() {
+                    if(!termForm[0].checkValidity()) {
+                        termForm[0].reportValidity();
+                        return;
+                    }
+
+                    const saveBtn = $(this);
+                    const isEdit = $('#termId').val() !== '';
+                    const formData = {
+                        CredID: $('#termId').val() || null,
+                        CredName: $('#termName').val(),
+                        CredDays: $('#creditDays').val(),
+                        Remark: $('#termDescription').val(),
+                        IsActive: $('#isActiveterm').is(':checked') == true ?"A":"I",
+                    };
+                    saveBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...');
+                    $.ajax({
+                        url: '@Url.Action("CREATEPAYTERMS", "Master")',
+                        type: 'POST',
+                          contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(formData),
+                        dataType: 'json',
+                        success: function(response) {
+                            if(response.success) {
+                                showListView();
+                                refreshTermsList();
+                                  Notify('success', response.message, '');
+                            }
+                        },
+                        error: function(xhr) {
+                            let errorMsg = 'Operation failed';
+                            if(xhr.responseJSON && xhr.responseJSON.errors) {
+                                errorMsg = Object.values(xhr.responseJSON.errors).join('<br>');
+                            } else if(xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMsg = xhr.responseJSON.message;
+                            }
+                            showToast(errorMsg, 'error');
+                        },
+                        complete: function() {
+                            saveBtn.prop('disabled', false).html('Save Changes');
+                        }
+                    });
+                });
+
+                // View management functions
+                function showFormView() {
+                    listView.addClass('d-none');
+                    formContainer.removeClass('d-none');
+                    saveBtn.show();
+                    cancelBtn.show();
+                    addBtn.hide();
+                    modal.find('.modal-title').text($('#termId').val() ? 'Edit Payment Term' : 'Add New Payment Term');
+                }
+
+                function showListView() {
+                    formContainer.addClass('d-none');
+                    listView.removeClass('d-none');
+                    saveBtn.hide();
+                    cancelBtn.hide();
+                    addBtn.show();
+                    modal.find('.modal-title').text('Payment Terms Master');
+                }
+                refreshTermsList()
+                // Refresh terms list
+                function refreshTermsList() {
+                    $.ajax({
+                         url: '@Url.Action("GETTERMS", "Master")',
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(response) {
+                            if(response && response.length) {
+
+                                const dropdown = $('#PaymentTerms');
+                                dropdown.empty();
+                                dropdown.append('<option value="">Select </option>');
+
+                                $.each(response, function(index, country) {
+                                    dropdown.append($('<option></option>').val(country.CredID).text(country.CredName));
+                                });
+
+                                const tbody = $('#termsListView tbody');
+                                tbody.empty();
+                                $.each(response, function(index, term) {
+                                    tbody.append(`
+                                        <tr>
+                                            <td>${index + 1}</td>
+                                            <td>${term.CredName}</td>
+                                            <td>${term.CredDays}</td>
+                                            <td><span class="badge ${term.IsActive =="A" ? 'bg-success' : 'bg-secondary'}">${term.IsActive=="A" ? 'Active' : 'Inactive'}</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary edit-term" data-id="${term.CredID}">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger delete-term" data-id="${term.CredID}">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `);
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            showToast('Failed to load payment terms: ' + xhr.responseJSON.message, 'error');
+                        }
+                    });
+                }
+
+                // Toast notification
+                function showToast(message, type = 'success') {
+                    // Remove any existing toasts
+                    $('.toast-container').remove();
+
+                    // Create toast HTML
+                    const toast = $(`
+                        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                            <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                                <div class="d-flex">
+                                    <div class="toast-body">
+                                        ${message}
+                                    </div>
+                                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+
+                    // Append to body and show
+                    $('body').append(toast);
+                    toast.find('.toast').toast('show');
+
+                    // Auto-remove after 5 seconds
+                    setTimeout(function() {
+                        toast.find('.toast').toast('hide');
+                        setTimeout(function() { toast.remove(); }, 500);
+                    }, 5000);
+                }
+                // Load terms when modal is shown
+                modal.on('shown.bs.modal', refreshTermsList);
+          }
+
+    // Bank Details
+    {
+// =========================
+// Utility Helpers
+// =========================
+const $bankTableBody = $("#bankAccountsTable tbody");
+
+const createStatusBadge = isActive =>
+    isActive === "A" 
+        ? '<span class="badge bg-success">Active</span>'
+        : '<span class="badge bg-secondary">Inactive</span>';
+
+const showAlert = (type, title, message) => {
+    Swal.fire({
+        icon: type,
+        title,
+        text: message,
+        timer: type === 'success' ? 2000 : undefined,
+        showConfirmButton: type !== 'success'
+    });
+};
+
+// =========================
+// Load Banks Dropdown
+// =========================
+function loadBanks() {
+    $.ajax({
+        url: '@Url.Action("GETBANK", "Master")',
+        type: 'GET',
+        dataType: 'json',
+        success(response) {
+            const $dropdown = $('#BankName').empty().append('<option value="">Select</option>');
+
+            if (!Array.isArray(response) || response.length === 0) {
+                showAlert('warning', 'No Data', 'No bank records found.');
+                return;
+            }
+
+            response.forEach(bank => {
+                $dropdown.append(`<option value="${bank.BankID}">${bank.BankName}</option>`);
+            });
+        },
+        error(xhr) {
+            const msg = xhr.responseJSON?.message || xhr.responseText || 'Error loading banks';
+            showAlert('error', 'Error', msg);
+        }
+    });
+}
+
+// =========================
+// Load Bank Accounts Table
+// =========================
+function loadBankAccounts(id) {
+    $.ajax({
+        url: '@Url.Action("GETBANKACCOUNTLEDGERBYID", "Master")',
+        type: 'GET',
+        dataType: 'json',
+        data: { id },
+        success(data) {
+            $bankTableBody.empty();
+
+            if (!Array.isArray(data) || data.length === 0) {
+                $bankTableBody.append(`
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No bank accounts found</td>
+                    </tr>
+                `);
+                return;
+            }
+
+            data.forEach(acc => {
+                $bankTableBody.append(`
+                    <tr data-id="${acc.ID}" data-bank-id="${acc.BankID || ''}">
+                        <td class="BankName">${acc.BankName || 'N/A'}</td>
+                        <td class="BankAcctName">${acc.BankAcctName || 'N/A'}</td>
+                        <td class="BankAcctNo">${acc.BankAcctNo || 'N/A'}</td>
+                        <td class="IFSCCode">${acc.IFSCCode || 'N/A'}</td>
+                        <td class="UPIID">${acc.UPIID || 'N/A'}</td>
+                        <td class="IsActiveCell" data-active="${acc.IsActive}">
+                            ${createStatusBadge(acc.IsActive)}
+                        </td>
+                        <td class="text-nowrap">
+                            <button class="btn btn-sm btn-outline-primary edit-btn me-1" data-id="${acc.ID}">
+                                <i class="bi bi-pen"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${acc.ID}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `);
+            });
+        },
+        error() {
+            showAlert('error', 'Error', 'Failed to load bank accounts. Please try again.');
+        }
+    });
+}
+
+// =========================
+// Add / Update Entry in Table
+// =========================
+function updateTableWithNewData(formData) {
+    let $row = $bankTableBody.find(`tr[data-id="${formData.ID}"]`);
+    const statusBadge = createStatusBadge(formData.IsActive);
+
+    const rowMarkup = `
+        <tr data-id="${formData.ID}" data-bank-id="${formData.BankID}">
+            <td class="BankName">${$('#BankName option:selected').text() || 'N/A'}</td>
+            <td class="BankAcctName">${formData.BankAcctName || 'N/A'}</td>
+            <td class="BankAcctNo">${formData.BankAcctNo || 'N/A'}</td>
+            <td class="IFSCCode">${formData.IFSCCode || 'N/A'}</td>
+            <td class="UPIID">${formData.UPIID || 'N/A'}</td>
+            <td class="IsActiveCell" data-active="${formData.IsActive}">
+                ${statusBadge}
+            </td>
+            <td class="text-nowrap">
+                <button class="btn btn-sm btn-outline-primary edit-btn me-1" data-id="${formData.ID}">
+                    <i class="bi bi-pen"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${formData.ID}">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `;
+
+    // If exists → Update
+    if ($row.length) {
+        $row.replaceWith(rowMarkup);
+        return;
+    }
+
+    // If placeholder exists → remove first
+    const $placeholder = $bankTableBody.find('td[colspan="7"]');
+    if ($placeholder.length) $placeholder.closest('tr').remove();
+
+    // Add new
+    $bankTableBody.prepend(rowMarkup);
+}
+
+// =========================
+// Edit Bank Account
+// =========================
+function editBankAccount(id, $row) {
+    if (!$row.length) {
+        showAlert('error', 'Error', 'Account not found for editing.');
+        return;
+    }
+
+    const account = {
+        ID: id,
+        BankID: $row.data("bank-id"),
+        BankAcctName: $row.find(".BankAcctName").text(),
+        BankAcctNo: $row.find(".BankAcctNo").text(),
+        IFSCCode: $row.find(".IFSCCode").text(),
+        UPIID: $row.find(".UPIID").text(),
+        IsActive: $row.find(".IsActiveCell").attr("data-active"),
+    };
+
+    populateBankForm(account);
+    $("#addBankModal").modal("show");
+}
+
+// =========================
+// Populate Form in Modal
+// =========================
+            function populateBankForm(acc) {
+                console.log(acc)
+    $("#BankID").val(acc.ID || "");   // Account ID
+    $("#BankName").val(acc.BankID || "");
+    $("#BankAcctName").val(acc.BankAcctName || "");
+    $("#BankAcctNo").val(acc.BankAcctNo || "");
+    $("#IFSCCode").val(acc.IFSCCode || "");
+    $("#UPIID").val(acc.UPIID || "");
+    $("#IsActive").val(acc.IsActive || "A");
+
+    $("#addBankModalLabel").text(acc.ID ? "Edit Bank Account" : "Add Bank Account");
+}
+
+// =========================
+// Save Bank Account
+// =========================
+function saveBankAccount() {
+    const formData = {
+        ID: $("#BankID").val() || crypto.randomUUID(),
+        BankID: $("#BankName").val(),
+        BankAcctName: $("#BankAcctName").val(),
+        BankAcctNo: $("#BankAcctNo").val(),
+        IFSCCode: $("#IFSCCode").val(),
+        UPIID: $("#UPIID").val(),
+        IsActive: $("#IsActive").val()
+    };
+
+    updateTableWithNewData(formData);
+    $("#addBankModal").modal("hide");
+    resetBankForm();
+}
+
+// =========================
+// Delete Bank Account
+// =========================
+function showDeleteConfirmation(id, row) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    }).then(result => {
+        if (result.isConfirmed) deleteBankAccount(id, row);
+    });
+}
+
+function deleteBankAccount(id, row) {
+    row.remove();
+
+    if ($bankTableBody.children().length === 0) {
+        $bankTableBody.append(`
+            <tr><td colspan="7" class="text-center py-4 text-muted">No bank accounts found</td></tr>
+        `);
+    }
+
+    $.ajax({
+        url: '@Url.Action("DELETELEDGERBANK", "Master")',
+        type: 'POST',
+        data: { id },
+        success(response) {
+            if (response?.success) {
+                Notify("success", "Success", response.message || "Bank deleted!");
+            } else {
+                Notify("warning", "Warning", response.message || "Delete failed");
+            }
+        },
+        error(xhr) {
+            const msg = xhr.responseJSON?.message || xhr.responseText || "Error deleting ledger";
+            Notify("error", "Error", msg);
+        }
+    });
+}
+
+// =========================
+// Reset Modal Form
+// =========================
+function resetBankForm() {
+    $("#bankAccountForm")[0].reset();
+    $("#BankID").val("");
+    $("#IsActive").val("1");
+    $("#addBankModalLabel").text("Add Bank Account");
+}
+
+// =========================
+// Events
+// =========================
+$("#saveBankBtn").on("click", function () {
+    if ($("#bankAccountForm")[0].checkValidity()) {
+        saveBankAccount();
+    } else {
+        $("#bankAccountForm")[0].reportValidity();
+    }
+});
+
+$("#addBankModal").on("hidden.bs.modal", resetBankForm);
+
+$("#bankAccountsTable")
+    .on("click", ".edit-btn", function () {
+        editBankAccount($(this).data("id"), $(this).closest("tr"));
+    })
+    .on("click", ".delete-btn", function () {
+        showDeleteConfirmation($(this).data("id"), $(this).closest("tr"));
+    });
+
+// Load banks at start
+loadBanks();
+
+    }
+    });
+    //TDS Applicable
+    {
+        $("#TDSApplicable").change(function(){
+            if($(this).is(":checked")){
+              $(".TDSApplicablediv").show();
+            }else{
+              $(".TDSApplicablediv").hide();
+            }
+        })
+        $("#AssesseeTyp").change(function(){
+            loadTDS($(this).val(),"")
+        })
+        // Load all TDS records
+        function loadTDS(type,defaultval) {
+            if(type==""){
+              $('#TDSCode').html(`<option value="">Select</option>`);
+              return;
+            }
+            $.ajax({
+                url: '@Url.Action("GETTDSBYASSETYP", "Master")',
+                type: 'GET',
+                data:{type:type},
+                beforeSend: function() {
+                    // Show loading indicator if needed
+                },
+                success: function(response) {
+                    if (response && response.length > 0) {
+                      const dropdown = $('#TDSCode');
+                        dropdown.empty();
+                        dropdown.append('<option value="">Select</option>');
+                        $.each(response, function(index, state) {
+                            dropdown.append($('<option></option>').val(state.TDSID).text(state.TDSCode));
+                        });
+                        if (defaultval !=="") {
+                            $("#TDSCode").val(defaultval );
+                        }
+                    } else {
+                        Notify('warning', 'No Data', 'No TDS records found.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading TDS records';
+                    Notify('error', 'Error', errorMessage);
+                }
+            });
+        }
+    }
+
+</script>

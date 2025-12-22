@@ -1,0 +1,421 @@
+﻿<!-- Bank Master Form Section -->
+<section id="bankMasterSection">
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title">
+                    <i class="bi bi-bank"></i> Bank Master
+                </h3>
+            </div>
+            <div class="card-body">
+                <form id="bankMasterForm">
+                    <input type="hidden" id="BankID" name="BankID">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="BankCode" class="form-label">Bank Code <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-code-square"></i></span>
+                                <input type="text" class="form-control" id="BankCode" name="BankCode" required maxlength="10">
+                                <div class="invalid-feedback">Please provide a valid bank code (2-10 characters).</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="BankName" class="form-label">Bank Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-building"></i></span>
+                                <input type="text" class="form-control" id="BankName" name="BankName" required maxlength="100">
+                                <div class="invalid-feedback">Please provide a bank name (2-100 characters).</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="Coun_Id" class="form-label">Country <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                                <select class="form-select" id="Coun_Id" name="Coun_Id" required>
+                                    <option value="">Select Country</option>
+                                    <!-- Countries will be loaded here -->
+                                </select>
+                                <div class="invalid-feedback">Please select a country.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="IsActive" name="IsActive" checked>
+                                <label class="form-check-label" for="IsActive">Active</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3 text-end">
+                        <div class="col-md-12">
+                            <div class="col-md-12">
+                                @if (ViewBag.BtnAuth != null)
+                                {
+                                    <!-- Button Rendering Logic -->
+                                    @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                                    {
+                                        var btnName = item["BtnName"]?.ToString().Trim();
+                                        var btnauth = item["Auth"]?.ToString();
+                                        var icon = item["Icon"]?.ToString();
+                                        var ColorClass = item["ColorClass"]?.ToString();
+
+                                        if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                        {
+                                            switch (btnName)
+                                            {
+                                                case "Save":
+                                                    <button type="button" id="btnSave" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2">
+                                                        <i class="@icon"></i>@btnName
+                                                    </button>
+                                                    break;
+                                                case "Delete":
+                                                    <button type="button" id="btnDelete" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2" disabled>
+                                                        <i class="@icon"></i>@btnName
+                                                    </button>
+                                                    break;
+                                                case "Reset":
+                                                    <button type="reset" id="btnReset" class="btn @ColorClass mb-1   me-2">
+                                                        <i class="@icon"></i> Reset
+                                                    </button>
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="alert alert-primary" role="alert">
+
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="table-responsive mt-4">
+                    <table id="bankMasterTable" class="table table-striped table-hover">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Bank Code</th>
+                                <th>Bank Name</th>
+                                <th>Country</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- jQuery CRUD Operations -->
+<script>
+        $(document).ready(function() {
+               // Load all countries for dropdown
+              function loadCountries() {
+            $.ajax({
+                url: '@Url.Action("GETCOUNTRY", "Master")',
+                type: 'GET',
+                success: function(response) {
+                    if (!response || !response.length) return;
+
+                    const dropdown = $('#Coun_Id').empty().append('<option value="">Select Country</option>');
+
+                    let indiaId = response.find(c => c.Name.trim().toLowerCase() === 'india')?.Coun_Id;
+
+                    response.forEach(c => dropdown.append($('<option>').val(c.Coun_Id).text(c.Name)));
+
+                    if (indiaId) dropdown.val(indiaId); // select India if exists
+                },
+                error: function(xhr) {
+                    Notify('error', 'Error', xhr.responseJSON?.message || xhr.responseText || 'Error loading countries');
+                }
+            });
+}
+            // Dynamic duplicate check
+            function checkDuplicate() {
+                const $codeInput = $('#BankCode');
+                const $nameInput = $('#BankName');
+                const code = $codeInput.val().trim();
+                const name = $nameInput.val().trim();
+                if (!code && !name) return false;
+
+                let codeExists = false;
+                let nameExists = false;
+
+                $('#bankMasterTable tbody tr').each(function () {
+                    const rowCode = $(this).find('td:eq(0)').text().trim();
+                    const rowName = $(this).find('td:eq(1)').text().trim();
+
+                    if (rowCode === code) codeExists = true;
+                    if (rowName === name) nameExists = true;
+
+                    if (codeExists && nameExists) return false; // break loop if both found
+                });
+
+                if (codeExists && nameExists) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Duplicate Entry',
+                        text: 'Both Code and Name already exist!',
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
+                    $codeInput.val('');
+                    $nameInput.val('');
+                } else if (codeExists) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Duplicate Code',
+                        text: 'This Code already exists!',
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
+                    $codeInput.val('');
+                } else if (nameExists) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Duplicate Name',
+                        text: 'This Name already exists!',
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
+                    $nameInput.val('');
+                }
+
+                return codeExists || nameExists;
+            }
+            // Bind live check
+            $(document).on('change', '#BankCode, #BankName', checkDuplicate);
+            // Initialize form validation
+            function validateForm() {
+                let isValid = true;
+                const bankCode = $('#BankCode').val().trim();
+                const bankName = $('#BankName').val().trim();
+                const countryId = $('#Coun_Id').val();
+
+                // Validate Bank Code (2-10 characters)
+                if (bankCode.length < 2 || bankCode.length > 10) {
+                    $('#BankCode').addClass('is-invalid');
+                    isValid = false;
+                } else {
+                    $('#BankCode').removeClass('is-invalid');
+                }
+
+                // Validate Bank Name (2-100 characters)
+                if (bankName.length < 2 || bankName.length > 100) {
+                    $('#BankName').addClass('is-invalid');
+                    isValid = false;
+                } else {
+                    $('#BankName').removeClass('is-invalid');
+                }
+
+                // Validate Country selection
+                if (!countryId) {
+                    $('#Coun_Id').addClass('is-invalid');
+                    isValid = false;
+                } else {
+                    $('#Coun_Id').removeClass('is-invalid');
+                }
+
+                return isValid;
+            }
+
+            // Load all banks
+            function loadBanks() {
+                $.ajax({
+                    url: '@Url.Action("GETBANK", "Master")',
+                    type: 'GET',
+                    beforeSend: function() {
+                        // Show loading indicator if needed
+                    },
+                    success: function(response) {
+                        if (response && response.length > 0) {
+                            var tableBody = $('#bankMasterTable tbody');
+                            tableBody.empty();
+
+                            $.each(response, function(index, bank) {
+                                var row = `<tr data-id="${bank.BankID}">
+                                    <td>${bank.BankCode || ''}</td>
+                                    <td>${bank.BankName || ''}</td>
+                                    <td>${bank.CountryName || ''}</td>
+                                    <td>${bank.IsActive == "A" ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>'}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary btn-edit" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>`;
+                                tableBody.append(row);
+                            });
+                        } else {
+                            Notify('warning', 'No Data', 'No bank records found.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading banks';
+                        Notify('error', 'Error', errorMessage);
+                    }
+                });
+            }
+
+            // Initial load
+            loadCountries();
+            loadBanks();
+
+            // Save/Update bank
+            $('#btnSave').click(function() {
+                if (!validateForm()) {
+                    Notify('warning', 'Validation Error', 'Please correct the form errors before saving.');
+                    return;
+                }
+
+                // Create a JavaScript object from the form data
+                var formData = {
+                    BankID: $('#BankID').val(),
+                    BankCode: $('#BankCode').val().trim(),
+                    BankName: $('#BankName').val().trim(),
+                    Coun_Id: $('#Coun_Id').val(),
+                    IsActive: $('#IsActive').is(':checked') ? "A" : "I"
+                };
+
+                var isEdit = formData.BankID !== '';
+                $.ajax({
+                    url: '@Url.Action("CREATEBANK", "Master")',
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(formData),
+                    beforeSend: function() {
+                        $('#btnSave').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Processing...');
+                    },
+                    success: function(response) {
+                        if (response && response.success) {
+                            Notify('success', 'Success', response.message || (isEdit ? 'Bank updated successfully!' : 'Bank created successfully!'));
+                            loadBanks();
+                            $('#bankMasterForm')[0].reset();
+                            $('#BankID').val('');
+                            $('#btnDelete').prop('disabled', true);
+                        } else {
+                            Notify('warning', 'Warning', response.message || 'Operation completed but with warnings.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error saving bank';
+                        Notify('error', 'Error', errorMessage);
+                    },
+                    complete: function() {
+                        $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
+                    }
+                });
+            });
+
+            // Delete bank
+            $('#btnDelete').click(function() {
+                var bankId = $('#BankID').val();
+                if (!bankId) {
+                    Notify('warning', 'Warning', 'No bank selected to delete.');
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '@Url.Action("DELETEBANK", "Master")',
+                            type: 'POST',
+                            data: { id: bankId },
+                            beforeSend: function() {
+                                $('#btnDelete').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Deleting...');
+                            },
+                            success: function(response) {
+                                if (response && response.success) {
+                            Notify('success', 'Success', response.message || 'Bank deleted successfully!');
+                            loadBanks();
+                            $('#bankMasterForm')[0].reset();
+                            $('#BankID').val('');
+                        } else {
+                            Notify('warning', 'Warning', response.message || 'Bank could not be deleted.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error deleting bank';
+                        Notify('error', 'Error', errorMessage);
+                    },
+                    complete: function() {
+                        $('#btnDelete').prop('disabled', false).html('<i class="bi bi-trash"></i> Delete');
+                    }
+                });
+            }
+        });
+    });
+
+    // Edit bank
+    $(document).on('click', '.btn-edit', function() {
+        var bankId = $(this).closest('tr').data('id');
+        if (!bankId) {
+            Notify('warning', 'Warning', 'No bank ID found for editing.');
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("GETBANKBYID", "Master")',
+            data: { id: bankId },
+            type: 'GET',
+            beforeSend: function() {
+                // Show loading indicator if needed
+            },
+            success: function(response) {
+                if (response && response.length > 0) {
+                    var bank = response[0];
+                    $('#BankID').val(bank.BankID);
+                    $('#BankCode').val(bank.BankCode);
+                    $('#BankName').val(bank.BankName);
+                    $('#Coun_Id').val(bank.Coun_Id);
+                    $('#IsActive').prop('checked', bank.IsActive === "A");
+                    $('#btnDelete').prop('disabled', false);
+                    $('html, body').animate({ scrollTop: 0 }, 'slow');
+                } else {
+                    Notify('warning', 'Warning', 'No data returned for this bank.');
+                }
+            },
+            error: function(xhr, status, error) {
+                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading bank data';
+                Notify('error', 'Error', errorMessage);
+            }
+        });
+    });
+
+    // Reset form
+    $('#btnReset').click(function() {
+        $('#BankID').val('');
+        $('#btnDelete').prop('disabled', true);
+        $('.is-invalid').removeClass('is-invalid');
+    });
+
+    // Real-time validation
+    $('#BankCode, #BankName, #Coun_Id').on('input change', function() {
+        $(this).removeClass('is-invalid');
+    });
+    });
+</script>

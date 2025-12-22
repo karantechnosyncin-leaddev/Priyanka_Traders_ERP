@@ -1,0 +1,399 @@
+﻿@{ 
+
+    var role = Context.Session.GetString("Role");
+}
+
+<style>
+    .fade-in {
+        animation: fadeIn 0.8s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+    }
+
+    .btn i {
+        margin-right: 5px;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f1f1;
+        transition: background-color 0.3s;
+    }
+
+    .form-section {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+</style>
+
+<div class="container py-5">
+
+    <h2 class="mb-4 text-center">User & License Management</h2>
+
+    <!-- User Form -->
+    <div class="form-section fade-in">
+        <form id="userForm" class="needs-validation" novalidate>
+            <input type="hidden" id="UserID">
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="Username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="Username" required>
+                    <div class="invalid-feedback">Username is required.</div>
+                </div>
+
+                <div class="col-md-4 position-relative">
+                    <label for="Password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="Password" required minlength="6">
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword"><i class="bi bi-eye"></i></button>
+                    </div>
+                    <div class="invalid-feedback">Password must be at least 6 characters.</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="FullName" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="FullName" required>
+                    <div class="invalid-feedback">Full name is required.</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="Email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="Email" >
+                    <div class="invalid-feedback">Valid email is required.</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="Mobile" class="form-label">Mobile</label>
+                    <input type="tel" class="form-control" id="Mobile" pattern="[0-9]{10}" required>
+                    <div class="invalid-feedback">Enter 10 digit mobile number.</div>
+                </div>
+               
+                    <div class="col-md-4"  @if (role != "A" && role != "D"){ <text>hidden</text>}>
+                        <label for="Role" class="form-label">Role</label>
+                        <select class="form-select" id="Role" required>
+                            @if (role == "A" || role == "D")
+                             {
+                                <option value="A">Admin</option>
+                                <option value="D">Developer</option>
+                                <option value="T">Trial User</option>
+                            }
+                            <option value="U">Erp User</option>
+                        </select>
+                        <div class="invalid-feedback">Role is required.</div>
+                    </div>
+                <div class="col-md-4">
+                    <label for="IsActive" class="form-label">IsActive</label>
+                    <select class="form-select" id="IsActive" required>
+                        <option value="True">Active</option>
+                        <option value="False">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="LicenseValidFrom" class="form-label">License Valid From</label>
+                    <input type="date" class="form-control" readonly id="LicenseValidFrom">
+                </div>
+
+                <div class="col-md-4">
+                    <label for="LicenseValidTo" class="form-label">License Valid To</label>
+                    <input type="date" class="form-control" readonly id="LicenseValidTo">
+                </div>
+                <div class="col-md-4" @if (role != "A" && role != "D"){ <text>hidden</text>}>
+                    <label for="Licencekey" class="form-label">License Key</label>
+                    <input type="text" class="form-control" readonly id="Licencekey">
+                </div>
+            </div>
+           
+                <!-- Apply License Section (Moved Outside .row) -->
+                <div class="mt-4" @if (role != "A" && role != "D"){ <text>hidden</text>}>
+                    <h5>Apply License</h5>
+                    <textarea id="LicenseTextarea" class="form-control mb-3" rows="3" placeholder="Paste license key(s) here..."></textarea>
+                    <button type="button" class="btn btn-success" id="applyLicenseBtn"><i class="bi bi-key"></i> Apply License</button>
+                </div>
+        <div class="mt-4 d-flex justify-content-end">
+            @if (ViewBag.BtnAuth != null)
+            {
+                <!-- Button Rendering Logic -->
+                @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                {
+                    var btnName = item["BtnName"]?.ToString().Trim();
+                    var btnauth = item["Auth"]?.ToString();
+                    var icon = item["Icon"]?.ToString();
+                    var ColorClass = item["ColorClass"]?.ToString();
+
+                    if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                    {
+                        switch (btnName)
+                        {
+                            case "Save":
+                                <button type="submit" id="btnSave" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2">
+                                    <i class="@icon"></i>
+                                    <span id="btnSaveText">@btnName</span>
+                                    <span id="btnSaveSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                </button>
+                                break;
+                            case "Reset":
+                                <button type="button" id="btnReset" class="btn @ColorClass mb-1   me-2">
+                                    <i class="@icon"></i> Reset
+                                </button>
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                <div class="alert alert-primary" role="alert">
+
+                </div>
+            }
+        </div>
+        </form>
+    </div>
+
+    <!-- User Table -->
+    <div class="form-section fade-in">
+        <h5>User List</h5>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>UserID</th>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th hidden>Role</th>
+                        <th>License</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+<script src="~/js/crypto-js.min.js"></script>
+<script>
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('Password');
+
+    togglePasswordBtn.addEventListener('click', function () {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+        this.innerHTML = type === 'password' ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+    });
+
+    let users = [];
+
+    // Replace with actual URL if not Razor view
+    const getUsersUrl = '@Url.Action("GETUSERS", "Auth")'
+    const postUserUrl = '@Url.Action("Users", "Auth")'
+
+    // Load existing users
+    $.ajax({
+        type: "GET",
+        url: getUsersUrl,
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            if (data.length) {
+                users = data;
+                renderTable();
+            }
+        },
+        error: function (xhr) {
+            const errorMessage = xhr.responseJSON?.error || 'Error loading users';
+            Notify('error', 'Error', data.message);
+        }
+    });
+
+    const form = document.getElementById('userForm');
+    const userTableBody = document.getElementById('userTableBody');
+    const btnReset = document.getElementById('btnReset');
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
+
+        const user = {
+            UserID: $('#UserID').val(),
+            Username: $('#Username').val(),
+            Password: $('#Password').val(),
+            FullName: $('#FullName').val(),
+            Email: $('#Email').val(),
+            Mobile: $('#Mobile').val(),
+            Role: $('#Role').val(),
+            LicenseValidFrom: $('#LicenseValidFrom').val(),
+            LicenseValidTo: $('#LicenseValidTo').val(),
+            Licencekey: $('#Licencekey').val() ,
+            IsActive: $('#IsActive').val()
+        };
+        $.ajax({
+            type: "POST",
+            url: postUserUrl,
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(user),
+            success: function (data) {
+                if (data.success) {
+                    Notify('success', 'Success', data.message);
+                    loadUsers();
+                    resetForm();
+                } else {
+                    Notify('error', 'Error', data.message);
+                }
+            },
+            error: function (xhr) {
+                const errorMessage = xhr.responseJSON?.message || "Unknown error";
+                Notify('error', 'Error', data.message);
+            }
+        });
+    });
+
+    function loadUsers() {
+        $.get(getUsersUrl, function (data) {
+            users = data;
+            renderTable();
+        });
+    }
+
+    function renderTable() {
+        userTableBody.innerHTML = '';
+        users.forEach(user => {
+            const row = `
+                <tr class="fade-in">
+                    <td>${user.UserID}</td>
+                    <td>${user.Username}</td>
+                    <td>${user.FullName}</td>
+                    <td>${user.Email}</td>
+                    <td>${user.Mobile}</td>
+                    <td hidden>${user.Role}</td>
+                    <td>${user.LicenseValidFrom} to ${user.LicenseValidTo}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning me-1" onclick="editUser('${user.UserID}')"><i class="bi bi-pencil-square"></i></button>
+                    </td>
+                </tr>
+            `;
+            userTableBody.insertAdjacentHTML('beforeend', row);
+        });
+    }
+
+    function editUser(id) {
+        const user = users.find(u => u.UserID == id);
+        if (user) {
+            for (const key in user) {
+                const input = document.getElementById(key);
+                if (input) input.value = user[key];
+            }
+        }
+    }
+
+    function deleteUser(id) {
+        $.ajax({
+            type: "POST",
+            url: '/Auth/DeleteUser', // Replace with actual delete URL
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({ UserID: id }),
+            success: function (data) {
+                if (data.success) {
+                    loadUsers();
+                } else {
+                    alert(data.message);
+                }
+            }
+        });
+    }
+
+    btnReset.addEventListener('click', resetForm);
+    function resetForm() {
+        form.reset();
+        form.classList.remove('was-validated');
+        document.getElementById('UserID').value = '';
+    }
+    // Add this function to your existing script
+    function decryptLicenseKey(encryptedKey, secretKey) {
+        try {
+            // Decrypt the license key
+            const bytes = CryptoJS.AES.decrypt(encryptedKey, secretKey);
+            const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+            // Parse and return the JSON
+            return JSON.parse(decryptedData);
+        } catch (error) {
+            console.error("Decryption failed:", error);
+            Notify('error', 'Decryption failed', error);
+            return null;
+        }
+    }
+    // jQuery version of the example usage
+    $(document).on('click', '#applyLicenseBtn', function() {
+        const licenseKey = document.getElementById('LicenseTextarea').value.trim();
+        const secretKey = $('#Licencekey').val();
+        if (!licenseKey) {
+            Notify('warning', 'Please enter a license key', '');
+            return;
+        }
+        if (!licenseKey || !secretKey) {
+            Notify('error', 'Missing Data', 'Both license key and secret key are required');
+            return;
+        } 
+        const licenseData = decryptLicenseKey(licenseKey, secretKey);
+        if (licenseData.secretKey !==secretKey) {
+            Notify('error', 'License Missmatch', 'Please Enter Valid License Key.');
+            return;
+        }
+
+        var data=
+        {
+         UserID:licenseData.userid,
+         LicenseValidFrom:licenseData.validFrom,
+         LicenseValidTo:licenseData.validTo,
+        }
+
+        if (data) {
+            // Display the decrypted data
+              Notify('info', 'Licence', JSON.stringify(licenseData, null, 2));
+               $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("APPLYLICENCE", "Auth")', // Add userId here
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(data),
+                    success: function(response) {
+                        if(response.success){
+                            Notify('success', 'Success', response.message);
+                            $("#LicenseValidFrom").val(licenseData.validFrom)
+                            $("#LicenseValidTo").val(licenseData.validTo)
+                        }else{
+                            Notify('error', 'Error',response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        const errorMessage = xhr.responseJSON?.error || 'Error saving menu permissions';
+                        Notify('error', 'Error', errorMessage);
+                    }
+                });
+            // Or update your UI as needed
+            $('#licenseDetails').text(JSON.stringify(licenseData, null, 2));
+        } else {
+            Notify('error', 'Decryption Failed', 'Invalid license key or secret key');
+        }
+    });
+</script>

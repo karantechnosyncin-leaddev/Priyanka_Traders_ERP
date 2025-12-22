@@ -1,0 +1,382 @@
+﻿<!-- TDS Master Form Section -->
+<section id="tdsMasterSection">
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title">
+                    <i class="bi bi-percent"></i> TDS Master
+                </h3>
+            </div>
+            <div class="card-body">
+                <form id="tdsMasterForm">
+                    <input type="hidden" id="TDSID" name="TDSID">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="TDSCode" class="form-label">TDS Code <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-code-square"></i></span>
+                                <input type="text" class="form-control" id="TDSCode" name="TDSCode" required maxlength="20">
+                                <div class="invalid-feedback">Please provide a valid TDS code (2-20 characters).</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="TDSName" class="form-label">TDS Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                                <input type="text" class="form-control" id="TDSName" name="TDSName" required maxlength="100">
+                                <div class="invalid-feedback">Please provide a TDS name (2-100 characters).</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="Rate" class="form-label">Rate (%) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-percent"></i></span>
+                                <input type="number" step="1" class="form-control" id="Rate" name="Rate" required min="0" max="100">
+                                <div class="invalid-feedback">Please provide a valid rate (0-100%).</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="Section" class="form-label">Section</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-file-text"></i></span>
+                                <input type="text" class="form-control" id="Section" name="Section" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="Assessee" class="form-label">Assessee</label>
+                            <div class="input-group">
+                                <select class="form-select" id="Assessee">
+                                    <option value="">Select</option>
+                                    <option value="C">Company</option>
+                                    <option value="O">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="PurTDSAcct" class="form-label">Purchase TDS Account</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-cart"></i></span>
+                                <input type="text" class="form-control" id="PurTDSAcct" name="PurTDSAcct" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="SaleTDSAcct" class="form-label">Sales TDS Account</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-cash-stack"></i></span>
+                                <input type="text" class="form-control" id="SaleTDSAcct" name="SaleTDSAcct" maxlength="50">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="IsActive" name="IsActive" checked>
+                                <label class="form-check-label" for="IsActive">Active</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3 text-end">
+                        <div class="col-md-12">
+                            @if (ViewBag.BtnAuth != null)
+                            {
+                                <!-- Button Rendering Logic -->
+                                @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                                {
+                                    var btnName = item["BtnName"]?.ToString().Trim();
+                                    var btnauth = item["Auth"]?.ToString();
+                                    var icon = item["Icon"]?.ToString();
+                                    var ColorClass = item["ColorClass"]?.ToString();
+
+                                    if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                    {
+                                        switch (btnName)
+                                        {
+                                            case "Save":
+                                                <button type="button" id="btnSave" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2">
+                                                    <i class="@icon"></i>@btnName
+                                                </button>
+                                                break;
+                                            case "Delete":
+                                                <button type="button" id="btnDelete" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2" disabled>
+                                                    <i class="@icon"></i>@btnName
+                                                </button>
+                                                break;
+                                            case "Reset":
+                                                <button type="reset" id="btnReset" class="btn @ColorClass mb-1   me-2">
+                                                    <i class="@icon"></i> Reset
+                                                </button>
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <div class="alert alert-primary" role="alert">
+
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </form>
+
+                <div class="table-responsive mt-4">
+                    <table id="tdsMasterTable" class="table table-striped table-hover">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>TDS Code</th>
+                                <th>TDS Name</th>
+                                <th>Rate (%)</th>
+                                <th>Section</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- jQuery CRUD Operations -->
+<script>
+    $(document).ready(function() {
+        // Initialize form validation
+        function validateForm() {
+            let isValid = true;
+            const tdsCode = $('#TDSCode').val().trim();
+            const tdsName = $('#TDSName').val().trim();
+            const rate = $('#Rate').val();
+
+            // Validate TDS Code (2-20 characters)
+            if (tdsCode.length < 2 || tdsCode.length > 20) {
+                $('#TDSCode').addClass('is-invalid');
+                isValid = false;
+            } else {
+                $('#TDSCode').removeClass('is-invalid');
+            }
+
+            // Validate TDS Name (2-100 characters)
+            if (tdsName.length < 2 || tdsName.length > 100) {
+                $('#TDSName').addClass('is-invalid');
+                isValid = false;
+            } else {
+                $('#TDSName').removeClass('is-invalid');
+            }
+
+            // Validate Rate (0-100)
+            if (rate === '' || isNaN(rate) || parseFloat(rate) < 0 || parseFloat(rate) > 100) {
+                $('#Rate').addClass('is-invalid');
+                isValid = false;
+            } else {
+                $('#Rate').removeClass('is-invalid');
+            }
+
+            return isValid;
+        }
+
+        // Load all TDS records
+        function loadTDS() {
+            $.ajax({
+                url: '@Url.Action("GETTDS", "Master")',
+                type: 'GET',
+                beforeSend: function() {
+                    // Show loading indicator if needed
+                },
+                success: function(response) {
+                    if (response && response.length > 0) {
+                        var tableBody = $('#tdsMasterTable tbody');
+                        tableBody.empty();
+
+                        $.each(response, function(index, tds) {
+                            var row = `<tr data-id="${tds.TDSID}">
+                                <td>${tds.TDSCode || ''}</td>
+                                <td>${tds.TDSName || ''}</td>
+                                <td>${tds.Rate || '0'}%</td>
+                                <td>${tds.Section || ''}</td>
+                                <td>${tds.IsActive == "A" ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>'}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary btn-edit" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </td>
+                            </tr>`;
+                            tableBody.append(row);
+                        });
+                    } else {
+                        Notify('warning', 'No Data', 'No TDS records found.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading TDS records';
+                    Notify('error', 'Error', errorMessage);
+                }
+            });
+        }
+
+        // Initial load
+        loadTDS();
+
+        // Save/Update TDS
+        $('#btnSave').click(function() {
+            if (!validateForm()) {
+                Notify('warning', 'Validation Error', 'Please correct the form errors before saving.');
+                return;
+            }
+
+            // Create a JavaScript object from the form data
+            var formData = {
+                TDSID: $('#TDSID').val(),
+                TDSCode: $('#TDSCode').val().trim(),
+                TDSName: $('#TDSName').val().trim(),
+                Rate: $('#Rate').val(),
+                Section: $('#Section').val().trim(),
+                Assessee: $('#Assessee').val().trim(),
+                PurTDSAcct: $('#PurTDSAcct').val().trim(),
+                SaleTDSAcct: $('#SaleTDSAcct').val().trim(),
+                IsActive: $('#IsActive').is(':checked') ? "A" : "I"
+            };
+            var isEdit = formData.TDSID !== '';
+            $.ajax({
+                url: '@Url.Action("CREATETDS", "Master")',
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(formData),
+                beforeSend: function() {
+                    $('#btnSave').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Processing...');
+                },
+                success: function(response) {
+                    if (response && response.success) {
+                        Notify('success', 'Success', response.message || (isEdit ? 'TDS updated successfully!' : 'TDS created successfully!'));
+                        loadTDS();
+                        $('#tdsMasterForm')[0].reset();
+                        $('#TDSID').val('');
+                        $('#btnDelete').prop('disabled', true);
+                    } else {
+                        Notify('warning', 'Warning', response.message || 'Operation completed but with warnings.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error saving TDS';
+                    Notify('error', 'Error', errorMessage);
+                },
+                complete: function() {
+                    $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
+                }
+            });
+        });
+
+        // Delete TDS
+        $('#btnDelete').click(function() {
+            var tdsId = $('#TDSID').val();
+            if (!tdsId) {
+                Notify('warning', 'Warning', 'No TDS selected to delete.');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("DELETETDS", "Master")',
+                        type: 'POST',
+                        data: { id: tdsId },
+                        beforeSend: function() {
+                            $('#btnDelete').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Deleting...');
+                        },
+                        success: function(response) {
+                            if (response && response.success) {
+                                Notify('success', 'Success', response.message || 'TDS deleted successfully!');
+                                loadTDS();
+                                $('#tdsMasterForm')[0].reset();
+                                $('#TDSID').val('');
+                            } else {
+                                Notify('warning', 'Warning', response.message || 'TDS could not be deleted.');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error deleting TDS';
+                            Notify('error', 'Error', errorMessage);
+                        },
+                        complete: function() {
+                            $('#btnDelete').prop('disabled', false).html('<i class="bi bi-trash"></i> Delete');
+                        }
+                    });
+                }
+            });
+        });
+
+        // Edit TDS
+        $(document).on('click', '.btn-edit', function() {
+            var tdsId = $(this).closest('tr').data('id');
+            if (!tdsId) {
+                Notify('warning', 'Warning', 'No TDS ID found for editing.');
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("GETTDSBYID", "Master")',
+                data: { id: tdsId },
+                type: 'GET',
+                beforeSend: function() {
+                    // Show loading indicator if needed
+                },
+                success: function(response) {
+                    if (response && response.length > 0) {
+                        var tds = response[0];
+                        $('#TDSID').val(tds.TDSID);
+                        $('#TDSCode').val(tds.TDSCode);
+                        $('#TDSName').val(tds.TDSName);
+                        $('#Rate').val(tds.Rate);
+                        $('#Section').val(tds.Section);
+                        $('#Assessee').val(tds.Assessee);
+                        $('#PurTDSAcct').val(tds.PurTDSAcct);
+                        $('#SaleTDSAcct').val(tds.SaleTDSAcct);
+                        $('#IsActive').prop('checked', tds.IsActive === "A");
+                        $('#btnDelete').prop('disabled', false);
+                        $('html, body').animate({ scrollTop: 0 }, 'slow');
+                    } else {
+                        Notify('warning', 'Warning', 'No data returned for this TDS.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error loading TDS data';
+                    Notify('error', 'Error', errorMessage);
+                }
+            });
+        });
+
+        // Reset form
+        $('#btnReset').click(function() {
+            $('#TDSID').val('');
+            $('#btnDelete').prop('disabled', true);
+            $('.is-invalid').removeClass('is-invalid');
+        });
+
+        // Real-time validation
+        $('#TDSCode, #TDSName, #Rate').on('input change', function() {
+            $(this).removeClass('is-invalid');
+        });
+    });
+</script>

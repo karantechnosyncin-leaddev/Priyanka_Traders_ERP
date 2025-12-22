@@ -1,0 +1,539 @@
+﻿<style>
+    .authorization-container {
+        margin-top: 20px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        background-color: #f8f9fa;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .btn-toggle {
+        cursor: pointer;
+        margin-right: 8px;
+        transition: transform 0.2s;
+        color: #6c757d;
+    }
+
+        .btn-toggle.collapsed {
+            transform: rotate(0deg);
+        }
+
+        .btn-toggle.expanded {
+            transform: rotate(90deg);
+        }
+
+    .menu-item {
+        margin-left: 15px;
+        padding: 8px 0;
+        border-radius: 4px;
+    }
+
+    .menu-header {
+        padding: 8px 12px;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+
+        .menu-header:hover {
+            background-color: #e9ecef;
+        }
+
+    .menu-name {
+        margin-left: 5px;
+    }
+
+    .btn-list {
+        margin-left: 30px;
+        margin-top: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .btn-auth {
+        background-color: white;
+        border: 1px solid #dee2e6;
+        border-radius: 20px;
+        padding: 5px 15px;
+        transition: all 0.2s;
+    }
+
+        .btn-auth:hover {
+            background-color: #f1f1f1;
+        }
+
+    .btn-auth-checkbox {
+        margin-right: 8px;
+    }
+
+    .selected {
+        background-color: #e7f1ff;
+        border-left: 3px solid #0d6efd;
+    }
+
+    .authorized-menu {
+        color: #0d6efd;
+        font-weight: 600;
+    }
+
+    .menu-icon {
+        width: 20px;
+        text-align: center;
+        margin-right: 8px;
+        color: #6c757d;
+    }
+
+    #buttonAuthSection {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    @@media (max-width: 768px) {
+        .menu-item
+
+    {
+        margin-left: 10px;
+    }
+
+    .btn-list {
+        margin-left: 15px;
+    }
+
+    .authorization-container {
+        padding: 15px;
+    }
+
+    }
+
+    .button-card {
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+        .button-card:hover {
+            border-color: #0d6efd;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            transform: translateY(-2px);
+        }
+
+    .category-header {
+        border-left: 3px solid #0d6efd;
+    }
+
+    .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    .form-switch .form-check-input {
+        width: 2.5em;
+        height: 1.4em;
+        margin-right: 0.5em;
+    }
+
+    @@media (max-width: 576px) {
+        .button-card
+
+    {
+        margin-bottom: 15px;
+    }
+
+    .form-switch .form-check-input {
+        width: 2em;
+        height: 1.2em;
+    }
+
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="bi bi-shield-lock me-2"></i>Button Authorization
+        </h2>
+        <div class="d-flex align-items-center">
+            <div class="spinner-border spinner-border-sm me-2 d-none" id="loadingSpinner" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div id="statusMessage" class="text-muted small"></div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-6 col-lg-4">
+                    <label for="userSelect" class="form-label">Select User</label>
+                    <select class="form-select" id="userSelect">
+                        <option value="">-- Select User --</option>
+                    </select>
+                </div>
+               <div class="col-md-6 col-lg-4">
+                    <label for="MenuID" class="form-label">Menu</label>
+                    <select class="form-select" id="MenuID">
+                        <option value="">-- Select Menu --</option>
+                    </select>
+                </div>
+                <div class="col-md-6 col-lg-4 text-end">
+                    <button id="btnSave" data-action="create" class="btn btn-success me-2 mb-1">
+                        <i class="bi bi-save me-1"></i> Save
+                    </button>
+                    <button id="btnDelete" class="btn btn-danger me-2 mb-1" disabled>
+                        <i class="bi bi-trash me-1"></i> Delete
+                    </button>
+                    <button id="btnReset" class="btn btn-warning mb-1">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="authorization-container">
+        <h4 class="mb-4">
+            <i class="bi bi-list-check me-2"></i>Menu & Button Authorization
+        </h4>
+
+        <div class="row g-4">
+            <div class="col-lg-12">
+                <div class="card" id="buttonAuthSection" style="display:none;">
+                    <div class="buttollist card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0" id="selectedMenuTitle">
+                                <i class="bi bi-menu-button me-2"></i>Button Authorization
+                            </h5>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-end mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="checkall">
+                                <label class="form-check-label" for="checkall">Select All</label>
+                            </div>
+                        </div>
+                        <div id="buttonList" class="">
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" id="noSelectionSection" style="display:block;">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-menu-up display-5 text-muted mb-3"></i>
+                        <h5 class="text-muted">Select a user and menu to manage button authorizations</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+         // Initialize variables
+        let users = [];
+        let menus = [];
+        let currentAuthData = []; // Store current authorization data
+
+        // Load initial data
+        loadUsers();
+        // Button event handlers
+        $('#btnSave').click(saveAuthorizations);
+        $('#btnReset').click(resetForm);
+
+        // Function to reset the form
+        function resetForm() {
+            $('#userSelect').val('');
+            $('#MenuID').val('');
+            $('#buttonList').empty();
+            $('#noSelectionSection').show();
+            $('#buttonAuthSection').hide();
+            $('#btnSave').data('action', 'create');
+            $('#btnDelete').prop('disabled', true);
+            $('#checkall').prop('checked', false);
+        }
+         $('#btnDelete').click(function() {
+            deleteDoc();
+        });
+        function deleteDoc(){
+          var id = $('#MenuID').val();
+            if(!id){
+                Notify('error', 'Auth Id is required for deletion','');
+                return;
+            }
+             Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("DELETEBTNAUTH", "Auth")',
+                        type: 'POST',
+                        data: { id: $("#MenuID").val() },
+                        beforeSend: function() {
+                            $('#btnDelete').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Deleting...');
+                        },
+                        success: function(response) {
+                            if (response && response.success) {
+                                Notify('success', 'Success', response.message || 'Document deleted successfully!');
+                                 resetForm();
+                            } else {
+                                Notify('warning', 'Warning', response.message || 'Document deleted successfully!');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error deleting Document';
+                            Notify('error', 'Error', errorMessage);
+                        },
+                        complete: function() {
+                            $('#btnDelete').prop('disabled', false).html('<i class="bi bi-trash"></i> Delete');
+                        }
+                    });
+                }
+            });
+        }
+        // Function to save authorizations
+        function saveAuthorizations() {
+            const userId = $('#userSelect').val();
+            const menuId = $('#MenuID').val();
+            const objtype = $('#MenuID option:selected').data("objtype");
+
+            if (!userId || !menuId) {
+                showError('Please select both a user and a menu');
+                return;
+            }
+
+            // Collect all button authorization states
+            const authorizations = [];
+            $('.btn-auth-checkbox').each(function() {
+                const btnId = $(this).val();
+                var authId = $(this).data("id").toString() || null;
+                const isAuthorized = $(this).is(':checked');
+                authorizations.push({
+                    Objtype: objtype,
+                    AuthID: authId,
+                    MenuID: menuId,
+                    BtnID: btnId,
+                    UserID: userId,
+                    Auth: isAuthorized ? 'Y' : 'N'
+                });
+            });
+
+            if (authorizations.length === 0) {
+                showError('No buttons found to save');
+                return;
+            }
+            showLoading(true);
+            $.ajax({
+                url: '@Url.Action("CREATEBTNAUTH", "Auth")',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    authorizations: authorizations
+                }),
+                success: function(response) {
+                    if (response.success) {
+                        Notify('success', 'Success', 'Authorizations saved successfully');
+                        loadAuthorizations(userId, menuId);
+                        $('#btnSave').data('action', 'update');
+                        $('#btnDelete').prop('disabled', false);
+                    } else {
+                        showError(response.message || 'Failed to save authorizations');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error saving authorizations:', error);
+                    showError('Failed to save authorizations');
+                },
+                complete: function() {
+                    showLoading(false);
+                }
+            });
+        }
+
+        // Function to show/hide loading spinner
+        function showLoading(show) {
+            if (show) {
+                $('#loadingSpinner').removeClass('d-none');
+                $('#statusMessage').text('Saving...');
+            } else {
+                $('#loadingSpinner').addClass('d-none');
+                $('#statusMessage').text('');
+            }
+        }
+
+        // Modify the loadAuthorizations function to store current auth data
+        function loadAuthorizations(userId, menuid) {
+            showLoading(true);
+            $.ajax({
+                url: '@Url.Action("GETBTNAUTH", "Auth")',
+                method: 'GET',
+                data: {
+                    userId: userId,
+                    menuid: menuid
+                },
+                dataType: 'json',
+                success: function(response) {
+                    currentAuthData = response || [];
+                    $('#buttonList').empty();
+                    if (currentAuthData.length > 0) {
+                        bindswitch(currentAuthData);
+                        $('#btnSave').data('action', 'update');
+                        $('#btnDelete').prop('disabled', false);
+                    } else {
+                        bindswitch([]);
+                        $('#btnSave').data('action', 'create');
+                        $('#btnDelete').prop('disabled', true);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading authorizations:', error);
+                    showError('Failed to load button authorizations');
+                },
+                complete: function() {
+                    showLoading(false);
+                }
+            });
+        }
+
+
+        // Function to load users
+        function loadUsers() {
+            $.ajax({
+                url: '@Url.Action("GETUSERS", "Auth")',
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response && Array.isArray(response)) {
+                        users = response;
+                        const $select = $('#userSelect');
+                        $select.empty().append('<option value="">-- Select User --</option>');
+                        users.forEach(user => {
+                            $select.append(`<option value="${user.UserID}">${user.Username}</option>`);
+                        });
+                    } else {
+                        console.error('Invalid user data received');
+                        showError('Invalid user data');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading users:', error);
+                    showError('Failed to load users');
+                    users = [];
+                }
+            });
+        }
+        $('#userSelect').change(function () {
+            loadMenus() 
+        })
+        // Function to load menus
+        function loadMenus() {
+            $.ajax({
+                url: '@Url.Action("GETMENUBYUSER", "Auth")',
+                method: 'GET',
+                data: { id: $('#userSelect').val()},
+                dataType: 'json',
+                success: function (response) {
+                    if (response && Array.isArray(response)) {
+                        menus = response;
+                        const $select = $('#MenuID');
+                        $select.empty();
+                        $select.append('<option value="">Select Menu</option>');
+                        menus.forEach(menu => {
+                            $select.append(`<option data-objtype="${menu.ObjType}" value="${menu.MenuID}">${menu.MenuName}</option>`);
+                        });
+                    } else {
+                        console.error('Invalid menu data received');
+                        showError('Invalid menu data');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading menus:', error);
+                    showError('Failed to load menus');
+                    menus = [];
+                }
+            });
+        }
+        // Change event handlers
+        $(document).on("change", "#userSelect,#MenuID", function() {
+            var userid = $("#userSelect").val();
+            var menuid = $("#MenuID").val();
+              $('#checkall').prop('checked', false);
+            // Only load authorizations if both values are selected
+            if (userid && menuid) {
+                loadAuthorizations(userid, menuid);
+            } else {
+                $('#buttonList').empty(); // Clear if either selection is empty
+            }
+        });
+         $("#checkall").click(function() {
+            $(".btn-auth-checkbox").prop("checked", $(this).is(":checked"));
+         });
+
+
+      function bindswitch(data) {
+        if (!data || data.length === 0) {
+            $('#buttonList').html('<div class="col-12"><p class="text-muted">No buttons found for this menu</p></div>');
+            $('#noSelectionSection').hide();
+            $('#buttonAuthSection').show();
+            return;
+        }
+
+        // Show the button section and hide the placeholder
+        $('#noSelectionSection').hide();
+        $('#buttonAuthSection').show();
+
+        // Clear previous content
+        const $buttonGrid = $('#buttonList');
+        $buttonGrid.empty();
+
+        // Create a row container
+        const $row = $('<div class="row g-3"></div>');
+        $buttonGrid.append($row);
+
+        data.forEach(button => {
+            // Fix: Check for proper property names (BtnID, Auth, Icon, BtnName)
+            const isAuthorized = (button.Auth && button.Auth.toUpperCase() === "Y");
+            const buttonIcon = button.Icon ? `<i class="bi ${button.Icon} me-2"></i>` : '';
+            const buttonDescription = button.Description ? `<small class="text-muted d-block mt-1">${button.Description}</small>` : '';
+
+            $row.append(`
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <div class="card button-card h-100">
+                        <div class="card-body p-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input btn-auth-checkbox" data-id="${button.AuthID || ''}"" type="checkbox"
+                                       id="btn-${button.BtnID}" value="${button.BtnID}"
+                                       ${isAuthorized ? 'checked' : ''}>
+                                <label class="form-check-label" for="btn-${button.BtnID}">
+                                    <div class="d-flex align-items-center">
+                                        ${buttonIcon}
+                                        <div>
+                                            <strong>${button.BtnName}</strong>
+                                            ${buttonDescription}
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `);
+            $("#AuthID").val(button.AuthID);
+        });
+
+        // Animate the cards
+        
+    }
+
+        // Helper function to show errors (make sure this exists)
+        function showError(message) {
+             Notify('error', 'Error', message);
+        }
+    });
+</script>

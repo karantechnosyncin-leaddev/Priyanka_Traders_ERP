@@ -1,0 +1,859 @@
+﻿@{
+
+    var role = Context.Session.GetString("Role");
+}
+<style>
+    :root {
+        --accent: #3a86ff;
+        --accent-light: #6ba4ff;
+        --accent-dark: #2667cc;
+        --card-bg: #ffffff;
+        --muted: #6c757d;
+        --success: #28a745;
+        --warning: #ffc107;
+        --danger: #dc3545;
+        --text-dark: #343a40;
+        --text-light: #f8f9fa;
+        --border-radius: 12px;
+        --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+        --shadow-md: 0 4px 16px rgba(0,0,0,0.12);
+        --shadow-lg: 0 8px 30px rgba(0,0,0,0.15);
+        --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .container {
+        max-width: 1400px;
+    }
+
+    .card_nav {
+        background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+    }
+
+        .card_nav .nav-item {
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: 10px;
+            margin: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .card_nav .nav-item::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                transition: left 0.5s;
+            }
+
+            .card_nav .nav-item:hover::before {
+                left: 100%;
+            }
+
+            .card_nav .nav-item .bi {
+                font-size: 1.75rem;
+                transition: var(--transition);
+            }
+
+            .card_nav .nav-item.active {
+                background: rgba(255,255,255,0.15);
+                box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
+                transform: translateY(-2px);
+            }
+
+                .card_nav .nav-item.active .bi {
+                    transform: scale(1.1);
+                }
+
+    .main-content-card {
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-lg);
+        border: none;
+        overflow: hidden;
+    }
+
+        .main-content-card .card-header {
+            background: linear-gradient(to right, var(--accent), var(--accent-light));
+            color: white;
+            border: none;
+            padding: 1.5rem;
+        }
+
+    .menu-list .card {
+        border: none;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+        background: white;
+        overflow: hidden;
+        position: relative;
+        cursor: pointer;
+    }
+
+        .menu-list .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 0;
+            background: var(--accent);
+            transition: height 0.3s ease;
+        }
+
+        .menu-list .card:hover::before {
+            height: 100%;
+        }
+
+        .menu-list .card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .menu-list .card h3, .menu-list .card h4 {
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 0;
+        }
+
+        .menu-list .card .bi {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+            color: var(--accent);
+        }
+
+    .fav-star {
+        color: rgba(0,0,0,0.2);
+        cursor: pointer;
+        transition: var(--transition);
+        margin-left: auto;
+        font-size: 1.2rem;
+    }
+
+        .fav-star:hover {
+            color: var(--warning);
+            transform: scale(1.2);
+        }
+
+        .fav-star.is-fav {
+            color: var(--warning);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            animation: pulse 1.5s infinite;
+        }
+
+    .loader-overlay {
+        position: relative;
+        min-height: 400px;
+    }
+
+        .loader-overlay[data-loading="true"]::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.85);
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius);
+        }
+
+    .pulse-spinner {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: conic-gradient(var(--accent), var(--accent-light), var(--accent-dark), var(--accent));
+        animation: rotate 1s linear infinite;
+        position: relative;
+    }
+
+        .pulse-spinner::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            background: white;
+            border-radius: 50%;
+        }
+
+    @@keyframes rotate {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @@keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .report-card {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        height: 100%;
+    }
+
+        .report-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+
+        .report-card h5 {
+            color: var(--accent);
+            font-weight: 600;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+    @@media (max-width: 575px) {
+        .card_nav .col-6 {
+            padding: 0.25rem;
+        }
+
+        .menu-list .card h3, .menu-list .card h4 {
+            font-size: 0.9rem;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .menu-list .card .bi {
+            margin-right: 0;
+            margin-bottom: 0.25rem;
+        }
+
+        .fav-star {
+            margin-left: 0;
+            margin-top: 0.25rem;
+        }
+    }
+
+    .menu-item .bi-star {
+        transition: var(--transition);
+    }
+
+    .menu-item.favourite .bi-star {
+        color: var(--warning);
+    }
+
+    .menu-item.selected {
+        box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--muted);
+        display: none;
+    }
+
+        .empty-state .bi {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+    .search-container {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+        .search-container .bi {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+        }
+
+        .search-container input {
+            padding-left: 45px;
+            border-radius: 50px;
+            border: 1px solid #e0e0e0;
+            transition: var(--transition);
+        }
+
+            .search-container input:focus {
+                border-color: var(--accent);
+                box-shadow: 0 0 0 0.2rem rgba(58, 134, 255, 0.25);
+            }
+
+    /* Modal Styles */
+    .modal-content {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .modal-header {
+        background: linear-gradient(to right, var(--accent), var(--accent-light));
+        color: white;
+        border: none;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #e9ecef;
+    }
+
+    .btn-primary {
+        background: var(--accent);
+        border-color: var(--accent);
+    }
+
+        .btn-primary:hover {
+            background: var(--accent-dark);
+            border-color: var(--accent-dark);
+        }
+
+    .form-control:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 0.2rem rgba(58, 134, 255, 0.25);
+    }
+
+    /* Add Menu Button */
+    .add-menu-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: white;
+        border: none;
+        box-shadow: var(--shadow-lg);
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        z-index: 1000;
+    }
+
+        .add-menu-btn:hover {
+            background: var(--accent-dark);
+            transform: scale(1.1);
+        }
+
+    /* Info Button */
+    .info-btn {
+        background: transparent;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        transition: var(--transition);
+        padding: 0.25rem;
+        border-radius: 50%;
+    }
+
+        .info-btn:hover {
+            color: var(--accent);
+            background: rgba(58, 134, 255, 0.1);
+        }
+</style>
+
+<div class="container py-4">
+    <!-- Top navigation -->
+    <div class="row card_nav mb-4 m-2 align-items-stretch" role="tablist" aria-label="Main sections">
+        <div class="col-6 col-md-2 p-2">
+            <div class="nav-item text-center p-3 rounded-2 text-white active" data-target="favourite" role="tab" tabindex="0" aria-selected="true">
+                <h2><i class="bi bi-heart-fill"></i></h2>
+                <h5 class="text-white fw-semibold mb-0">Favourite</h5>
+            </div>
+        </div>
+        <div class="col-6 col-md-2 p-2">
+            <div class="nav-item text-center p-3 rounded-2 text-white" data-target="sales" role="tab" tabindex="0" aria-selected="false">
+                <h2><i class="bi bi-cart-check"></i></h2>
+                <h5 class="text-white fw-semibold mb-0">Sales</h5>
+            </div>
+        </div>
+        <div class="col-6 col-md-2 p-2">
+            <div class="nav-item text-center p-3 rounded-2 text-white" data-target="purchase" role="tab" tabindex="0" aria-selected="false">
+                <h2><i class="bi bi-bag-check"></i></h2>
+                <h5 class="text-white fw-semibold mb-0">Purchase</h5>
+            </div>
+        </div>
+        <div class="col-6 col-md-2 p-2">
+            <div class="nav-item text-center p-3 rounded-2 text-white" data-target="inventory" role="tab" tabindex="0" aria-selected="false">
+                <h2><i class="bi bi-box-seam"></i></h2>
+                <h5 class="text-white fw-semibold mb-0">Inventory</h5>
+            </div>
+        </div>
+        <div class="col-6 col-md-2 p-2">
+            <div class="nav-item text-center p-3 rounded-2 text-white" data-target="accounts" role="tab" tabindex="0" aria-selected="false">
+                <h2><i class="bi bi-journal-text"></i></h2>
+                <h5 class="text-white fw-semibold mb-0">Accounts</h5>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content area -->
+    <div class="row m-2">
+        <div class="card main-content-card w-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0" id="section-title">Favourite</h3>
+            </div>
+            <div class="card-body p-0">
+                <div class="p-4 loader-overlay" id="content-area" data-loading="false">
+                    <!-- Favourite Panel -->
+                    <div id="favourite-panel" class="menu-list tab-panel row">
+                        <div class="row" id="favourite-grid"></div>
+                        <div class="empty-state" id="empty-favourites">
+                            <i class="bi bi-heart"></i>
+                            <h4>No favourites yet</h4>
+                            <p>Click the star icon on any report to add it to favourites</p>
+                        </div>
+                    </div>
+
+                    <!-- Sales Panel -->
+                    <div id="sales-panel" class="menu-list tab-panel d-none row">
+                        <div class="row" id="sales-grid"></div>
+                        <div class="empty-state" id="empty-sales">
+                            <i class="bi bi-cart"></i>
+                            <h4>No Sales Reports available</h4>
+                        </div>
+                    </div>
+
+                    <!-- Purchase Panel -->
+                    <div id="purchase-panel" class="menu-list tab-panel d-none row">
+                        <div class="row" id="purchase-grid"></div>
+                        <div class="empty-state" id="empty-purchase">
+                            <i class="bi bi-bag"></i>
+                            <h4>No Purchase Reports available</h4>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Panel -->
+                    <div id="inventory-panel" class="menu-list tab-panel d-none row">
+                        <div class="row" id="inventory-grid"></div>
+                        <div class="empty-state" id="empty-inventory">
+                            <i class="bi bi-box"></i>
+                            <h4>No Inventory Reports available</h4>
+                        </div>
+                    </div>
+
+                    <!-- Accounts Panel -->
+                    <div id="accounts-panel" class="menu-list tab-panel d-none row">
+                        <div class="row" id="accounts-grid"></div>
+                        <div class="empty-state" id="empty-accounts">
+                            <i class="bi bi-journal-text"></i>
+                            <h4>No Accounts Reports available</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (role == "A" || role == "D")
+{
+    <!-- Add Menu Button -->
+    <button class="add-menu-btn" id="add-menu-btn" title="Add New Menu Item">
+        <i class="bi bi-plus-lg"></i>
+    </button>
+}
+<!-- Add Menu Modal -->
+<div class="modal fade" id="addMenuModal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addMenuModalLabel"> Report Menu</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Create Menu</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">All Menu</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                        <form id="add-menu-form">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="menu-title" class="form-label">Title *</label>
+                                    <input type="text" class="form-control" id="menu-title" required>
+                                    <input type="text" class="form-control" id="ReportID" hidden>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="menu-type" class="form-label">Type *</label>
+                                    <select class="form-select" id="menu-type" required>
+                                        <option value="">Select Type</option>
+                                        <option value="SALE">Sales</option>
+                                        <option value="PUR">Purchase</option>
+                                        <option value="INVEN">Inventory</option>
+                                        <option value="ACC">Accounts</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="menu-icon" class="form-label">Icon *</label>
+                                    <input class="form-control" type="text" id="menu-icon" required />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="menu-controller" class="form-label">Controller Name *</label>
+                                    <input type="text" class="form-control" readonly id="menu-controller" value="Reports" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="menu-view" class="form-label">View Name *</label>
+                                    <input type="text" class="form-control" id="menu-view" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="menu-favourite" class="form-label">Add to Favourites</label>
+                                    <div class="form-check form-switch mt-2">
+                                        <input class="form-check-input" type="checkbox" id="menu-favourite">
+                                        <label class="form-check-label" for="menu-favourite">Mark as favourite</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="menu-active" class="form-label">Is Active</label>
+                                    <div class="form-check form-switch mt-2">
+                                        <input class="form-check-input" type="checkbox" checked id="menu-active">
+                                        <label class="form-check-label" for="menu-active">Mark as Active</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="reportlisttable">
+                                <thead>
+                                    <tr>
+                                        <th nowrap>Sr No</th>
+                                        <th nowrap>Name</th>
+                                        <th nowrap>Edite</th>
+                                        <th nowrap>Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="save-menu-btn">Save Menu Item</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Info Modal -->
+<div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="infoModalLabel">About Reports Section</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>This section allows you to manage and access various reports organized by categories:</p>
+                <ul>
+                    <li><strong>Favourite:</strong> Your frequently used reports</li>
+                    <li><strong>Sales:</strong> Sales-related reports and analytics</li>
+                    <li><strong>Purchase:</strong> Purchase order and vendor reports</li>
+                    <li><strong>Inventory:</strong> Stock levels and inventory management</li>
+                    <li><strong>Accounts:</strong> Financial statements and ledger reports</li>
+                </ul>
+                <p>Click the star icon to add/remove reports from favourites. Use the + button to create custom menu items.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got it!</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+var menuItems = [];
+
+$(document).ready(function () {
+    LoadData();
+
+    function getUrl(item) {
+        return (item.ViewName && item.ControllerName)
+            ? `../${item.ControllerName}/${item.ViewName}`
+            : '#';
+    }
+
+    function renderGrid() {
+        $("#favourite-grid, #sales-grid, #purchase-grid, #inventory-grid, #accounts-grid, #gst-grid").empty();
+
+        menuItems.forEach(item => {
+            let $grid;
+            switch (item.ObjType) {
+                case "SALE": $grid = $('#sales-grid'); break;
+                case "PUR": $grid = $('#purchase-grid'); break;
+                case "INVEN": $grid = $('#inventory-grid'); break;
+                case "ACC": $grid = $('#accounts-grid'); break;
+                case "GST": $grid = $('#gst-grid'); break;
+                default: return;
+            }
+
+            const itemId = item.ReportID;
+            const $col = $(`
+                <div class="col-md-4 p-3">
+                    <div class="card shadow p-3 d-flex flex-row align-items-center justify-content-between menu-item"
+                         data-id="${itemId}" data-category="${item.ObjType}" data-conid="${item.ID}">
+                        <i class="bi ${item.Icon} fs-3"></i>
+                        <h4 class="m-0 flex-grow-1 text-center" role="link" tabindex="0">
+                            ${item.Title}
+                        </h4>
+                        <i class="bi ${item.IsFav === 'Y' ? 'bi-star-fill is-fav' : 'bi-star'} fs-3 fav-toggle"
+                           role="button" tabindex="0"
+                           aria-label="${item.IsFav === 'Y' ? 'Remove from favourites' : 'Add to favourites'}"></i>
+                    </div>
+                </div>
+            `);
+
+            // Clickable title
+            $col.find("h4").on("click keydown", function(e) {
+                if (e.type === "click" || e.key === "Enter" || e.key === " ") {
+                    window.location.href = getUrl(item);
+                }
+            });
+
+            $grid.append($col);
+
+            if (item.IsFav === 'Y') {
+                $("#favourite-grid").append($col.clone(true)); // clone to keep in both places
+            }
+        });
+    }
+
+    function showSection(name) {
+        $('.card_nav .nav-item').removeClass('active').attr('aria-selected', 'false');
+        $(`.card_nav .nav-item[data-target="${name}"]`).addClass('active').attr('aria-selected', 'true');
+
+        $('#section-title').text(name.charAt(0).toUpperCase() + name.slice(1));
+
+        $('.tab-panel').addClass('d-none');
+        $(`#${name}-panel`).removeClass('d-none');
+
+        $('#favourite-search').toggleClass('d-none', name !== 'favourite');
+    }
+
+    $(document).on('click keydown', '.fav-toggle', function (e) {
+        if (e.type === 'keydown' && !['Enter', ' '].includes(e.key)) return;
+        e.stopPropagation();
+
+        const id = $(this).closest('.menu-item').attr('data-conid');
+        const ReportID = $(this).closest('.menu-item').attr('data-id');
+        const isFavourited = $(this).hasClass('bi-star-fill');
+        if (isFavourited) {
+            $(this).removeClass('bi-star-fill').addClass('bi-star');
+        } else {
+            $(this).removeClass('bi-star').addClass('bi-star-fill');
+        }
+       var isflag= $(this).hasClass('bi-star-fill');
+        const flag = isflag ? 'Y' : 'N';
+        toggleFavourite(id, flag, ReportID);
+    });
+
+
+    function toggleFavourite(id, flag, ReportID) {
+        $.ajax({
+            url: '@Url.Action("SETFAV", "Reports")',
+            type: 'POST',
+            data: { ReportID: ReportID, flag: flag,id: id},
+            success: function(response) {
+                if (response && response.success) {
+                    LoadData(); // Refresh view
+                } else {
+                    Notify("warning", "Warning", response.message || "Unable to update favourite");
+                }
+            },
+            error: function(xhr) {
+                Notify("error", "Error", xhr.responseText || "Failed to update favourite");
+            }
+        });
+    }
+
+    function LoadData() {
+        $.ajax({
+            url: '@Url.Action("GETREPORTS", "Reports")',
+            method: 'GET',
+            success: function (response) {
+                if (Array.isArray(response)) {
+                    menuItems = response;
+                    BindTable(menuItems);
+                    renderGrid();
+                }
+            },
+            error: function(xhr) {
+                console.error('Error loading reports:', xhr);
+                menuItems = [];
+            }
+        });
+    }
+
+    $('.card_nav .nav-item').on('click keydown', function(e) {
+        if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
+            showSection($(this).data('target'));
+        }
+    });
+
+    $('#add-menu-btn').on('click', function() {
+        resetForm();
+        $('#addMenuModal').modal('show');
+    });
+
+    function resetForm() {
+        $('#add-menu-form')[0].reset();
+        $('#ReportID').val('');
+        $('#menu-controller').val('Reports');
+        $('#menu-active').prop('checked', true);
+    }
+
+    $('#save-menu-btn').on('click', function() {
+        const formData = {
+            ReportID: $('#ReportID').val() || null,
+            Title: $('#menu-title').val(),
+            ObjType: $('#menu-type').val(),
+            Icon: $('#menu-icon').val(),
+            ControllerName: $('#menu-controller').val(),
+            ViewName: $('#menu-view').val(),
+            IsFav: $('#menu-favourite').is(':checked') ? "Y" : "N",
+            IsActive: $('#menu-active').is(':checked') ? "Y" : "N",
+        };
+
+        if (!formData.Title || !formData.ObjType || !formData.Icon || !formData.ControllerName || !formData.ViewName) {
+            alert("Please fill all required fields");
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("CREATEREPORT", "Reports")',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function (response) {
+                if (response?.success) {
+                    Notify("success", response.message, "");
+                    LoadData();
+                    $('#addMenuModal').modal('hide');
+                } else {
+                    alert('Error: ' + (response.message || 'Failed to create report'));
+                }
+            },
+            error: function(xhr) {
+                alert('Error: ' + (xhr.responseText || 'Request failed'));
+            }
+        });
+    });
+
+    $(document).on("click", ".edite-menu", function () {
+        var json = $(this).closest("tr").data("json");
+        $('#ReportID').val(json.ReportID || '');
+        $('#menu-title').val(json.Title || '');
+        $('#menu-type').val(json.ObjType || '');
+        $('#menu-icon').val(json.Icon || '');
+        $('#menu-controller').val(json.ControllerName || 'Report');
+        $('#menu-view').val(json.ViewName || '');
+        $('#menu-favourite').prop("checked", json.IsFav === "Y");
+        $('#menu-active').prop("checked", json.IsActive !== "N");
+        $("#home-tab").click();
+        $('#addMenuModal').modal('show');
+    });
+
+    function BindTable(data) {
+        const $tbody = $("#reportlisttable tbody").empty();
+        if (Array.isArray(data) && data.length > 0) {
+            data.forEach((item, index) => {
+                const row = `
+                    <tr data-json='${JSON.stringify(item)}'>
+                        <td>${index + 1}</td>
+                        <td>${item.Title || 'No Title'}</td>
+                        <td><button class='btn btn-primary btn-sm edite-menu'>Edit</button></td>
+                        <td><button class='btn btn-danger btn-sm delete-menu'><i class="bi bi-trash"></i> Delete</button></td>
+                    </tr>
+                `;
+                $tbody.append(row);
+            });
+        }
+    }
+
+    $(document).on("click", ".delete-menu", function () {
+        const $btn = $(this);
+        const json = $btn.closest("tr").data("json");
+        const id = json?.ReportID;
+
+        if (!id) {
+            Notify('error', 'Document Entry is required for deletion','');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This action cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (!result.isConfirmed) return;
+
+            $.ajax({
+                url: '@Url.Action("DELETEREPORT", "Reports")',
+                type: 'POST',
+                data: { id: id },
+                beforeSend: function() {
+                    $btn.prop('disabled', true).html('<i class="bi bi-hourglass"></i> Deleting...');
+                },
+                success: function(response) {
+                    if (response?.success) {
+                        LoadData();
+                        Notify('success', 'Success', response.message || 'Document deleted successfully!');
+                    } else {
+                        Notify('warning', 'Warning', response.message || 'Unable to delete document');
+                    }
+                },
+                error: function(xhr) {
+                    Notify('error', 'Error', xhr.responseJSON?.message || xhr.responseText || 'Error deleting document');
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).html('<i class="bi bi-trash"></i> Delete');
+                }
+            });
+        });
+    });
+});
+</script>

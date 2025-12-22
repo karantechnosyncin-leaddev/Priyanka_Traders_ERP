@@ -1,0 +1,1500 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Flatpickr for date range picker -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        :root {
+            --primary-color: #ff8f40;
+            --secondary-color: #f2ff36;
+            --success-color: #cf71f5;
+            --warning-color: #2d03ff;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --sale-color: hsla(159, 100%, 67.6%, 0.42);
+            --purchase-color: hsla(196, 100%, 82.5%, 0.42);
+            --neutral-color: hsla(24, 100%, 82.5%, 0.42);
+            --shadow-light: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-medium: 0 4px 16px rgba(0,0,0,0.10);
+            --transition: all 0.3s ease;
+        }
+
+       
+
+        .erp-container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 10px 40px 10px;
+        }
+
+        .erp-header h2 {
+            font-weight: 700;
+            color: #222;
+            letter-spacing: 1px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .erp-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .erp-header h2:hover::after {
+            width: 100%;
+        }
+
+        .erp-btn {
+            border: none;
+            outline: none;
+            padding: 7px 18px;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .erp-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .erp-btn:hover::before {
+            left: 100%;
+        }
+
+        .erp-btn-primary {
+            background: var(--primary-color);
+            color: #fff;
+        }
+
+        .erp-btn-primary:hover {
+            background: #0a58ca;
+            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
+        }
+
+        .erp-btn-secondary {
+            background: #f1f3f6;
+            color: #222;
+            border: 1px solid #d1d5db;
+        }
+
+        .erp-btn-secondary:hover {
+            background: #e2e6ea;
+            transform: translateY(-2px);
+        }
+
+        .erp-tiles {
+            /* Bootstrap grid used for responsiveness */
+        }
+
+        .erp-tile {
+            background: var(--neutral-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-light);
+            padding: 18px 20px 14px 20px;
+            min-width: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .erp-tile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--primary-color);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .erp-tile:hover::before {
+            transform: scaleY(1);
+        }
+
+        .erp-tile-sale {
+            background: var(--sale-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-light);
+            padding: 18px 20px 14px 20px;
+            min-width: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .erp-tile-sale::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--success-color);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .erp-tile-sale:hover::before {
+            transform: scaleY(1);
+        }
+
+        .erp-tile-purchase {
+            background: var(--purchase-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-light);
+            padding: 18px 20px 14px 20px;
+            min-width: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .erp-tile-purchase::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--warning-color);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .erp-tile-purchase:hover::before {
+            transform: scaleY(1);
+        }
+
+        .erp-tile:hover, .erp-tile-sale:hover, .erp-tile-purchase:hover {
+            box-shadow: var(--shadow-medium);
+            transform: translateY(-5px);
+        }
+
+        .erp-tile-icon {
+            font-size: 1.7em;
+            color: var(--primary-color);
+            margin-bottom: 7px;
+            transition: var(--transition);
+        }
+
+        .erp-tile-sale .erp-tile-icon {
+            color: var(--success-color);
+        }
+
+        .erp-tile-purchase .erp-tile-icon {
+            color: var(--warning-color);
+        }
+
+        .erp-tile:hover .erp-tile-icon {
+            transform: scale(1.1);
+        }
+
+        .erp-tile-label {
+            font-size: 1em;
+            color: #666;
+            margin-bottom: 2px;
+            font-weight: 500;
+        }
+
+        .erp-tile-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #222;
+            letter-spacing: 1px;
+            transition: var(--transition);
+        }
+
+        .erp-tile:hover .erp-tile-value {
+            color: var(--primary-color);
+        }
+
+        .erp-tile-sale:hover .erp-tile-value {
+            color: var(--success-color);
+        }
+
+        .erp-tile-purchase:hover .erp-tile-value {
+            color: var(--warning-color);
+        }
+
+        .erp-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: var(--shadow-light);
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 0;
+            transition: var(--transition);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            padding:10px;
+        }
+
+        .erp-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            transform: scaleX(0);
+            transition: transform 0.5s ease;
+        }
+
+        .erp-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .erp-card:hover {
+            box-shadow: var(--shadow-medium);
+            transform: translateY(-3px);
+        }
+
+        .erp-card-header {
+            padding: 16px 22px 10px 22px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #222;
+            border-bottom: 1px solid #f1f3f6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: #fff;
+            flex-wrap: wrap;
+            transition: var(--transition);
+        }
+
+        .erp-card:hover .erp-card-header {
+            background: #f8fafc;
+        }
+
+        .erp-card-body {
+            padding: 18px 22px 18px 22px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            background: #fff;
+            transition: var(--transition);
+        }
+
+        .erp-card:hover .erp-card-body {
+            background: #fcfdfe;
+        }
+
+        .erp-date-filter {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .erp-input {
+            border: 1px solid #d1d5db;
+            border-radius: 5px;
+            padding: 4px 8px;
+            font-size: 15px;
+            outline: none;
+            background: #f9fafb;
+            transition: var(--transition);
+            min-width: 180px;
+        }
+
+        .erp-input:focus {
+            border: 1.5px solid var(--primary-color);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+        }
+
+        .erp-table th, .erp-table td {
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid #f1f3f6;
+            vertical-align: middle;
+            transition: var(--transition);
+        }
+
+        .erp-table th {
+            background: #f8fafc;
+            color: var(--primary-color);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .erp-table tbody tr {
+            transition: var(--transition);
+        }
+
+        .erp-table tbody tr:hover {
+            background: #f1f7ff;
+            cursor: pointer;
+            transform: translateX(5px);
+        }
+
+        .erp-table tbody tr.erp-row-selected {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .erp-scroll-table {
+            max-height: 260px;
+            overflow-y: auto;
+        }
+
+        /* Custom scrollbar */
+        .erp-scroll-table::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .erp-scroll-table::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .erp-scroll-table::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+
+        .erp-scroll-table::-webkit-scrollbar-thumb:hover {
+            background: #0a58ca;
+        }
+
+        /* Loader Styles */
+        .loader-bg {
+            position: fixed;
+            z-index: 9999;
+            background: rgba(255,255,255,0.95);
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s;
+        }
+
+        .loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .spinner {
+            width: 54px;
+            height: 54px;
+            border: 6px solid #e3e6ea;
+            border-top: 6px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 8px;
+        }
+
+        @@keyframes spin {
+            0% { transform: rotate(0deg);}
+            100% { transform: rotate(360deg);}
+        }
+
+        .loader span {
+            font-size: 1.1em;
+            color: var(--primary-color);
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        /* Mini spinner for filter loading */
+        .mini-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid #e3e6ea;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+        }
+
+        /* Notification toast */
+        .erp-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        .erp-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Tile pulse animation for updates */
+        @@keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(13, 110, 253, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
+        }
+
+        .erp-tile-updated {
+            animation: pulse 1.5s;
+        }
+
+        /* Tooltip */
+        .erp-tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .erp-tooltip .erp-tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--dark-color);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9em;
+        }
+
+        .erp-tooltip .erp-tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--dark-color) transparent transparent transparent;
+        }
+
+        .erp-tooltip:hover .erp-tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Responsive Tweaks */
+        @@media (max-width: 991.98px) {
+            .erp-card-header, .erp-card-body {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            .erp-date-filter .erp-input {
+                min-width: 120px;
+                font-size: 13px;
+            }
+        }
+
+        @@media (max-width: 767.98px) {
+            .erp-card-header, .erp-card-body {
+                padding-left: 6px;
+                padding-right: 6px;
+            }
+            .erp-header h2 {
+                font-size: 1.2rem;
+            }
+            .erp-tile-label, .erp-tile-value {
+                font-size: 0.95em;
+            }
+            .erp-tile-icon {
+                font-size: 1.3em;
+            }
+            .erp-date-filter .erp-input {
+                min-width: 100px;
+                font-size: 12px;
+            }
+            .erp-date-filter span {
+                font-size: 13px;
+            }
+        }
+
+        @@media (max-width: 575.98px) {
+            .erp-header h2 {
+                font-size: 1.1rem;
+            }
+            .erp-tile-label, .erp-tile-value {
+                font-size: 0.9em;
+            }
+            .erp-tile-icon {
+                font-size: 1.1em;
+            }
+            .erp-date-filter .erp-input {
+                min-width: 80px;
+                font-size: 11px;
+                padding: 2px 4px;
+            }
+            .erp-date-filter {
+                gap: 3px;
+            }
+            .erp-card-header, .erp-card-body {
+                padding-left: 2px;
+                padding-right: 2px;
+            }
+        }
+    </style>
+</head>
+<body>
+   
+
+    <!-- Notification Toast -->
+    <div id="erp-toast" class="erp-toast">Data updated successfully!</div>
+
+    <!-- Main Container -->
+    <div class="erp-container container-fluid">
+        <!-- Dashboard Title -->
+        <div class="erp-header row align-items-center mb-4 pt-3">
+            <!-- Left side: Title -->
+            <div class="col-12 col-md-7">
+                <h2 class="fw-bold text-dark mb-0">ERP Dashboard</h2>
+            </div>
+
+            <!-- Middle: Date range input -->
+            <div class="col-12 col-md-3 d-flex justify-content-md-end justify-content-start mt-3 mt-md-0">
+                <input type="text" id="top-products-date-range"
+                       class="form-control me-md-3"
+                       placeholder="Select date range" readonly />
+            </div>
+
+            <!-- Right side: Refresh button -->
+            <div class="col-12 col-md-2 d-flex justify-content-md-end justify-content-start mt-3 mt-md-0">
+                <button class="btn btn-primary w-100 w-md-auto" id="refresh-dashboard">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+
+        <!-- Tiles Row -->
+        <div class="erp-tiles row g-3 mb-4">
+            <!-- Sales Tiles -->
+
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile-sale h-100" id="tile-total-sale">
+                    <div class="erp-tile-icon"><i class="bi bi-cash-stack"></i></div>
+                    <div class="erp-tile-label">Total Sale</div>
+                    <div class="erp-tile-value" id="basic-return">0</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile-sale h-100" id="tile-sale-total-invoices">
+                    <div class="erp-tile-icon"><i class="bi bi-receipt"></i></div>
+                    <div class="erp-tile-label">Total Invoices</div>
+                    <div class="erp-tile-value" id="sale-total-invoices">0</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile-sale h-100" id="tile-gross-profit">
+                    <div class="erp-tile-icon"><i class="bi bi-bag-check"></i></div>
+                    <div class="erp-tile-label">Sold Qty</div>
+                    <div class="erp-tile-value" id="sale-sold-qty">0</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile-sale h-100" id="tile-sale-total-customer">
+                    <div class="erp-tile-icon"><i class="bi bi-people"></i></div>
+                    <div class="erp-tile-label">Total Customer</div>
+                    <div class="erp-tile-value" id="total-customer">0</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile-sale h-100" id="tile-sale-to-receive">
+                    <div class="erp-tile-icon"><i class="bi bi-wallet2"></i></div>
+                    <div class="erp-tile-label">To Receive</div>
+                    <div class="erp-tile-value" id="to-receive">0</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile-sale h-100" id="tile-sale-return">
+                    <div class="erp-tile-icon"><i class="bi bi-arrow-return-left"></i></div>
+                    <div class="erp-tile-label">Total Sale Return</div>
+                    <div class="erp-tile-value" id="sale-return">0</div>
+                </div>
+            </div>
+
+            <!-- Purchase Tiles -->
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile-purchase h-100" id="tile-total-purchase">
+                    <div class="erp-tile-icon"><i class="bi bi-basket"></i></div>
+                    <div class="erp-tile-label">Total Purchase</div>
+                    <div class="erp-tile-value" id="basic-total-purchase">0</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile-purchase h-100" id="tile-total-bills">
+                    <div class="erp-tile-icon"><i class="bi bi-receipt"></i></div>
+                    <div class="erp-tile-label">Total Bills</div>
+                    <div class="erp-tile-value" id="total-bills">0</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile-purchase h-100" id="tile-purchase-qty">
+                    <div class="erp-tile-icon"><i class="bi bi-box-seam"></i></div>
+                    <div class="erp-tile-label">Purchase Qty</div>
+                    <div class="erp-tile-value" id="total-purchase-qty">0</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile-purchase h-100" id="tile-purchase-supplier">
+                    <div class="erp-tile-icon"><i class="bi bi-truck"></i></div>
+                    <div class="erp-tile-label">Total Supplier</div>
+                    <div class="erp-tile-value" id="total-supplier">0</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile-purchase h-100" id="tile-purchase-topay">
+                    <div class="erp-tile-icon"><i class="bi bi-wallet2"></i></div>
+                    <div class="erp-tile-label">To Pay</div>
+                    <div class="erp-tile-value" id="total-topay">0</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile-purchase h-100" id="tile-purchase-return">
+                    <div class="erp-tile-icon"><i class="bi bi-arrow-return-left"></i></div>
+                    <div class="erp-tile-label">Purchase Return</div>
+                    <div class="erp-tile-value" id="total-purchsase-return">0</div>
+                </div>
+            </div>
+
+            <!-- General Tiles -->
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile h-100" id="tile-total-paid">
+                    <div class="erp-tile-icon"><i class="bi bi-credit-card"></i></div>
+                    <div class="erp-tile-label">Total Paid</div>
+                    <div class="erp-tile-value" id="total-paid">0</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile h-100" id="tile-receipt">
+                    <div class="erp-tile-icon"><i class="bi bi-file-earmark-text"></i></div>
+                    <div class="erp-tile-label">Total Expense</div>
+                    <div class="erp-tile-value" id="total-expence">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile h-100" id="tile-stock-qty">
+                    <div class="erp-tile-icon"><i class="bi bi-archive"></i></div>
+                    <div class="erp-tile-label">Stock Qty</div>
+                    <div class="erp-tile-value" id="stock-qty">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile h-100" id="tile-total-product">
+                    <div class="erp-tile-icon"><i class="bi bi-box-seam"></i></div>
+                    <div class="erp-tile-label">Total Product</div>
+                    <div class="erp-tile-value" id="total-product">0</div>
+                </div>
+            </div>
+
+
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile h-100" id="tile-cashinhand">
+                    <div class="erp-tile-icon"><i class="bi bi-wallet2"></i></div>
+                    <div class="erp-tile-label">Cash In Hand</div>
+                    <div class="erp-tile-value" id="cash-in-hand">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="erp-tile h-100" id="tile-gross-profit">
+                    <div class="erp-tile-icon"><i class="bi bi-wallet2"></i></div>
+                    <div class="erp-tile-label">Gross Profit</div>
+                    <div class="erp-tile-value" id="gross-profit">0</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sales Analysis & Top Products -->
+        <div class="erp-row row g-4 mb-4" hidden>
+            <div class="col-12 col-lg-6">
+                <div class="erp-card erp-card-lg h-100">
+                    <div class="erp-card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <span><i class="bi bi-pie-chart"></i> Sales Analysis</span>
+                        <form class="erp-date-filter row gx-1 gy-1 align-items-center flex-nowrap flex-md-wrap" id="sales-analysis-filter" autocomplete="off">
+                            <div class="col-auto">
+                                <input type="text" id="sales-date-range" class="erp-input form-control form-control-sm" placeholder="Select date range" readonly />
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="erp-btn btn-sm erp-btn-secondary" id="filter-sales"><i class="bi bi-funnel"></i> Find</button>
+                                <span class="filter-loader d-none ms-2" id="sales-filter-loader"><span class="mini-spinner"></span></span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="erp-card-body align-items-center" style="width: 500px!important; height:500px!important;">
+                        <canvas id="category-sales-pie"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+                <div class="erp-card erp-card-md h-100">
+                    <div class="erp-card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <span><i class="bi bi-person-badge"></i> Top 20 Customer Category Sale</span>
+                        <form class="erp-date-filter row gx-1 gy-1 align-items-center flex-nowrap flex-md-wrap" id="customer-category-filter" autocomplete="off">
+                            <div class="col-auto">
+                                <input type="text" id="customer-category-date-range" class="erp-input form-control form-control-sm" placeholder="Select date range" readonly />
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="erp-btn btn-sm erp-btn-secondary" id="find-customer-category"><i class="bi bi-funnel"></i> Find</button>
+                                <span class="filter-loader d-none ms-2" id="customer-category-filter-loader"><span class="mini-spinner"></span></span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="erp-card-body erp-scroll-table">
+                        <div class="table-responsive">
+                            <table class="erp-table table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Customer Category</th>
+                                        <th>Sale Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="top-customer-category-table">
+                                    <!-- Top 20 customer category sale rows here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expenses & Customer Category Sale -->
+        <div class="erp-row row g-4 mb-4" hidden>
+            <div class="col-12 col-lg-6">
+                <div class="erp-card erp-card-md h-100">
+                    <div class="erp-card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <span><i class="bi bi-trophy"></i>Top 10 Best Selling Products </span>
+                        <form class="erp-date-filter row gx-1 gy-1 align-items-center flex-nowrap flex-md-wrap" id="best-selling-products-filter" autocomplete="off">
+                            <div class="col-auto">
+                                <input type="text" id="best-selling-date-range" class="erp-input form-control form-control-sm" placeholder="Select date range" readonly />
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="erp-btn btn-sm erp-btn-secondary" id="find-best-selling"><i class="bi bi-funnel"></i> Find</button>
+                                <span class="filter-loader d-none ms-2" id="best-selling-filter-loader"><span class="mini-spinner"></span></span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="erp-card-body erp-scroll-table">
+                        <div class="table-responsive">
+                            <table class="erp-table table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Product</th>
+                                        <th>Units Sold</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="best-selling-products-table">
+                                    <!-- Top 10 best selling products rows here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6">
+                <div class="erp-card erp-card-md h-100">
+                    <div class="erp-card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <span><i class="bi bi-star"></i> Top 10 Products by Sale Value</span>
+                        <form class="erp-date-filter row gx-1 gy-1 align-items-center flex-nowrap flex-md-wrap" id="top-products-filter" autocomplete="off">
+                            <div class="col-auto">
+                                <input type="text" id="top-products-date-range" class="erp-input form-control form-control-sm" placeholder="Select date range" readonly />
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="erp-btn btn-sm erp-btn-secondary" id="find-top-products"><i class="bi bi-funnel"></i> Find</button>
+                                <span class="filter-loader d-none ms-2" id="top-products-filter-loader"><span class="mini-spinner"></span></span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="erp-card-body erp-scroll-table">
+                        <div class="table-responsive">
+                            <table class="erp-table table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Product</th>
+                                        <th>Sale Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="top-products-table">
+                                    <!-- Top 10 products rows here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Best Selling Products & Top Expenses -->
+        <div class="erp-row row g-4" hidden>
+
+            <div class="col-12 col-lg-6">
+                <div class="erp-card erp-card-md h-100">
+                    <div class="erp-card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <span><i class="bi bi-cash"></i> Expenses Report</span>
+                        <form class="erp-date-filter row gx-1 gy-1 align-items-center flex-nowrap flex-md-wrap" id="expenses-filter" autocomplete="off">
+                            <div class="col-auto">
+                                <input type="text" id="expenses-date-range" class="erp-input form-control form-control-sm" placeholder="Select date range" readonly />
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="erp-btn btn-sm erp-btn-secondary" id="filter-expenses"><i class="bi bi-funnel"></i> Find</button>
+                                <span class="filter-loader d-none ms-2" id="expenses-filter-loader"><span class="mini-spinner"></span></span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="erp-card-body erp-scroll-table">
+                        <div class="table-responsive">
+                            <table class="erp-table table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Expense Head</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="top-expenses-table">
+                                    <!-- Top 10 expenses rows here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6">
+                <div class="erp-card erp-card-md h-100">
+                    <div class="erp-card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <span><i class="bi bi-list-ul"></i> Top Expenses (Top 10)</span>
+                        <form class="erp-date-filter row gx-1 gy-1 align-items-center flex-nowrap flex-md-wrap" id="top-expenses-filter" autocomplete="off">
+                            <div class="col-auto">
+                                <input type="text" id="top-expenses-date-range" class="erp-input form-control form-control-sm" placeholder="Select date range" readonly />
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="erp-btn btn-sm erp-btn-secondary" id="find-top-expenses"><i class="bi bi-funnel"></i> Find</button>
+                                <span class="filter-loader d-none ms-2" id="top-expenses-filter-loader"><span class="mini-spinner"></span></span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="erp-card-body erp-scroll-table">
+                        <div class="table-responsive">
+                            <table class="erp-table table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Expense Head</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="top-expenses-table-2">
+                                    <!-- Top 10 expenses rows here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js for Pie Chart (Category Wise Sale) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Flatpickr for date range picker -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/rangePlugin.js"></script>
+
+    <script>
+        // Show loader, then dashboard
+        $(document).ready(function () {
+            $("#top-products-date-range").val(new Date().toISOString().split('T')[0] + " to " + new Date().toISOString().split('T')[0]);
+            $("#sales-date-range").val(new Date().toISOString().split('T')[0] + " to " + new Date().toISOString().split('T')[0]);
+            $("#customer-category-date-range").val(new Date().toISOString().split('T')[0] + " to " + new Date().toISOString().split('T')[0]);
+            $("#best-selling-date-range").val(new Date().toISOString().split('T')[0] + " to " + new Date().toISOString().split('T')[0]);
+            $("#top-products-date-range").val(new Date().toISOString().split('T')[0] + " to " + new Date().toISOString().split('T')[0]);
+            $("#expenses-date-range").val(new Date().toISOString().split('T')[0] + " to " + new Date().toISOString().split('T')[0]);
+            $("#top-expenses-date-range").val(new Date().toISOString().split('T')[0] + " to " + new Date().toISOString().split('T')[0]);
+            
+
+            setTimeout(function () {
+                $('#loader').fadeOut(300, function () {
+                    $('.erp-container').fadeIn(300);
+                });
+            }, 900); // Simulate loading time
+
+            // Tile click animation and tooltip
+            $('.erp-tile').on('mousedown', function () {
+                $(this).css('transform', 'scale(0.97)');
+            }).on('mouseup mouseleave', function () {
+                $(this).css('transform', '');
+            });
+
+            // Add tooltip to tiles
+            $('.erp-tile').each(function () {
+                const label = $(this).find('.erp-tile-label').text();
+                $(this).attr('title', `Click to view details for ${label}`);
+            });
+
+            // Refresh button with animation
+            $('#refresh-dashboard').on('click', function () {
+                const $btn = $(this);
+                $btn.prop('disabled', true);
+                $btn.find('i').addClass('fa-spin');
+                $('#loader').fadeIn(200);
+                // Simulate data refresh
+                setTimeout(function () {
+                    // Update tile values with animation
+                    var value = $("#top-products-date-range").val().split("to");
+                    var fromDate = value[0]
+                    var toDate = value[1]
+                    updateTileValues(fromDate, toDate)
+                    $('#loader').fadeOut(300);
+                    $btn.prop('disabled', false);
+                    $btn.find('i').removeClass('fa-spin');
+                }, 1500);
+            });
+
+            // Table row click highlight with animation
+            $('.erp-table').on('click', 'tbody tr', function () {
+                $(this).addClass('erp-row-selected').siblings().removeClass('erp-row-selected');
+
+                // Add a subtle animation
+                $(this).css('transform', 'scale(1.02)');
+                setTimeout(() => {
+                    $(this).css('transform', 'scale(1)');
+                }, 200);
+            });
+
+            // Date filter forms: show mini spinner, simulate loading, then fill table
+            function handleFilter(formId, loaderId, fillFunc) {
+                $(formId).on('submit', function (e) {
+                    e.preventDefault();
+                    $(formId + ' button[type=submit]').prop('disabled', true);
+                    $(loaderId).removeClass('d-none');
+
+                    // Add loading animation to the button
+                    const $btn = $(formId + ' button[type=submit]');
+                    $btn.find('i').addClass('fa-spin');
+
+                    setTimeout(function () {
+                        $(formId + ' button[type=submit]').prop('disabled', false);
+                        $(loaderId).addClass('d-none');
+                        $btn.find('i').removeClass('fa-spin');
+
+                        if (typeof fillFunc === 'function') fillFunc();
+
+                        // Show notification
+                        showToast('Filter applied successfully!');
+                    }, 900);
+                });
+            }
+
+            // Attach filter handlers for all tables
+            handleFilter('#sales-analysis-filter', '#sales-filter-loader', updateSalesChart);
+            handleFilter('#top-products-filter', '#top-products-filter-loader', updateTopProducts);
+            handleFilter('#expenses-filter', '#expenses-filter-loader', updateExpenses);
+            handleFilter('#customer-category-filter', '#customer-category-filter-loader', updateCustomerCategory);
+            handleFilter('#best-selling-products-filter', '#best-selling-filter-loader', updateBestSelling);
+            handleFilter('#top-expenses-filter', '#top-expenses-filter-loader', updateTopExpenses);
+
+            // Responsive: collapse date filter to vertical on xs screens
+            function adjustDateFilters() {
+                $('.erp-date-filter').each(function () {
+                    if ($(window).width() < 576) {
+                        $(this).addClass('flex-column').removeClass('flex-row');
+                    } else {
+                        $(this).removeClass('flex-column').addClass('flex-row');
+                    }
+                });
+            }
+            $(window).on('resize', adjustDateFilters);
+            adjustDateFilters();
+
+            // Flatpickr date range pickers for all filters
+            function setupRangePicker(inputId) {
+                flatpickr(inputId, {
+                    mode: "range",
+                    dateFormat: "Y-m-d",
+                    allowInput: false,
+                    onClose: function (selectedDates, dateStr, instance) {
+                        // Optionally, you can trigger form submit or other logic here
+                    }
+                });
+            }
+            setupRangePicker("#sales-date-range");
+            setupRangePicker("#top-products-date-range");
+            setupRangePicker("#expenses-date-range");
+            setupRangePicker("#customer-category-date-range");
+            setupRangePicker("#best-selling-date-range");
+            setupRangePicker("#top-expenses-date-range");
+            setupRangePicker("#global-date-range");
+
+            // Initialize charts and data
+            initializeDashboard();
+        });
+
+
+        $("#top-products-date-range").change(function () {
+            var value = $("#top-products-date-range").val().split("to");
+            var fromDate =value[0]
+            var toDate = value[1]
+         
+            if (fromDate !== undefined && fromDate !== null && toDate !== undefined && toDate !== null) {
+                updateTileValues(fromDate.trim(), toDate.trim())
+            }
+        })
+        // Function to update tile values with animation
+        function updateTileValues(fromDate, toDate) {
+            // Default values if dates not provided
+            fromDate = fromDate || new Date().toISOString().split('T')[0];
+            toDate = toDate || new Date().toISOString().split('T')[0];
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GETDASHCARDS", "DashBoard")',
+                contentType: "application/json; charset=utf-8",
+                data: {
+                    FromDate: fromDate,
+                    ToDate: toDate
+                },
+                cache: false,
+                success: function (data) {
+                    console.log("Dashboard data:", data);
+
+                    if (!data || data.length === 0) {
+                        console.warn("No data received from server");
+                        return;
+                    }
+
+                    const tileData = Array.isArray(data) ? data[0] : data;
+
+                    // Map the data to the correct HTML elements
+                    updateTileValue('basic-return', tileData.TotalSale);
+                    updateTileValue('sale-total-invoices', tileData.TotalSaleInvoices);
+                    updateTileValue('sale-sold-qty', tileData.SoldQty);
+                    updateTileValue('total-customer', tileData.TotalCustomer);
+                    updateTileValue('to-receive', tileData.ToReceive);
+                    updateTileValue('sale-return', tileData.TotalSaleReturn);
+                    updateTileValue('basic-total-purchase', tileData.TotalPurchase);
+                    updateTileValue('total-bills', tileData.TotalBils);
+                    updateTileValue('total-purchase-qty', tileData.PurchaseQty);
+                    updateTileValue('total-supplier', tileData.TotalSupplier);
+                    updateTileValue('total-topay', tileData.ToPay);
+                    updateTileValue('total-purchsase-return', tileData.TotalPurchaseReturn);
+                    updateTileValue('total-paid', tileData.TotalPaid);
+                    updateTileValue('total-expence', tileData.TotalExps);
+                    updateTileValue('stock-qty', tileData.StockQty);
+                    updateTileValue('total-product', tileData.TotalProduct);
+                    updateTileValue('cash-in-hand', tileData.ChaInHand);
+                    updateTileValue('gross-profit', tileData.GrossProfit);
+
+                },
+                error: function (xhr) {
+                    console.error('Error loading dashboard data:', xhr);
+                    Notify('error', 'Error', xhr.responseText || 'Error loading dashboard data');
+                }
+            });
+        }
+        // Helper function to update individual tile values with animation
+        function updateTileValue(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (!element) {
+                console.warn(`Element with id '${elementId}' not found`);
+                return;
+            }
+
+            const tileContainer = element.closest('.erp-tile, .erp-tile-sale, .erp-tile-purchase');
+            const currentValue = parseFloat(element.textContent.replace(/[^0-9.-]/g, '')) || 0;
+            const newValue = parseFloat(value) || 0;
+
+            // PRECISE currency detection - only for actual monetary values
+            const currencyTileIds = [
+                'basic-return',           // Total Sale
+                'to-receive',             // To Receive
+                'basic-total-purchase',   // Total Purchase
+                'total-topay',            // To Pay
+                'total-paid',             // Total Paid
+                'total-expence',          // Total Expense
+                'cash-in-hand',           // Cash In Hand
+                'gross-profit'            // Gross Profit
+            ];
+
+            // Quantity fields (should NOT have rupee symbol)
+            const quantityTileIds = [
+                'sale-sold-qty',          // Sold Qty
+                'total-purchase-qty',     // Purchase Qty  
+                'stock-qty',              // Stock Qty
+                'sale-total-invoices',    // Total Invoices
+                'total-customer',         // Total Customer
+                'total-bills',            // Total Bills
+                'total-supplier',         // Total Supplier
+                'total-product'           // Total Product
+            ];
+
+            const isCurrency = currencyTileIds.includes(elementId);
+            const isQuantity = quantityTileIds.includes(elementId);
+
+            const prefix = isCurrency ? '₹ ' : '';
+
+            // Add update animation class
+            if (tileContainer) {
+                tileContainer.classList.add('erp-tile-updated');
+            }
+
+            // Animate the value change
+            animateValue(element, currentValue, newValue, 1000, prefix);
+
+            // Remove animation class after delay
+            setTimeout(() => {
+                if (tileContainer) {
+                    tileContainer.classList.remove('erp-tile-updated');
+                }
+            }, 1500);
+        }
+        // Animation function (keep your existing animateValue function)
+        function animateValue(element, start, end, duration, prefix = '') {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+
+                // Format number with proper decimal places
+                let currentValue = Math.floor(progress * (end - start) + start);
+
+                // For decimal values, use floating point calculation
+                if (String(start).includes('.') || String(end).includes('.')) {
+                    currentValue = progress * (end - start) + start;
+                    // Format to reasonable decimal places
+                    element.textContent = prefix + currentValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                } else {
+                    element.textContent = prefix + currentValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
+
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+
+        // Initialize dashboard data
+        function initializeDashboard() {
+            // Example data for the pie chart
+            const categorySalesData = {
+                labels: ['Electronics', 'Clothing', 'Grocery', 'Stationery', 'Others'],
+                datasets: [{
+                    data: [120000, 90000, 70000, 30000, 20000],
+                    backgroundColor: [
+                        '#0d6efd', '#198754', '#ffc107', '#dc3545', '#6c757d'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                    hoverOffset: 15
+                }]
+            };
+
+            // Pie chart
+            const ctx = document.getElementById('category-sales-pie').getContext('2d');
+            window.salesChart = new Chart(ctx, {
+                type: 'pie',
+                data: categorySalesData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const label = context.label || '';
+                                    const value = context.raw;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ₹${value.toLocaleString()} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            });
+
+            // Table data
+            fillTable('top-products-table', [
+                ['Product A', '₹ 25,000'],
+                ['Product B', '₹ 22,000'],
+                ['Product C', '₹ 20,000'],
+                ['Product D', '₹ 18,000'],
+                ['Product E', '₹ 16,000'],
+                ['Product F', '₹ 15,000'],
+                ['Product G', '₹ 14,000'],
+                ['Product H', '₹ 13,000'],
+                ['Product I', '₹ 12,000'],
+                ['Product J', '₹ 11,000']
+            ]);
+
+            fillTable('top-expenses-table', [
+                ['Rent', '₹ 10,000'],
+                ['Salaries', '₹ 8,000'],
+                ['Utilities', '₹ 5,000'],
+                ['Maintenance', '₹ 4,000'],
+                ['Transport', '₹ 3,500'],
+                ['Marketing', '₹ 3,000'],
+                ['Office Supplies', '₹ 2,500'],
+                ['Insurance', '₹ 2,000'],
+                ['Legal', '₹ 1,500'],
+                ['Miscellaneous', '₹ 1,000']
+            ]);
+
+            fillTable('top-expenses-table-2', [
+                ['Rent', '₹ 10,000'],
+                ['Salaries', '₹ 8,000'],
+                ['Utilities', '₹ 5,000'],
+                ['Maintenance', '₹ 4,000'],
+                ['Transport', '₹ 3,500'],
+                ['Marketing', '₹ 3,000'],
+                ['Office Supplies', '₹ 2,500'],
+                ['Insurance', '₹ 2,000'],
+                ['Legal', '₹ 1,500'],
+                ['Miscellaneous', '₹ 1,000']
+            ]);
+
+            fillTable('top-customer-category-table', [
+                ['Retail', '₹ 50,000'],
+                ['Wholesale', '₹ 45,000'],
+                ['Corporate', '₹ 40,000'],
+                ['Online', '₹ 35,000'],
+                ['Export', '₹ 30,000'],
+                ['Distributor', '₹ 28,000'],
+                ['Dealer', '₹ 25,000'],
+                ['Reseller', '₹ 22,000'],
+                ['Government', '₹ 20,000'],
+                ['Institutional', '₹ 18,000'],
+                ['Franchise', '₹ 16,000'],
+                ['Direct', '₹ 15,000'],
+                ['Channel', '₹ 14,000'],
+                ['Partner', '₹ 13,000'],
+                ['Agent', '₹ 12,000'],
+                ['Consultant', '₹ 11,000'],
+                ['Affiliate', '₹ 10,000'],
+                ['Bulk', '₹ 9,000'],
+                ['Special', '₹ 8,000'],
+                ['Others', '₹ 7,000']
+            ]);
+
+            fillTable('best-selling-products-table', [
+                ['Product A', '500'],
+                ['Product B', '450'],
+                ['Product C', '400'],
+                ['Product D', '350'],
+                ['Product E', '300'],
+                ['Product F', '250'],
+                ['Product G', '200'],
+                ['Product H', '180'],
+                ['Product I', '160'],
+                ['Product J', '150']
+            ]);
+            var value = $("#top-products-date-range").val().split("to");
+            var fromDate = value[0]
+            var toDate = value[1]
+            // Initialize tile values
+            updateTileValues(fromDate, toDate)
+        }
+        // Function to fill table with data
+        function fillTable(tableId, rows) {
+            const $tbody = $('#' + tableId);
+            $tbody.empty();
+            $.each(rows, function (idx, row) {
+                let tr = `<tr><td>${idx + 1}</td>`;
+                $.each(row, function (_, cell) { tr += `<td>${cell}</td>`; });
+                tr += '</tr>';
+                $tbody.append(tr);
+            });
+        }
+
+        // Update functions for each section (simulated)
+        function updateSalesChart() {
+            // In a real app, this would fetch new data and update the chart
+            if (window.salesChart) {
+                // Randomize data for demo
+                const newData = window.salesChart.data.datasets[0].data.map(() =>
+                    Math.floor(Math.random() * 100000) + 50000
+                );
+                window.salesChart.data.datasets[0].data = newData;
+                window.salesChart.update();
+            }
+        }
+
+        function updateTopProducts() {
+            // Simulate updating top products
+            const newRows = [
+                ['Product X', '₹ 28,000'],
+                ['Product Y', '₹ 26,500'],
+                ['Product Z', '₹ 24,000'],
+                ['Product A', '₹ 22,000'],
+                ['Product B', '₹ 20,500'],
+                ['Product C', '₹ 19,000'],
+                ['Product D', '₹ 17,500'],
+                ['Product E', '₹ 16,000'],
+                ['Product F', '₹ 14,500'],
+                ['Product G', '₹ 13,000']
+            ];
+            fillTable('top-products-table', newRows);
+        }
+
+        function updateExpenses() {
+            // Simulate updating expenses
+            const newRows = [
+                ['Rent', '₹ 11,000'],
+                ['Salaries', '₹ 9,000'],
+                ['Utilities', '₹ 5,500'],
+                ['Marketing', '₹ 4,500'],
+                ['Maintenance', '₹ 4,200'],
+                ['Transport', '₹ 3,800'],
+                ['Office Supplies', '₹ 2,800'],
+                ['Insurance', '₹ 2,200'],
+                ['Legal', '₹ 1,800'],
+                ['Miscellaneous', '₹ 1,200']
+            ];
+            fillTable('top-expenses-table', newRows);
+        }
+
+        function updateCustomerCategory() {
+            // Simulate updating customer categories
+            const newRows = [
+                ['Retail', '₹ 55,000'],
+                ['Wholesale', '₹ 48,000'],
+                ['Corporate', '₹ 42,000'],
+                ['Online', '₹ 38,000'],
+                ['Export', '₹ 32,000'],
+                ['Distributor', '₹ 30,000'],
+                ['Dealer', '₹ 27,000'],
+                ['Reseller', '₹ 24,000'],
+                ['Government', '₹ 22,000'],
+                ['Institutional', '₹ 20,000'],
+                ['Franchise', '₹ 18,000'],
+                ['Direct', '₹ 16,000'],
+                ['Channel', '₹ 15,000'],
+                ['Partner', '₹ 14,000'],
+                ['Agent', '₹ 13,000'],
+                ['Consultant', '₹ 12,000'],
+                ['Affiliate', '₹ 11,000'],
+                ['Bulk', '₹ 10,000'],
+                ['Special', '₹ 9,000'],
+                ['Others', '₹ 8,000']
+            ];
+            fillTable('top-customer-category-table', newRows);
+        }
+
+        function updateBestSelling() {
+            // Simulate updating best selling products
+            const newRows = [
+                ['Product X', '550'],
+                ['Product Y', '520'],
+                ['Product Z', '480'],
+                ['Product A', '450'],
+                ['Product B', '420'],
+                ['Product C', '380'],
+                ['Product D', '350'],
+                ['Product E', '320'],
+                ['Product F', '300'],
+                ['Product G', '280']
+            ];
+            fillTable('best-selling-products-table', newRows);
+        }
+
+        function updateTopExpenses() {
+            // Simulate updating top expenses
+            const newRows = [
+                ['Rent', '₹ 11,000'],
+                ['Salaries', '₹ 9,000'],
+                ['Marketing', '₹ 6,000'],
+                ['Utilities', '₹ 5,500'],
+                ['Maintenance', '₹ 4,500'],
+                ['Transport', '₹ 4,000'],
+                ['Office Supplies', '₹ 3,000'],
+                ['Insurance', '₹ 2,500'],
+                ['Legal', '₹ 2,000'],
+                ['Miscellaneous', '₹ 1,500']
+            ];
+            fillTable('top-expenses-table-2', newRows);
+        }
+    </script>
+</body>
+</html>

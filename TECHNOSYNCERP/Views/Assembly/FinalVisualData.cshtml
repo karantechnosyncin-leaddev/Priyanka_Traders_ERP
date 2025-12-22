@@ -1,0 +1,1229 @@
+﻿<style>
+</style>
+<div class="container-fluid">
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="card p-2 rounded shadow-sm">
+                <div class="row">
+                    <div class="col-md-6 d-flex align-items-center">
+                        <h3 id="doctitle"><b>Final Visual Data</b></h3>
+                    </div>
+                    <div class="col-md-6 d-flex justify-content-end align-items-center flex-wrap">
+                        @if (ViewBag.BtnAuth != null)
+                        {
+
+                            <!-- Button Rendering Logic -->
+                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                            {
+                                var btnName = item["BtnName"]?.ToString().Trim();
+                                var btnauth = item["Auth"]?.ToString();
+                                var icon = item["Icon"]?.ToString();
+                                var ColorClass = item["ColorClass"]?.ToString();
+                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                {
+                                    switch (btnName)
+                                    {
+
+                                        case "Export":
+                                            <button id="btnPdf" class="btn btn-outline-danger me-2 mb-1">
+                                                <i class="bi bi-file-pdf me-1"></i> PDF
+                                            </button>
+                                            <button id="btnExcel" class="btn btn-outline-success me-2 mb-1">
+                                                <i class="bi bi-file-earmark-excel me-1"></i> EXCEL
+                                            </button>
+                                            <button id="btnCSV" class="btn btn-outline-success me-2 mb-1">
+                                                <i class="bi bi-file-earmark-excel me-1"></i> CSV
+                                            </button>
+                                            break;
+                                        case "Copy From":
+                                            <div class="dropdown">
+                                                <button id="btnCopyFrom" class="btn @ColorClass mb-1  dropdown-toggle me-2 mb-1" type="button"  data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="@icon"></i> @btnName
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li class='copyfrombtn' data-flag="FVD" data-bs-toggle="modal"><a class="dropdown-item" href="#">First Visual Data</a></li>
+                                                </ul>
+                                            </div>
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-primary" role="alert">
+
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mt-3">
+            <div class="card p-3 rounded shadow-sm">
+                <!-- Action Buttons -->
+                <div class="row mb-3">
+                    <div class="col-12 d-flex justify-content-end flex-wrap">
+                        @if (ViewBag.BtnAuth != null)
+                        {
+                            <!-- Button Rendering Logic -->
+                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                            {
+                                var btnName = item["BtnName"]?.ToString().Trim();
+                                var btnauth = item["Auth"]?.ToString();
+                                var icon = item["Icon"]?.ToString();
+                                var ColorClass = item["ColorClass"]?.ToString();
+
+                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                {
+                                    switch (btnName)
+                                    {
+                                        case "Save":
+                                            <button id="btnSave" data-action="create" data-item-id="" class="btn @ColorClass mb-1  me-2">
+                                                <i class="@icon"></i>@btnName
+                                            </button>
+                                            break;
+                                        @*    case "Update":
+                                            <button id="btnUpdate" data-action="update" class="btn @ColorClass mb-1  me-2" disabled>
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break; *@
+                                        case "Print":
+                                            <button id="btnassmPrint" class="btn @ColorClass mb-1   me-2">
+                                                <i class="@icon"></i>@btnName
+                                            </button>
+                                            break;
+                                        case "Reset":
+                                            <button id="btnReset" class="btn @ColorClass mb-1   me-2">
+                                                <i class="@icon"></i> Reset
+                                            </button>
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-primary" role="alert">
+
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Header Information -->
+                <div class="row">
+                    <div class="col-md-2 col-6 mb-2" hidden>
+                        <input id="DocumentEntry" hidden class="form-control" type="text" readonly />
+                        <input id="doctype" type="text" hidden value="AFIVD" class="form-control" />
+                    </div>
+
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="RevNo" class="form-label">Rev No</label>
+                        <input id="RevNo" class="form-control" value="0" type="text" readonly />
+                    </div>
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="FormatNo" class="form-label">Format No</label>
+                        <input id="FormatNo" class="form-control" value="BE/QA/11A" type="text" readonly />
+                    </div>
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="FromDate" class="form-label">From Date</label>
+                        <input id="FromDate" class="form-control datepicker" type="date" />
+                    </div>
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="ToDate" class="form-label">To Date</label>
+                        <input id="ToDate" class="form-control datepicker" type="date" />
+                    </div>
+                    <div class="col-md-2 col-6 mb-2">
+                        <label for="FYearId" class="form-label">Fiscal Year</label>
+                        <select id="FYearId" class="form-select">
+                            <option value="">Select Fiscal Year</option>
+                            <!-- Will be populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+                <!-- Line Items -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table  table-hover" id="mainitemtable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th nowrap>Sr No</th>
+                                        <th nowrap>Delete</th>
+
+                                        <th nowrap>Date</th>
+                                        <th nowrap>Operator Name</th>
+
+                                        <th nowrap>Item Code</th>
+                                        <th nowrap>Item Name</th>
+
+                                        <th nowrap>Rating</th>
+
+                                        <th nowrap>S.P/M.P</th>
+
+                                        <th nowrap>Total Qty</th>
+                                        <th nowrap>Ok Qty</th>
+                                        <th nowrap>Rej Qty</th>
+                                        <th nowrap>Delatch</th>
+
+                                        <th nowrap>Housing</th>
+                                        <th nowrap>Cover</th>
+                                        <th nowrap>Red Indicator</th>
+                                        <th nowrap>Slow Reset</th>
+                                        <th nowrap>Knob Stuck</th>
+
+                                        <th nowrap>Other Prob</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-id='' data-changeflag="N" data-baserefid="" class="line-item">
+                                        <td>1</td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-outline-danger remove-line" disabled>
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                        <td><input type="date" class="form-control  form-control-sm datepicker Date" /></td>
+                                        <td><input style='width:250px!important;' type="text" class="form-control form-control-sm  text-end  OperatorName" placeholder="Oprator Name" value=""></td>
+                                        <td>
+                                            <div class="input-group" style='width:200px!important;'>
+                                                <input data-id='' type="text" class="form-control form-control-sm ItemCode" placeholder="Item Code">
+                                                <button class="btn btn-sm btn-outline-secondary openmodal" type="button" data-bs-toggle="modal" data-bs-target="#itemSearchModal">
+                                                    <i class="bi bi-search"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td><input style='width:250px!important;' type="text" class="form-control form-control-sm ItemName"></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm  text-end  Rating" value=""></td>
+                                        <td><input style='width:100px!important;' type="text" class="form-control form-control-sm text-end SPMP" value=""></td>
+                                        <td><input data-id='' style='width:150px!important;' type="number" class="form-control form-control-sm text-end TotalQty"></td>
+                                        <td><input style='width: 100px !important;' type="number" class="form-control form-control-sm text-end OkQty" readonly></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end RejQty" readonly value=""></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Delatch" value=""></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end DamHousing" value=""></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end DamCover" value=""></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end RedIndicator" value=""></td>
+                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end SlowReset" value=""></td>
+                                        <td><input type="number" style='width:100px!important;' class=" form-control form-control-sm text-end  KnobStuck" value=""></td>
+                                        <td><input type="number" style='width:100px!important;' class=" form-control form-control-sm text-end  OtherProb" value=""></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-12 text-end mt-3">
+                        @if (ViewBag.BtnAuth != null)
+                        {
+                            <!-- Button Rendering Logic -->
+                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                            {
+                                var btnName = item["BtnName"]?.ToString().Trim();
+                                var btnauth = item["Auth"]?.ToString();
+                                var icon = item["Icon"]?.ToString();
+                                var ColorClass = item["ColorClass"]?.ToString();
+
+                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                {
+                                    switch (btnName)
+                                    {
+                                        case "Add New Line":
+                                            <button class="btn @ColorClass mb-1 " id="btnAddLine"><i class="@icon"></i> @btnName</button>
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-primary" role="alert">
+
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modals -->
+<!-- Item Search Modal -->
+<div class="modal fade" id="itemSearchModal" tabindex="-1" aria-labelledby="itemSearchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="itemSearchModalLabel">Item Search</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12 text-end mb-3">
+                    <button class="btn btn-primary refreshitems">Refresh Items</button>
+                </div>
+                <div class="table-responsive ">
+                    <table class="table table-bordered table-striped table-hover w-100" id="itemSearchTable">
+                        <thead>
+                            <tr>
+                                <th width="5%">Select</th>
+                                <th width="15%">Item Code</th>
+                                <th width="15%">EAN Code</th>
+                                <th width="30%">Item Name</th>
+                                <th width="15%">UOM</th>
+                                <th width="15%">HSN</th>
+                                <th width="20%">Group</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Copy From Modal -->
+<div class="modal fade" id="CopyFromModal" tabindex="-1" aria-labelledby="CopyFromModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CopyFromModalLabel">Copy From </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mt-1 mb-3">
+                    <div class="col-md-3">
+                        <label>From Date</label>
+                        <input class="form-control datepicker" type="date" id="ffromdate" />
+                    </div>
+                    <div class="col-md-3">
+                        <label>To Date</label>
+                        <input class="form-control datepicker" type="date" id="ftodate" />
+                    </div>
+                    <div class="col-md-3 align-content-center align-items-center  ">
+                        <button class="btn btn-primary" id="FFind"><i class="bi bi-search me-2"></i>Find</button>
+                        <button class="btn btn-secondary" id="FReset"><i class="bi bi-arrow-clockwise me-2"></i>Reset</button>
+
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped w-100 display nowrap" id="copyfromtbl">
+                        <thead>
+                            <tr>
+                                <th class="text-center"> <input type='checkbox' class='copyfromcheckall'></th>
+                                <th>Date</th>
+                                <th>Operator Name</th>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Total Qty</th>
+                                <th>Ok Qty</th>
+                                <th>Rej Qty</th>
+                                <th>Created By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="SelectCopyFrom" data-bs-dismiss="modal">Select</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        // Initialize variables
+        let selectedRowIndex = null;
+        $('.datepicker').val(new Date().toISOString().split('T')[0]);
+        loadFiscalYears();
+        // Add new line item
+        $('#btnAddLine').click(function () {
+            savedocument("S")
+            addNewLineItem();
+        });
+        // Save document
+        $('#btnSave').click(function () {
+            savedocument("S");
+        });
+        // Save document
+        $('#btnPark').click(function () {
+            savedocument("P");
+        });
+        // Update document
+        $('#btnUpdate').click(function () {
+            savedocument();
+        });
+        // Reset form
+        $('#btnReset').click(function () {
+            resetForm();
+        });
+
+        // Function to add new line item
+        function addNewLineItem() {
+            const table = $('#mainitemtable tbody');
+            const lastRow = table.find('tr').last();
+
+            // Check if there is at least one row and its ItemCode is empty
+            if (lastRow.length && !lastRow.find('.OperatorName').val().trim()) {
+                lastRow.find('.OperatorName').focus();
+                return; // Stop execution if the previous row's ItemCode is empty
+            }
+
+            const rowCount = table.find('tr').length;
+            const newRow = `
+                  <tr data-id='' data-changeflag="N" data-baserefid="" class="line-item">
+                        <td>${rowCount + 1}</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-danger remove-line" disabled>
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                        <td><input type="date" class="form-control  form-control-sm datepicker Date" /></td>
+                        <td><input style='width:250px!important;' type="text" class="form-control form-control-sm  text-end  OperatorName" placeholder="Oprator Name" value=""></td>
+                        <td>
+                            <div class="input-group" style='width:200px!important;'>
+                                <input data-id='' type="text" class="form-control form-control-sm ItemCode" placeholder="Item Code">
+                                <button class="btn btn-sm btn-outline-secondary openmodal" type="button" data-bs-toggle="modal" data-bs-target="#itemSearchModal">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td><input style='width:250px!important;' type="text" class="form-control form-control-sm ItemName"></td>
+                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm  text-end  Rating" value=""></td>
+                        <td><input style='width:100px!important;' type="text" class="form-control form-control-sm text-end SPMP" value=""></td>
+                        <td><input data-id='' style='width:150px!important;' type="number" class="form-control form-control-sm text-end TotalQty"></td>
+                        <td><input style='width: 100px !important;' type="number" class="form-control form-control-sm text-end OkQty" readonly></td>
+                        <td><input style='width:100px!important;'   type="number" class="form-control form-control-sm text-end RejQty" value="" readonly></td>
+                        <td><input style='width:100px!important;'   type="number" class="form-control form-control-sm text-end Delatch" value=""></td>
+                        <td><input style='width:100px!important;'   type="number" class="form-control form-control-sm text-end DamHousing" value=""></td>
+                        <td><input style='width:100px!important;'   type="number" class="form-control form-control-sm text-end DamCover" value=""></td>
+                        <td><input style='width:100px!important;'   type="number" class="form-control form-control-sm text-end RedIndicator" value=""></td>
+                        <td><input style='width:100px!important;'   type="number" class="form-control form-control-sm text-end SlowReset" value=""></td>
+                        <td><input type="number" style='width:100px!important;' class=" form-control form-control-sm text-end  KnobStuck" value=""></td>
+                         <td><input type="number" style='width:100px!important;' class=" form-control form-control-sm text-end  OtherProb" value=""></td>
+                    </tr>
+            `;
+            table.append(newRow);
+            const newRowElement = table.find('tr').last();
+            newRowElement.find('.Date').val(new Date().toISOString().split('T')[0]);
+            newRowElement.find('.OperatorName').focus();
+
+            if (rowCount > 0) {
+                table.find('tr').each(function () {
+                    $(this).find('.remove-line').prop('disabled', false);
+                });
+            }
+        }
+        $(document).on("input", "#mainitemtable tbody input,textarea", function () {
+            var row = $(this).closest("tr");
+            row.attr("data-changeflag", "Y")
+        })
+
+        function loadFiscalYears() {
+            $.ajax({
+                 url: '@Url.Action("GETOPENFYEAR", "Inventory")',
+                method: 'GET',
+                success: function(response) {
+                    const select = $('#FYearId');
+                    select.empty();
+
+                    response.forEach(function(year) {
+                        select.append(`<option value="${year.FYearId}">${year.FYear}</option>`);
+                    });
+                },
+                error: function(xhr) {
+                            Notify('error', 'Error', xhr.responseText );
+                }
+            });
+        }
+         // Item Search
+          {
+              var $activeInput = null;
+              var ItemData = [];
+              function loadItemMasterTable() {
+                  $.ajax({
+                      type: "GET",
+                      url: '@Url.Action("GETACTIVEITEMS", "Inventory")',
+                      contentType: "application/json; charset=utf-8",
+                      cache: false,
+                      success: function (data) {
+                          ItemData=[];
+                          ItemData = Array.isArray(data) ? data : [];
+                          bindtable(data)
+                      },
+                      error: function (xhr) {
+                          Notify('error', 'Error', xhr.responseText || 'Error loading items');
+                      }
+                  });
+              }
+              $('.refreshitems').click(function() {
+                  loadItemMasterTable()
+              });
+              loadItemMasterTable();
+              function bindtable(response){
+                          if ($.fn.DataTable.isDataTable('#itemSearchTable')) {
+                              $('#itemSearchTable').DataTable().destroy();
+                              $('#itemSearchTable thead th').not(':first').find('input').remove();
+                          }
+                          const table = $('#itemSearchTable tbody');
+                          table.empty();
+                          response.forEach(function(item) {
+                              const row = `
+                                  <tr data-item-id="${item.ItemID}"
+                                      data-item-code="${item.ItemCode}"
+                                      data-item-eancode="${item.EanCode}"
+                                      data-item-name="${item.ItemName}"
+                                      data-item-uom="${item.UomCode}"
+                                      data-item-hsn="${item.HSNCode}">
+                                      <td class="text-center">
+                                          <button class="btn btn-sm btn-primary btnSelectItem">Select</button>
+                                      </td>
+                                      <td nowrap>${item.ItemCode}</td>
+                                      <td nowrap>${item.EanCode}</td>
+                                      <td nowrap>${item.ItemName}</td>
+                                      <td nowrap>${item.UomCode}</td>
+                                      <td nowrap>${item.HSNCode}</td>
+                                      <td nowrap>${item.ItmGrpNam}</td>
+                                  </tr>
+                              `;
+                              table.append(row);
+                          });
+
+                          $('#itemSearchTable').DataTable({
+                              // dom: '<"top"f>rt<"bottom"lip><"clear">',
+                              initComplete: function() {
+                                  this.api().columns().every(function() {
+                                      var column = this;
+                                      var header = $(column.header());
+                                      if (header.index() === 0) return;
+                                      if (header.find('input').length === 0) {
+                                          var input = $('<input type="text" class="form-control form-control-sm" placeholder="Search..."/>')
+                                              .appendTo(header)
+                                              .on('keyup change clear', function() {
+                                                  if (column.search() !== this.value) {
+                                                      column.search(this.value).draw();
+                                                  }
+                                              });
+                                      }
+                                  });
+                              },
+                              columnDefs: [
+                                  { orderable: false, targets: 0 }, // Disable sorting for select button column
+                                  { searchable: false, targets: 0 } // Disable searching for select button column
+                              ],
+                              language: {
+                                  search: "Global Search:",
+                                  searchPlaceholder: "Search all columns..."
+                              },
+                              responsive: true
+                          });
+                          $('.dataTables_filter input').focus();
+
+                  }
+              // Function to create item suggestions based on input
+              function CreateItemList(inputClass) {
+                  $(document).on('input', "#mainitemtable tbody tr td ." + inputClass, function () {
+                      var $input = $(this);
+                      $activeInput = $input;
+                      var value = $input.val().toLowerCase().replace(/_/g, ' ');
+                      var suggestions = [];
+                      var suggestionContainerId = 'ItemNameSuggestions-' + $input.closest('tr').index();
+                      if (!$('#' + suggestionContainerId).length) {
+                          $('<div id="' + suggestionContainerId + '" class="suggestions-container"></div>').appendTo('body');
+                      }
+                      var $suggestionContainer = $('#' + suggestionContainerId);
+                      $suggestionContainer.empty();
+
+                      if (Array.isArray(ItemData) && ItemData.length > 0) {
+                          if (value.length > 0) {
+                              var searchTokens = value.split(/\s+/);
+                              suggestions = ItemData.filter(function (data) {
+                                  if (data && typeof data === 'object') {
+                                      var code = (data.ItemCode || '').toLowerCase();
+                                      var name = (data.ItemName || '').toLowerCase();
+                                      var allTokens = code.split(/\s+|[_-]+/).concat(name.split(/\s+|[_-]+/));
+                                      return searchTokens.every(function (token) {
+                                          return allTokens.some(function (itemToken) {
+                                              return itemToken.includes(token);
+                                          });
+                                      });
+                                  }
+                                  return false;
+                              }).sort(function (a, b) {
+                                  return a.ItemName.localeCompare(b.ItemName);
+                              }).slice(0, 20);
+                          }
+
+                          if (suggestions.length > 0) {
+                              suggestions.forEach(function (data) {
+                                  $suggestionContainer.append(
+                                      `<div class="suggestion-item MItemList" data-code="${data.ItemCode || ''}" data-id="${data.ItemID || ''}" data-name="${data.ItemName || ''}">
+                                          <span class="supplier-code">${data.ItemCode || ''}</span> -
+                                          <span class="supplier-name">${data.ItemName || ''}</span>
+                                      </div>`
+                                  );
+                              });
+
+                              var offset = $input.offset();
+                              $suggestionContainer.css({
+                                  top: offset.top + $input.outerHeight(),
+                                  left: offset.left,
+                                  width: $input.outerWidth(),
+                                  position: 'absolute',
+                                  "z-index": 1000
+                              }).show();
+                          } else {
+                              $suggestionContainer.hide();
+                          }
+                      } else {
+                          console.error("ItemData is empty or not defined");
+                          $suggestionContainer.hide();
+                      }
+                  });
+              }
+              CreateItemList("ItemCode");
+              CreateItemList("ItemName");
+             // handle mouse click
+             $(document).on('click', '.MItemList', function () {
+                 selectSuggestion($(this));
+             });
+             // handle keyboard navigation
+             $(document).on('keydown', function (e) {
+                 if (!$activeInput) return;
+                 var $suggestionContainer = $('.suggestions-container:visible');
+                 if (!$suggestionContainer.length) return;
+
+                 var $items = $suggestionContainer.find('.suggestion-item');
+                 var $current = $items.filter('.suggestion-item-active');
+                 var idx = $items.index($current);
+
+                 if (e.key === "ArrowDown") {
+                     e.preventDefault();
+                     if (idx < $items.length - 1) {
+                         $current.removeClass('suggestion-item-active');
+                         $items.eq(idx + 1).addClass('suggestion-item-active');
+                     }
+                 } else if (e.key === "ArrowUp") {
+                     e.preventDefault();
+                     if (idx > 0) {
+                         $current.removeClass('suggestion-item-active');
+                         $items.eq(idx - 1).addClass('suggestion-item-active');
+                     }
+                 } else if (e.key === "Enter") {
+                     e.preventDefault();
+                     if ($current.length) {
+                         selectSuggestion($current);
+                     }
+                 }
+             });
+             function selectSuggestion($item) {
+                 var id = $item.data('id');
+                 var name = $item.data('name');
+                 var code = $item.data('code');
+                 if ($activeInput) {
+                     var $activeRow = $activeInput.closest('tr');
+                     SetItem(id, $activeRow);
+                 }
+                 $('.suggestions-container').hide();
+             }
+             $(document).on('click', function (e) {
+                 if (!$(e.target).closest('.suggestions-container, .ItemCode').length) {
+                     $('.suggestions-container').hide();
+                 }
+             });
+              $(document).on("change",".ItemCode",function(){
+                  var row =$(this).closest("tr");
+                  var ItemCode =row.find(".ItemCode").val();
+                  if(ItemCode !=="" && ItemCode !==null){
+                     SetItem(ItemCode.trim(),row)
+                  }
+              })
+              function SetItem(id, row) {
+                  if (id) {
+                      $.ajax({
+                          type: "GET",
+                          url: '@Url.Action("GETACTIVEITEMSBYID", "Inventory")',
+                          data: { id: id },
+                          contentType: "application/json; charset=utf-8",
+                          cache: false,
+                          success: function(data) {
+                              if (data.length>0) {
+                                  var item = data[0];
+                                  row.find('.ItemCode').val(item.ItemCode);
+                                  row.find('.ItemCode').attr("data-id", item.ItemID);
+                                  row.find('.ItemName').val(item.ItemName);
+                              } else {
+                                  // Notify('info', "No Item Found.", "Try Again..!")
+                              }
+                          },
+                          error: function(xhr) {
+                              Notify('error', 'Error', xhr.responseText || 'Error loading item by ID');
+                          }
+                      });
+                  }
+              }
+              $(document).on('click', '.openmodal', function () {
+                  selectedRowIndex = null;
+                  selectedItemId = null;
+                  const row = $(this).closest('tr');
+                  selectedRowIndex = row.index();
+              });
+              $(document).on('click', '.btnSelectItem', function () {
+                  const row = $(this).closest('tr');
+                  if (selectedRowIndex !== null) {
+                      const targetRow = $('#mainitemtable tbody tr').eq(selectedRowIndex);
+                      SetItem(row.data('item-id'), targetRow)
+                      $('#itemSearchModal').modal('hide');
+                  } else {
+                      Notify('warning', 'No target row selected', '');
+                  }
+              });
+          }
+        function savedocument(flag) {
+            removeempty()
+            const headerData = getHeaderData();
+            const lineItems = getLineItems();
+            if (!validateForm(headerData, lineItems)) {
+                return;
+            }
+            const data = {
+                header: headerData,
+                lines: lineItems,
+            };
+            // AJAX call to save
+            $.ajax({
+                url: '@Url.Action("CREATEFINELVISUALDATA", "Assembly")' + '?flag=' + flag + '&doctype=' + $("#doctype").val(),
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                beforeSend: function() {
+                    if (flag == "S") {
+                        $('#btnSave').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Processing...');
+                    } else {
+                        $('#btnPark').prop('disabled', true).html('<i class="bi bi-p-circle"></i> Processing...');
+                    }
+                },
+                success: function (response) {
+
+                    if(response.success){
+                       Notify('success', response.message,'');
+                       currentDocEntry = response.docEntry;
+                       //$('#btnUpdate').prop('disabled', false);
+                       $('#btnDelete').prop('disabled', false);
+                       $('#btnCancel').prop('disabled', false);
+                       $('#DocumentEntry').val("");
+                       $('#addFilesButton').click();
+                     //  $("#btnReset").click();
+                        if (flag == "S") {
+                             Get_RowBinding()
+                        } else {
+                            $("#btnReset").click();
+                        }
+                    }else{
+                       Notify('error','Faild To Create ', response.message);
+                    }
+                },
+                error: function(xhr) {
+                    const errorMessage = xhr.responseText || 'Error To Save Data';
+                    Notify('error', 'Error', errorMessage);
+                    if (flag == "S") {
+                        $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
+                    } else {
+                        $('#btnPark').prop('disabled', false).html('<i class="bi bi-p-circle"></i> Park');
+                    }
+
+                },complete: function() {
+                    if (flag == "S") {
+                        $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
+                    } else {
+                        $('#btnPark').prop('disabled', false).html('<i class="bi bi-p-circle"></i> Park');
+                    }
+                }
+            });
+        }
+        function removeempty(){
+            var tablerow= $('#mainitemtable tbody tr').length;
+            if(tablerow >1){
+                $('#mainitemtable tbody tr').each(function(){
+                     var row = $(this).closest("tr");
+                    if (row.length && !row.find('.OperatorName').val().trim()) {
+                        row.remove();
+                        return; // Stop execution if the previous row's ItemCode is empty
+                    }
+                });
+            }
+        }
+        function getHeaderData() {
+            return {
+                DocEntry: $('#DocumentEntry').val() || null,
+                RevNo: $('#RevNo').val(),
+                FYearId: $('#FYearId').val(),
+                FormatNo: $('#FormatNo').val()
+            };
+        }
+        function getLineItems() {
+            const lineItems = [];
+            $('#mainitemtable tbody tr').each(function(index) {
+                const row = $(this);
+                var val =  row.attr("data-changeflag");
+                if (val == "Y") {
+                    lineItems.push({
+                        ID: row.data('id').toString() || null,
+                        BaseRefId: row.data('baserefid').toString() || null,
+                        RevNo: "",
+                        Date: row.find('.Date').val() || '',
+                        OpetorName: row.find('.OperatorName').val() || "",
+                        ItemID: row.find('.ItemCode').attr('data-id').toString() || null,
+                        ItemCode: row.find('.ItemCode').val(),
+                        ItemName: row.find('.ItemName').val(),
+                        Rating: row.find('.Rating').val() || "0",
+                        SPMP: row.find('.SPMP').val() || "0",
+
+                        TotalQty: parseFloat(row.find('.TotalQty').val()) || 0,
+                        OkQty: parseFloat(row.find('.OkQty').val()) || 0,
+                        RejQty: parseFloat(row.find('.RejQty').val()) || 0,
+
+                        Delatch: row.find('.Delatch').val() || "0",
+
+                        DamHousing: row.find('.DamHousing').val() || "0",
+                        DamCover: row.find('.DamCover').val() || "0",
+                        RedIndicator: row.find('.RedIndicator').val() || "0",
+                        SlowReset: row.find('.SlowReset').val() || "0",
+                        KnobStuck: row.find('.KnobStuck').val() || "0",
+                        OtherProb: row.find('.OtherProb').val() || "0",
+                    });
+                }
+            });
+            return lineItems;
+        }
+        function validateForm(header, lines) {
+
+            if (!header.FormatNo) {
+                Notify('error', 'Format No is required','');
+                return false;
+            }
+            if (!header.RevNo) {
+                Notify('error', 'Rev No is required','');
+                return false;
+            }
+            if (!header.FYearId) {
+                Notify('error', 'Fiscal year is required','');
+                return false;
+            }
+            if (lines.length ==0) {
+                Notify('warning', 'No Changes Found To Update', '');
+                return false;
+            }
+            var index= 1;
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                if (!line.Date) {
+                    Notify('error', `Date is required for line ${index}`, '');
+                    return false;
+                }
+                if (!line.OpetorName) {
+                    Notify('error', `Oprator Name is required for line ${index }`,'');
+                    return false;
+                }
+                if (!line.ItemCode) {
+                    Notify('error', `Item code is required for line ${index}`, '');
+                    return false;
+                }
+                index++;
+            }
+            return true;
+        }
+        function resetForm() {
+
+                currentDocEntry = null;
+                isEditMode = false;
+                // Reset header fields
+                $('#DocumentEntry').val('');
+                $('#FYearId').val('');
+                $('#mainitemtable tbody').empty();
+                $('#FromDate').val(new Date().toISOString().split('T')[0]);
+                $('#ToDate').val(new Date().toISOString().split('T')[0]);
+                Get_RowBinding()
+                // Reset buttons
+               $('#btnSave').prop('disabled', false);
+               $('#btnPark').prop('disabled', false);
+               $('#btnDelete').prop('disabled', true);
+                loadFiscalYears();
+            }
+         // Modify the remove-line click handler
+        $(document).on('click', '.remove-line', function () {
+
+            const row = $(this).closest('tr');
+            var id = row.attr("data-id");
+            const table = $('#mainitemtable tbody');
+            const rowCount = table.find('tr').length;
+            if (!id) {
+                if (rowCount > 1) {
+                    row.remove();
+                    table.find('tr').each(function (index) {
+                        $(this).find('td:first').text(index + 1);
+                    });
+                    // Disable remove button if only one row left
+                    if (table.find('tr').length === 1) {
+                        table.find('tr').first().find('.remove-line').prop('disabled', true);
+                    }
+                } else {
+                    Notify('warning', 'At least one item is required');
+                }
+                return;
+            } else {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '@Url.Action("DELETEFINELVISUALDATA", "Assembly")',
+                            type: 'POST',
+                            data: { id: id },
+                            beforeSend: function () {
+                                $('#btnDelete').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Deleting...');
+                            },
+                            success: function (response) {
+                                if (response && response.success) {
+                                    Notify('success', 'Success', response.message || 'Record deleted successfully!');
+                                    Get_RowBinding()
+                                } else {
+                                    Notify('warning', 'Warning', response.message || 'Record could not be deleted.');
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error deleting Record';
+                                Notify('error', 'Error', errorMessage);
+                            },
+                            complete: function () {
+                                $('#btnDelete').prop('disabled', false).html('<i class="bi bi-trash"></i> Delete');
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        //Load Row
+        {
+            $("#FromDate,#ToDate").change(function () {
+                Get_RowBinding()
+            })
+            Get_RowBinding()
+            function Get_RowBinding() {
+                $("#mainitemtable tbody").empty();
+                $.ajax({
+                    url: '@Url.Action("GETFINALVISUALDATAROW", "Assembly")',
+                    method: 'GET',
+                    data: { FromDate: $("#FromDate").val(), ToDate: $("#ToDate").val() },
+                    success: function (response) {
+                        if (Array.isArray(response) && response.length > 0) {
+                            $("#DocumentEntry").val("")
+                            for (var i = 0; i < response.length; i++) {
+                                var item = response[i];
+                                const newRow = `
+                                     <tr data-id='${item.ID}' data-changeflag="N"  data-baserefid='${item.BaseRefId}' class="line-item">
+                                            <td>${i + 1}</td>
+                                            <td class="text-center">
+                                                <button class="btn btn-sm btn-outline-danger remove-line" disabled>
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                            <td><input type="date" class="form-control  form-control-sm datepicker Date" value='${item.Date}' /></td>
+                                            <td><input style='width:250px!important;' type="text" class="form-control form-control-sm  text-end  OperatorName" placeholder="Oprator Name" value="${item.OpetorName}"></td>
+                                             <td>
+                                                 <div class="input-group" style='width:200px!important;'>
+                                                     <input data-id="${item.ItemID}" type="text" class="form-control form-control-sm ItemCode" value="${item.ItemCode}" placeholder="Item Code">
+                                                     <button class="btn btn-sm btn-outline-secondary openmodal"   type="button" data-bs-toggle="modal" data-bs-target="#itemSearchModal">
+                                                         <i class="bi bi-search"></i>
+                                                     </button>
+                                                 </div>
+                                             </td>
+                                             <td><input style='width:250px!important;' type="text" class="form-control form-control-sm ItemName" value="${item.ItemName}"></td>
+                                            <td><input style='width:100px!important;' type="number" class="form-control form-control-sm  text-end  Rating" value="${item.Rating}"></td>
+
+                                            <td><input style='width:100px!important;' type="text" class="form-control form-control-sm text-end SPMP" value="${item.SPMP}"></td>
+
+                                            <td><input style='width:150px!important;' data-id='' type="number" class="form-control form-control-sm text-end TotalQty" value="${parseFloat(item.TotalQty).toFixed(2)}"></td>
+                                            <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end OkQty" value="${parseFloat(item.OkQty).toFixed(2)}" readonly></td>
+                                            <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end RejQty" readonly value="${parseFloat(item.RejQty).toFixed(2)}"></td>
+                                            <td><input style='width:100px!important;' type="text" class="form-control form-control-sm text-end Delatch" value="${item.Delatch}"></td>
+
+                                            <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end DamHousing" value="${item.DamHousing}"></td>
+                                            <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end DamCover" value="${item.DamCover}"></td>
+                                            <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end RedIndicator" value="${item.RedIndicator}"></td>
+                                            <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end SlowReset" value="${item.SlowReset}"></td>
+                                            <td><input type="number" style='width:100px!important;' class=" form-control form-control-sm text-end  KnobStuck" value="${item.KnobStuck}"></td>
+                                            <td><input type="text" style='width:100px!important;' class=" form-control form-control-sm text-end OtherProb" value="${item.OtherProb}"></td>
+                                      </tr>
+                               `;
+                                $("#mainitemtable tbody").append(newRow)
+                            }
+                            function formatDate(inputDate) {
+                                const [datePart] = inputDate.split(' ');
+                                const [day, month, year] = datePart.split('-');
+                                return `${year}-${month}-${day}`;
+                            }
+                            addNewLineItem()
+                        } else {
+                            addNewLineItem()
+                        }
+                    },
+                    error: function (xhr) {
+                        Notify('error', 'Error', xhr.responseText);
+                    }
+                });
+            }
+        }
+        // Calculations
+        {
+            $(document).on("input", ".Delatch,.DamHousing,.DamCover,.RedIndicator,.SlowReset,.KnobStuck,.TotalQty,.OtherProb", function () {
+                var row = $(this).closest("tr");
+                var Delatch = parseFloat(row.find(".Delatch").val()) || 0;
+                var DamHousing = parseFloat(row.find(".DamHousing").val()) || 0;
+                var DamCover = parseFloat(row.find(".DamCover").val()) || 0;
+                var RedIndicator = parseFloat(row.find(".RedIndicator").val()) || 0;
+                var SlowReset = parseFloat(row.find(".SlowReset").val()) || 0;
+                var KnobStuck = parseFloat(row.find(".KnobStuck").val()) || 0;
+                var OtherProb = parseFloat(row.find(".OtherProb").val()) || 0;
+
+                var TotalQty = parseFloat(row.find(".TotalQty").val()) || 0;
+                var rejqty = Delatch + DamHousing + DamCover + RedIndicator + SlowReset + KnobStuck + OtherProb;
+                var okqty = TotalQty - rejqty;;
+                row.find(".RejQty").val(rejqty)
+                row.find(".OkQty").val(okqty)
+            })
+        }
+         //Copy From
+        {
+                $("#FFind").click(function () {
+                    getcopyfrom()
+                })
+                $("#FReset").click(function () {
+                    $("#ffromdate").val(new Date().toISOString().split('T')[0]);
+                    $("#ftodate").val(new Date().toISOString().split('T')[0]);
+                })
+               $(".copyfrombtn").click(function () {
+                   getcopyfrom()
+                   $("#CopyFromModal").modal("show");
+               });
+              function getcopyfrom() {
+                var obj = {
+                    FromDate: $("#ffromdate").val(),
+                    Todate: $("#ftodate").val(),
+                };
+                $.ajax({
+                    url: '@Url.Action("COPYFROM", "Assembly")',
+                    method: 'GET',
+                    data: obj,
+                    success: function (response) {
+                        // ✅ Destroy previous table
+                        if ($.fn.DataTable.isDataTable('#copyfromtbl')) {
+                            $('#copyfromtbl').DataTable().destroy();
+                        }
+                        // ✅ Initialize DataTable with data
+                        var mainTable = $('#copyfromtbl').DataTable({
+                            data: response,
+
+                            className: "text-center",
+                            columns: [
+
+                                {
+                                    data: "ID",
+                                    className:"text-center",
+                                    render: function (data, type, row) {
+                                        return `
+                                        <input type='checkbox' class='copyfromcheck' data-rowobj='${JSON.stringify(row)}' >
+                                        `;
+                                    },
+                                    orderable: false
+                                },
+                                { data: "FormattedDate" },
+                                { data: "OpetorName" },
+                                { data: "ItemCode" },
+                                { data: "ItemName" },
+                                {
+                                    data: "TotalQty",
+                                    render: function (data, type, row) {
+                                        return parseFloat(data).toFixed(2)
+                                     },
+                                },
+                                {
+                                    data: "OkQty",
+                                    render: function (data, type, row) {
+                                        return parseFloat(data).toFixed(2)
+                                    },
+                                },
+                                {
+                                    data: "RejQty",
+                                    render: function (data, type, row) {
+                                        return parseFloat(data).toFixed(2)
+                                    },
+                                },
+                                { data: "CretedByUName" },
+                            ],
+                            dom: '<"top"lf>rt<"bottom"ip>',
+                            pageLength: 10,
+                            lengthMenu: [5, 10, 25, 50, 100],
+                            responsive: true
+                        });
+                        // ✅ Select all checkbox (per nested table)
+                        $(document).on("click", ".copyfromcheckall", function () {
+                            var isChecked = $(this).is(":checked");
+                            $(this).closest("table").find(".copyfromcheck").prop("checked", isChecked);
+                        });
+                    },
+                    error: function () {
+                        Notify('error', 'Failed to copy from ', '');
+                    }
+                });
+            }
+            // ✅ Select & Copy rows
+            $("#SelectCopyFrom").click(function () {
+                var rowdata = [];
+
+                $("#copyfromtbl tbody tr").each(function () {
+                    var checkbox = $(this).find(".copyfromcheck");
+                    if (checkbox.is(":checked")) {
+                        rowdata.push(checkbox.data("rowobj"));
+                    }
+                });
+
+                if (rowdata.length === 0) {
+                    Notify('warning', 'Please select at least one row', '');
+                    return;
+                }
+                $("#mainitemtable tbody").empty();
+
+                // Append rows to target table
+                for (var i = 0; i < rowdata.length; i++) {
+                    var item = rowdata[i];
+                    var row = `
+          <tr data-id='' data-changeflag="Y" data-baserefid="${item.ID}" class="line-item">
+                 <td></td> <!-- Row number will be set later -->
+                 <td class="text-center">
+                     <button class="btn btn-sm btn-outline-danger remove-line" disabled>
+                         <i class="bi bi-trash"></i>
+                     </button>
+                 </td>
+                 <td><input type="date" class="form-control form-control-sm datepicker Date" value='${new Date().toISOString().split('T')[0]}' /></td>
+                 <td><input style="width:250px!important;" type="text" class="form-control form-control-sm text-end OperatorName" value="${item.OpetorName}" placeholder="Operator Name"></td>
+                 <td>
+                     <div class="input-group" style="width:200px!important;">
+                         <input data-id="${item.ItemID}" type="text" class="form-control form-control-sm ItemCode" value="${item.ItemCode}" placeholder="Item Code">
+                         <button class="btn btn-sm btn-outline-secondary openmodal" type="button" data-bs-toggle="modal" data-bs-target="#itemSearchModal">
+                             <i class="bi bi-search"></i>
+                         </button>
+                     </div>
+                 </td>
+                 <td><input style="width:250px!important;" type="text" class="form-control form-control-sm ItemName" value="${item.ItemName}"></td>
+                 <td><input style="width:100px!important;" type="number" class="form-control form-control-sm text-end Rating" value=""></td>
+                 <td><input style="width:100px!important;" type="text" class="form-control form-control-sm text-end SPMP" value=""></td>
+                 <td><input style="width:150px!important;" type="number" class="form-control form-control-sm TotalQty" value="${parseFloat(item.OkQty).toFixed(2)}" ></td>
+                 <td><input style="width:100px!important;" type="number" class="form-control form-control-sm OkQty" value="" readonly></td>
+                 <td><input style="width:100px!important;" type="number" class="form-control form-control-sm text-end RejQty" readonly value=""></td>
+                 <td><input style="width:100px!important;" type="text" class="form-control form-control-sm text-end Delatch" value=""></td>
+                 <td><input style="width:100px!important;" type="number" class="form-control form-control-sm text-end DamHousing" value=""></td>
+                 <td><input style="width:100px!important;" type="number" class="form-control form-control-sm text-end DamCover" value=""></td>
+                 <td><input style="width:100px!important;" type="number" class="form-control form-control-sm text-end RedIndicator" value=""></td>
+                 <td><input style="width:100px!important;" type="number" class="form-control form-control-sm text-end SlowReset" value=""></td>
+                 <td><input style="width:100px!important;" type="number" class="form-control form-control-sm text-end KnobStuck" value=""></td>
+                 <td><input style="width:100px!important;" type="text" class="form-control form-control-sm text-end OtherProb" value=""></td>
+             </tr>
+        `;
+                    $("#mainitemtable tbody").append(row);
+                }
+
+                // ✅ Renumber rows
+                $("#mainitemtable tbody tr").each(function (index) {
+                    $(this).find("td:first").text(index + 1);
+                });
+            });
+         }
+
+         //Print Layout
+        {
+            $("#btnassmPrint").click(function () {
+                    PrintLayout1()
+            })
+            function PrintLayout1() {
+                var FromDate = $("#FromDate").val();
+                var ToDate = $("#ToDate").val();
+                if (FromDate == "" || ToDate == "")
+                {
+                    Notify('warning','Please Select Valid Date ..!','');
+                    return;
+                }
+                // AJAX call to save
+                $.ajax({
+                    url: '@Url.Action("GenerateAssembyLayout", "Layout")',
+                    method: 'GET',
+                    contentType: 'application/json',
+                    data: { FromDate: FromDate, ToDate: ToDate, DocType: $("#doctype").val()},
+                    beforeSend: function() {
+                        $('#btnassmPrint').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Processing...');
+                    },
+                    success: function (response) {
+                        if (response.success) {
+
+                            if (response.message && response.fileName) {
+                                // Extract the base64 part after the comma
+                                const base64Data = response.message.split(',')[1];
+                                // Decode the base64 string
+                                const byteCharacters = atob(base64Data);
+                                const byteNumbers = new Array(byteCharacters.length);
+                                for (let i = 0; i < byteCharacters.length; i++) {
+                                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                                }
+                                const byteArray = new Uint8Array(byteNumbers);
+                                const blob = new Blob([byteArray], { type: 'application/pdf' });
+                                const pdfUrl = URL.createObjectURL(blob);
+
+                                // Open PDF in a new tab
+                                const newTab = window.open(pdfUrl, '_blank');
+                                if (newTab) {
+                                    newTab.focus();
+                                } else {
+                                    alert("Please allow popups to view the PDF.");
+                                }
+
+                                // Revoke the URL after some time (to free memory)
+                                setTimeout(() => {
+                                    URL.revokeObjectURL(pdfUrl);
+                                }, 5 * 60 * 1000); // keep alive for 5 minutes so PDF loads fine
+                            }
+                        } else {
+                            Notify('error', 'Failed To Create', response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        const errorMessage = xhr.responseText || 'Error loading ITEM GROUP';
+                        Notify('error', 'Error', errorMessage);
+
+                    },complete: function() {
+                        $('#btnassmPrint').prop('disabled', false).html('<i class="bi bi-printer"></i> Print');
+                    }
+                });
+            }
+        }
+    });
+</script>
