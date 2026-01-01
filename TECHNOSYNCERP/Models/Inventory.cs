@@ -505,6 +505,171 @@
 
     }
 
+    public class INVENTORYCOUNTINGNEW
+    {
+        public INVENTORYCOUNTINGHEADNEW header { get; set; }
+        public INVENTORYCOUNTINGITEMNEW[] lines { get; set; }
+    }
+    public class INVENTORYCOUNTINGHEADNEW
+    {
+        public string DocEntry { get; set; }          // ""
+        public string OBJType { get; set; }            // "IICN"
+        public string Docnum { get; set; }             // "6"
+        public string DocStatus { get; set; }          // "O"
+
+        public string CountDate { get; set; }          // "2025-12-29"
+        public string CountTime { get; set; }          // "12:13"
+        public string DocumentDate { get; set; }       // "2025-12-29"
+
+        public string FYearId { get; set; }            // "1"
+        public string RefNo { get; set; }              // "0"
+        public string Remarks { get; set; }            // " "
+
+        public string Weight { get; set; }             // "0.00"
+
+        // 🔹 Audit (optional – frontend not sending these)
+        public string? CretedByUId { get; set; }
+        public string? CretedByUName { get; set; }
+        public DateTime? CreatedDate { get; set; }
+
+        public string? UpdatedByUId { get; set; }
+        public string? UpdatedByUName { get; set; }
+        public DateTime? UpdatedDate { get; set; }
+    }
+    public class INVENTORYCOUNTINGITEMNEW
+    {
+        public string ID { get; set; }                 // ""
+
+        public string DocEntry { get; set; }           // ""
+
+        public int LineNum { get; set; }               // 1
+
+        public string ItemID { get; set; }             // "96"
+        public string ItemCode { get; set; }           // "00089"
+        public string ItemName { get; set; }           // "1 MODULE GANG BOX"
+
+        public string HSNID { get; set; }              // "00000"
+        public string HSNCode { get; set; }            // "00000"
+
+        public string WhsID { get; set; }                 // 1
+        public string WhsCode { get; set; }            // "01"
+
+        public decimal StockInWhs { get; set; }        // 7304
+
+        public string EmployeeID { get; set; }         // "1"
+        public string StockTakerName { get; set; }         // "1"
+
+
+        public decimal Price { get; set; }             // 0
+        public string AcctCode { get; set; }           // "10"
+
+        public int BaseDocEntry { get; set; }           // 0
+        public string BaseObj { get; set; }             // ""
+        public string BaseLine { get; set; }               // 0
+
+        public string EanCode { get; set; }             // "00089"
+
+        public string Remarks { get; set; }             // ""
+
+        public string Weight { get; set; }             // 100
+
+        public string Status { get; set; }              // "O"
+
+        // 🔹 Audit (server side)
+        public string? CretedByUId { get; set; }
+        public string? CretedByUName { get; set; }
+        public DateTime? CreatedDate { get; set; }
+
+        public string? UpdatedByUId { get; set; }
+        public string? UpdatedByUName { get; set; }
+        public DateTime? UpdatedDate { get; set; }
+    }
+
+    public class INVENTORYPOSTINGNEW
+    {
+        public INVENTORYCOUNTINGHEADNEW header { get; set; }
+        public INVENTORYCOUNTINGITEMNEW[] lines { get; set; }
+    }
+    public class INVENTORYPOSTINGHEADNEW
+    {
+        public string DocEntry { get; set; }          // ""
+        public string OBJType { get; set; }            // "IICN"
+        public string Docnum { get; set; }             // "6"
+        public string DocStatus { get; set; }          // "O"
+        public string EmployeeID { get; set; }          // "O"
+
+        public string CountDate { get; set; }          // "2025-12-29"
+        public string CountTime { get; set; }          // "12:13"
+        public string ItemCode { get; set; }         
+        public string ItemName { get; set; }         
+        public string DocumentDate { get; set; }       // "2025-12-29"
+
+        public string FYearId { get; set; }            // "1"
+        public string RefNo { get; set; }              // "0"
+        public string Remarks { get; set; }            // " "
+
+        public string Weight { get; set; }             // "0.00"
+
+        // 🔹 Audit (optional – frontend not sending these)
+        public string? CretedByUId { get; set; }
+        public string? CretedByUName { get; set; }
+        public DateTime? CreatedDate { get; set; }
+
+        public string? UpdatedByUId { get; set; }
+        public string? UpdatedByUName { get; set; }
+        public DateTime? UpdatedDate { get; set; }
+    }
+    public class INVENTORYPOSTINGITEMNEW
+    {
+        public string ID { get; set; }                 // ""
+
+        public string DocEntry { get; set; }           // ""
+
+        public int LineNum { get; set; }               // 1
+
+        public string ItemID { get; set; }             // "96"
+        public string ItemCode { get; set; }           // "00089"
+
+        public string EanCode { get; set; }            // "01"
+        public string ItemName { get; set; }           // "1 MODULE GANG BOX"
+
+        public string HSNID { get; set; }              // "00000"
+        public string HSNCode { get; set; }            // "00000"
+
+        public string WhsID { get; set; }                 // 1
+        public string WhsCode { get; set; }            // "01"
+
+        public decimal StockInWhs { get; set; }        // 7304
+
+        public string EmployeeID { get; set; }         // "1"
+        public string StockTakerName { get; set; }         // "1"
+
+
+        public decimal Price { get; set; }             // 0
+        public string AcctCode { get; set; }           // "10"
+
+        public int BaseDocEntry { get; set; }           // 0
+        public string BaseObj { get; set; }             // ""
+        public string BaseLine { get; set; }               // 0
+
+        public string Remarks { get; set; }             // ""
+
+        public string Weight { get; set; }             // 100
+
+        public string Status { get; set; }              // "O"
+
+        // 🔹 Audit (server side)
+        public string? CretedByUId { get; set; }
+        public string? CretedByUName { get; set; }
+        public DateTime? CreatedDate { get; set; }
+
+        public string? UpdatedByUId { get; set; }
+        public string? UpdatedByUName { get; set; }
+        public DateTime? UpdatedDate { get; set; }
+    }
+
+
+
     public class INVENTORYPOSTING
     {
         public INVENTORYPOSTINGHEAD header { get; set; }

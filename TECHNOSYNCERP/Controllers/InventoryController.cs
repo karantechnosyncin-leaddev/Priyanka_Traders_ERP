@@ -203,7 +203,7 @@ namespace TECHNOSYNCERP.Controllers
             if (HttpContext.Session.GetString("UserID") != "")
             {
                 ViewBag.BtnAuth = null;
-                var responce = await GETBTNAUTH("IICN");
+                var responce = await GETBTNAUTH("IIPN");
                 if (responce is JsonResult jsonResult && jsonResult.Value is List<Dictionary<string, object>> dataList)
                 {
                     if (dataList.Count > 0)
@@ -1157,6 +1157,37 @@ namespace TECHNOSYNCERP.Controllers
                 return StatusCode(500, new { error = ex.Message });
             }
         }
+        public async Task<IActionResult> GETINVENTORYCOUNTINGDOCNUMNEW(string id)
+        {
+            var connStr = _configuration.GetConnectionString("ErpConnection");
+            var list = new List<Dictionary<string, string>>();
+
+            try
+            {
+                await using var con = new SqlConnection(connStr);
+                string query = @$"EXEC GET_NextDocNumber '{id}', 'Inventory_Counting_HeadNEW'";
+
+                await using var cmd = new SqlCommand(query, con);
+                await con.OpenAsync();
+
+                await using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    var obj = new Dictionary<string, string>();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        obj[reader.GetName(i)] = reader.GetValue(i)?.ToString();
+                    }
+                    list.Add(obj);
+                }
+
+                return Json(list);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
         public async Task<IActionResult> VALIDATEITMS(string id)
         {
             var connStr = _configuration.GetConnectionString("ErpConnection");
@@ -1774,6 +1805,37 @@ namespace TECHNOSYNCERP.Controllers
             {
                 await using var con = new SqlConnection(connStr);
                 string query = @$"EXEC GET_NextDocNumber '{id}', 'Inventory_Posting_Head'";
+
+                await using var cmd = new SqlCommand(query, con);
+                await con.OpenAsync();
+
+                await using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    var obj = new Dictionary<string, string>();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        obj[reader.GetName(i)] = reader.GetValue(i)?.ToString();
+                    }
+                    list.Add(obj);
+                }
+
+                return Json(list);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+        public async Task<IActionResult> GETINVPOSTINGDOCNUMNEW(string id)
+        {
+            var connStr = _configuration.GetConnectionString("ErpConnection");
+            var list = new List<Dictionary<string, string>>();
+
+            try
+            {
+                await using var con = new SqlConnection(connStr);
+                string query = @$"EXEC GET_NextDocNumber '{id}', 'Inventory_Posting_Head_New'";
 
                 await using var cmd = new SqlCommand(query, con);
                 await con.OpenAsync();
@@ -2993,6 +3055,147 @@ namespace TECHNOSYNCERP.Controllers
             }
         }
         #endregion
+        #region Inventroy Counting New
+        public async Task<IActionResult> CREATEINVENTORYCOUNTINGNEW([FromBody] INVENTORYCOUNTINGNEW data, string flag, string doctype)
+        {
+            if (flag == "P")
+            {
+                return await PARK(data, doctype);
+            }
+
+            string connectionString = _configuration.GetConnectionString("ErpConnection");
+            SqlTransaction transaction = null;
+
+            await using var con = new SqlConnection(connectionString);
+            await con.OpenAsync();
+
+            try
+            {
+                transaction = con.BeginTransaction();
+
+                // Process Header
+                var header = data.header;
+                header.UpdatedDate = DateTime.Now;
+                header.UpdatedByUName = HttpContext.Session.GetString("UserName");
+                header.UpdatedByUId = HttpContext.Session.GetString("UserID");
+
+                Genrate_Query generator = new Genrate_Query();
+                string query;
+
+                if (string.IsNullOrEmpty(header.DocEntry))
+                {
+                    // New record
+                    header.CreatedDate = DateTime.Now;
+                    header.CretedByUId = HttpContext.Session.GetString("UserID");
+                    header.CretedByUName = HttpContext.Session.GetString("UserName");
+                    header.DocEntry = null;
+
+                    await using (var cmd = new SqlCommand(@$"EXEC GET_NextDocNumber '{header.FYearId}','Inventory_Counting_HeadNEW'", con, transaction))
+                    await using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            header.Docnum = reader["Message"].ToString();
+                        }
+                    }
+
+                    query = generator.GenerateInsertQuery(header, "[Inventory_Counting_HeadNEW]", "DocEntry");
+                }
+                else
+                {
+                    // Update record
+                    query = generator.GenerateUpdateQuery(header, "[Inventory_Counting_HeadNEW]", "DocEntry", header.DocEntry, "");
+                }
+
+                await using (var cmd = new SqlCommand(query, con, transaction))
+                {
+                    cmd.CommandTimeout = 300;
+                    await cmd.ExecuteNonQueryAsync();
+
+                    if (string.IsNullOrEmpty(header.DocEntry))
+                    {
+                        cmd.CommandText = "SELECT SCOPE_IDENTITY()";
+                        header.DocEntry = (await cmd.ExecuteScalarAsync()).ToString();
+                    }
+                }
+                //Delete
+                using (SqlCommand cmd = new SqlCommand($"DELETE FROM [Inventory_CountingNEW_Row] WHERE DocEntry = '{header.DocEntry}'", con, transaction))
+                {
+                    cmd.CommandTimeout = 300;
+                    await cmd.ExecuteNonQueryAsync();
+                }
+                // Process Lines
+                if (data.lines != null && data.lines.Length > 0)
+                {
+                    int linenum = 1;
+                    foreach (var line in data.lines)
+                    {
+                        line.UpdatedDate = DateTime.Now;
+                        line.UpdatedByUName = HttpContext.Session.GetString("UserName");
+                        line.UpdatedByUId = HttpContext.Session.GetString("UserID");
+                        line.DocEntry = data.header.DocEntry;
+                        line.LineNum = linenum;
+                        string lineQuery;
+                        if (string.IsNullOrEmpty(line.ID))
+                        {
+                            line.CreatedDate = DateTime.Now;
+                            line.CretedByUId = HttpContext.Session.GetString("UserID");
+                            line.CretedByUName = HttpContext.Session.GetString("UserName");
+                            line.ID = null;
+                            lineQuery = generator.GenerateInsertQuery(line, "[Inventory_CountingNEW_Row]", "ID");
+                        }
+                        else
+                        {
+                            lineQuery = generator.GenerateUpdateQuery(line, "[Inventory_CountingNEW_Row]", "ID", line.ID, "");
+                        }
+
+                        await using (var cmd = new SqlCommand(lineQuery, con, transaction))
+                        {
+                            cmd.CommandTimeout = 300;
+                            await cmd.ExecuteNonQueryAsync();
+                        }
+
+                        linenum++;
+                    }
+
+                    await using (var cmd = new SqlCommand($"EXEC [Insert_InvtoryStock] '{data.header.DocEntry}','IICN'", con, transaction))
+                    {
+                        cmd.CommandTimeout = 300;
+                        await using var rdr = await cmd.ExecuteReaderAsync();
+                        while (await rdr.ReadAsync())
+                        {
+                            string success = rdr["Success"].ToString();
+                            string message = rdr["Message"].ToString();
+
+                            if (!string.Equals(success, "true", StringComparison.OrdinalIgnoreCase))
+                            {
+                                await transaction.RollbackAsync();
+                                return StatusCode(500, $"An error occurred: {message}");
+                            }
+                        }
+                    }
+                }
+
+                await transaction.CommitAsync();
+                return Json(new { Success = true, DocEntry = data.header.DocEntry, Message = "Inventory Counting New saved successfully." });
+            }
+            catch (SqlException ex) when (ex.Number == 2627 || ex.Number == 2601)
+            {
+                if (transaction != null) await transaction.RollbackAsync();
+                return Conflict("A record with the same value already exists.");
+            }
+            catch (Exception ex)
+            {
+                if (transaction != null) await transaction.RollbackAsync();
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+            finally
+            {
+                if (transaction != null) await transaction.DisposeAsync();
+                await con.CloseAsync();
+            }
+        }
+        #endregion
         #region Inventroy Posting
         public async Task<IActionResult> CREATEINVENTORYPOSTING([FromBody] INVENTORYPOSTING data, string flag, string doctype)
         {
@@ -3136,6 +3339,228 @@ namespace TECHNOSYNCERP.Controllers
             }
         }
         #endregion
+        #region Inventroy Posting New
+        public async Task<IActionResult> CREATEINVENTORYPOSTINGNEW([FromBody] INVENTORYPOSTINGNEW data, string flag, string doctype)
+        {
+            if (flag == "P")
+            {
+                return await PARK(data, doctype);
+            }
+
+            string connectionString = _configuration.GetConnectionString("ErpConnection");
+            SqlTransaction transaction = null;
+
+            await using var con = new SqlConnection(connectionString);
+            await con.OpenAsync();
+
+            try
+            {
+                transaction = con.BeginTransaction();
+
+                // Process Header
+                var header = data.header;
+                header.UpdatedDate = DateTime.Now;
+                header.UpdatedByUName = HttpContext.Session.GetString("UserName");
+                header.UpdatedByUId = HttpContext.Session.GetString("UserID");
+
+                Genrate_Query generator = new Genrate_Query();
+                string query;
+
+                if (string.IsNullOrEmpty(header.DocEntry))
+                {
+                    // New record
+                    header.CreatedDate = DateTime.Now;
+                    header.CretedByUId = HttpContext.Session.GetString("UserID");
+                    header.CretedByUName = HttpContext.Session.GetString("UserName");
+                    header.DocEntry = null;
+
+                    await using (var cmd = new SqlCommand(@$"EXEC GET_NextDocNumber '{header.FYearId}','Inventory_Posting_Head_New'", con, transaction))
+                    await using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            header.Docnum = reader["Message"].ToString();
+                        }
+                    }
+
+                    query = generator.GenerateInsertQuery(header, "[Inventory_Posting_Head_New]", "DocEntry");
+                }
+                else
+                {
+                    // Update record
+                    query = generator.GenerateUpdateQuery(header, "[Inventory_Posting_Head_New]", "DocEntry", header.DocEntry, "");
+                }
+
+                await using (var cmd = new SqlCommand(query, con, transaction))
+                {
+                    cmd.CommandTimeout = 300;
+                    await cmd.ExecuteNonQueryAsync();
+
+                    if (string.IsNullOrEmpty(header.DocEntry))
+                    {
+                        cmd.CommandText = "SELECT SCOPE_IDENTITY()";
+                        header.DocEntry = (await cmd.ExecuteScalarAsync()).ToString();
+                    }
+                }
+                //Delete
+                using (SqlCommand cmd = new SqlCommand($"DELETE FROM [Inventory_Posting_Row_New] WHERE DocEntry = '{header.DocEntry}'", con, transaction))
+                {
+                    cmd.CommandTimeout = 300;
+                    await cmd.ExecuteNonQueryAsync();
+                }
+                // Process Lines
+                if (data.lines != null && data.lines.Length > 0)
+                {
+                    int linenum = 1;
+                    foreach (var line in data.lines)
+                    {
+                        line.UpdatedDate = DateTime.Now;
+                        line.UpdatedByUName = HttpContext.Session.GetString("UserName");
+                        line.UpdatedByUId = HttpContext.Session.GetString("UserID");
+                        line.DocEntry = data.header.DocEntry;
+                        line.LineNum = linenum;
+                        string lineQuery;
+                        if (string.IsNullOrEmpty(line.ID))
+                        {
+                            line.CreatedDate = DateTime.Now;
+                            line.CretedByUId = HttpContext.Session.GetString("UserID");
+                            line.CretedByUName = HttpContext.Session.GetString("UserName");
+                            line.ID = null;
+                            lineQuery = generator.GenerateInsertQuery(line, "[Inventory_Posting_Row_New]", "ID");
+                        }
+                        else
+                        {
+                            lineQuery = generator.GenerateUpdateQuery(line, "[Inventory_Posting_Row_New]", "ID", line.ID, "");
+                        }
+
+                        await using (var cmd = new SqlCommand(lineQuery, con, transaction))
+                        {
+                            cmd.CommandTimeout = 300;
+                            await cmd.ExecuteNonQueryAsync();
+                        }
+
+                        linenum++;
+                    }
+
+                    await using (var cmd = new SqlCommand($"EXEC [Insert_InvtoryStock] '{data.header.DocEntry}','IIPN'", con, transaction))
+                    {
+                        cmd.CommandTimeout = 300;
+                        await using var rdr = await cmd.ExecuteReaderAsync();
+                        while (await rdr.ReadAsync())
+                        {
+                            string success = rdr["Success"].ToString();
+                            string message = rdr["Message"].ToString();
+
+                            if (!string.Equals(success, "true", StringComparison.OrdinalIgnoreCase))
+                            {
+                                await transaction.RollbackAsync();
+                                return StatusCode(500, $"An error occurred: {message}");
+                            }
+                        }
+                    }
+                }
+
+                await transaction.CommitAsync();
+                return Json(new { Success = true, DocEntry = data.header.DocEntry, Message = "Inventory Counting New saved successfully." });
+            }
+            catch (SqlException ex) when (ex.Number == 2627 || ex.Number == 2601)
+            {
+                if (transaction != null) await transaction.RollbackAsync();
+                return Conflict("A record with the same value already exists.");
+            }
+            catch (Exception ex)
+            {
+                if (transaction != null) await transaction.RollbackAsync();
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+            finally
+            {
+                if (transaction != null) await transaction.DisposeAsync();
+                await con.CloseAsync();
+            }
+        }
+        public async Task<IActionResult> GETHEADERDATAINVENTORYPOSTINGNEW()
+        {
+            var connStr = _configuration.GetConnectionString("ErpConnection");
+            var list = new List<Dictionary<string, string>>();
+
+            try
+            {
+                await using var con = new SqlConnection(connStr);
+                string query = @"SELECT DocStatus,FYearId,RefNo,Weight,Remarks FROM Inventory_Counting_HeadNEW;";
+                await using var cmd = new SqlCommand(query, con);
+                await con.OpenAsync();
+
+                await using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    var obj = new Dictionary<string, string>();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        obj[reader.GetName(i)] = reader.GetValue(i)?.ToString();
+                    }
+                    list.Add(obj);
+                }
+
+                return Json(list);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+        public async Task<IActionResult> GETROWDATAINVENTORYPOSTINGNEW()
+        {
+            var connStr = _configuration.GetConnectionString("ErpConnection");
+            var list = new List<Dictionary<string, string>>();
+
+            try
+            {
+                await using var con = new SqlConnection(connStr);
+                string query = @"SELECT [ID]
+                                  ,[Status]
+                                  ,[ItemID]
+                                  ,[EanCode]
+                                  ,[ItemCode]
+                                  ,[ItemName]
+                                  ,[HSNID]
+                                  ,[HSNCode]
+                                  ,[WhsCode]
+                                  ,[WhsID]
+                                  ,[EmployeeID]
+	                              ,[StockTakerName]
+                                  ,[StockInWhs]
+                                  ,[AcctCode]
+                                  ,[Remarks]
+                                  ,[BaseLine]
+                                  ,[BaseObj]
+                                  ,[BaseDocEntry]
+                                  ,[Price]
+                                  ,[Weight]
+	                              FROM Inventory_CountingNEW_Row";
+                await using var cmd = new SqlCommand(query, con);
+                await con.OpenAsync();
+
+                await using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    var obj = new Dictionary<string, string>();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        obj[reader.GetName(i)] = reader.GetValue(i)?.ToString();
+                    }
+                    list.Add(obj);
+                }
+
+                return Json(list);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+        #endregion
+
 
         #region Goods Issue
         public async Task<IActionResult> CREATEISSUE([FromBody] GOODSISSUE data, string flag, string doctype)

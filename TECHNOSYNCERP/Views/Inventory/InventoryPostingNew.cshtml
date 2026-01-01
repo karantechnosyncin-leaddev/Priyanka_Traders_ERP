@@ -1,382 +1,990 @@
-﻿<style>
-
-/*    body {
-        background-color: #f5f7fa;
+﻿
+<style>
+    /* Mobile Back Button */
+    .mobile-back-btn {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 1000;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: white;
+        border: 1px solid #dee2e6;
         display: flex;
-        justify-content: center;
         align-items: center;
-        min-height: 100vh;
-        padding: 20px;
-    }*/
-
-    .inventory-card {
-        width: 100%;
-        max-width: 350px;
-        background-color: white;
-        border-radius: 12px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-        overflow: hidden;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        justify-content: center;
+        text-decoration: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s;
     }
 
-        .inventory-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+        .mobile-back-btn:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-    .card-header {
-        background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
-        color: white;
-        padding: 18px 20px;
-        text-align: center;
-    }
-
-        .card-header h2 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
+        .mobile-back-btn i {
+            color: #495057;
+            font-size: 1.2rem;
         }
 
-        .card-header p {
-            opacity: 0.85;
-            font-size: 0.9rem;
-            margin-top: 4px;
-        }
-
-    .inventory-image-container {
+    /* Common styles */
+    .product-card-wrapper {
         width: 100%;
-        height: 200px;
-        overflow: hidden;
+        max-width: 420px;
+        margin: 0 auto;
         position: relative;
+        min-height: 450px;
     }
 
-    .inventory-image {
+    .product-card-container {
+        position: absolute;
         width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s ease;
+        top: 0;
+        left: 0;
+        transition: transform 0.6s ease, opacity 0.6s ease;
     }
 
-    .inventory-card:hover .inventory-image {
-        transform: scale(1.05);
-    }
-
-    .inventory-details {
-        padding: 24px 20px;
-    }
-
-    .detail-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 16px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-        .detail-row:last-of-type {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-    .detail-label {
-        font-size: 0.85rem;
-        color: #666;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-        .detail-label i {
-            width: 18px;
-            color: #4b6cb7;
-        }
-
-    .detail-value {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #333;
-        text-align: right;
-        max-width: 60%;
-        word-break: break-word;
-    }
-
-    .quantity-display {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .quantity-value {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: #2c5aa0;
-    }
-
-    .quantity-status {
-        font-size: 0.75rem;
-        font-weight: 600;
-        padding: 4px 10px;
-        border-radius: 20px;
-    }
-
-    .status-in-stock {
-        background-color: rgba(46, 204, 113, 0.15);
-        color: #27ae60;
-    }
-
-    .status-low-stock {
-        background-color: rgba(241, 196, 15, 0.15);
-        color: #d35400;
-    }
-
-    .card-footer {
-        padding: 0 20px 24px 20px;
-    }
-
-    .submit-btn {
-        width: 100%;
-        padding: 14px;
-        background: linear-gradient(to right, #4b6cb7, #2c5aa0);
-        color: white;
+    .product-card {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
         border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
+        background: white;
     }
 
-        .submit-btn:hover {
-            background: linear-gradient(to right, #3a5ca9, #1f4785);
-            box-shadow: 0 5px 15px rgba(43, 108, 176, 0.25);
-        }
-
-        .submit-btn:active {
-            transform: scale(0.98);
-        }
-
-    .card-id {
-        text-align: center;
-        font-size: 0.75rem;
-        color: #888;
-        margin-top: 15px;
-        letter-spacing: 0.3px;
+    .slide-out-left {
+        transform: translateX(-100%);
+        opacity: 0;
     }
 
-    /* Responsive adjustments */
-    @@media (max-width: 400px) {
-        .inventory-card {
-            max-width: 100%;
+    .slide-in-right {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    .active {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .product-image {
+        height: 160px;
+        object-fit: contain;
+        background: #f8f9fa;
+        padding: 15px;
+    }
+
+    /* Mobile-specific styles */
+    @@media (max-width: 991.98px) {
+        body {
+            background: #f5f6fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            margin: 0;
         }
 
-        .inventory-details {
-            padding: 20px 16px;
+        .product-card-wrapper {
+            margin-top: 10px;
         }
 
-        .card-footer {
-            padding: 0 16px 20px 16px;
+        .product-card-body {
+            padding: 1.25rem;
+        }
+
+        .product-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .product-location {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid #3498db;
+        }
+
+            .product-location strong {
+                color: #2c3e50;
+                display: block;
+                margin-bottom: 3px;
+                font-size: 0.9rem;
+            }
+
+        .info-row {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+            .info-row:last-child {
+                border-bottom: none;
+            }
+
+        .quantity-input {
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .form-text {
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .btn {
+            padding: 10px;
+            font-size: 0.95rem;
         }
     }
+
+    /* Desktop-specific styles */
+    @@media (min-width: 992px) {
+        .mobile-back-btn {
+            display: none;
+        }
+
+        .desktop-container {
+            padding: 20px 0;
+        }
+
+        .product-card-wrapper {
+            max-width: 450px;
+            min-height: 500px;
+            margin-top: 100px;
+            margin-bottom: 100px;
+        }
+
+        .product-image {
+            height: 180px;
+            padding: 20px;
+        }
+
+        .product-card-body {
+            padding: 1.5rem;
+        }
+
+        .product-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            line-height: 1.3;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .warehouse-section {
+            margin-bottom: 20px;
+            padding: 12px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            border-left: 3px solid #3498db;
+        }
+
+        .warehouse-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1rem;
+        }
+
+            .warehouse-label i {
+                color: #3498db;
+                font-size: 0.9rem;
+            }
+
+        .warehouse-value {
+            color: #555;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            padding-left: 22px;
+        }
+
+        .details-section {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+            .detail-row:last-child {
+                border-bottom: none;
+            }
+
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+            min-width: 100px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+            .detail-label i {
+                font-size: 0.85rem;
+            }
+
+        .detail-value {
+            color: #2c3e50;
+            font-weight: 600;
+            text-align: right;
+            word-break: break-word;
+            font-size: 0.9rem;
+        }
+
+        .quantity-input {
+            font-size: 1.1rem;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .quantity-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .quantity-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .quantity-label i {
+                color: #3498db;
+                font-size: 0.9rem;
+            }
+
+        .quantity-input-container {
+            position: relative;
+        }
+
+        .quantity-input {
+            padding-right: 40px;
+            padding-left: 40px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+            .quantity-input:focus {
+                border-color: #3498db;
+                box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+            }
+
+        .quantity-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            border: 1px solid #ddd;
+            background: white;
+            color: #555;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+        }
+
+            .quantity-btn:hover {
+                background: #3498db;
+                color: white;
+                border-color: #3498db;
+            }
+
+        .quantity-minus {
+            left: 4px;
+        }
+
+        .quantity-plus {
+            right: 4px;
+        }
+
+        .form-text {
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .btn {
+            padding: 12px;
+            font-size: 1rem;
+        }
+    }
+
+    /* Loading animation */
+    .btn-loading {
+        position: relative;
+        color: transparent !important;
+    }
+
+        .btn-loading:after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin: -8px 0 0 -8px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .completion-icon {
+        width: 100px !important;
+        height: 100px !important;
+    }
+
+        .completion-icon i {
+            font-size: 2.5rem !important;
+        }
+
+    .alert {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }   
 </style>
-<div class="container-fluid">
-    <div class="row mt-2">
-        <div class="col-12">
-            <div class="card p-2 rounded shadow-sm">
-                <div class="row">
-                    <div class="col-md-6 d-flex align-items-center">
-                        <h3 id="doctitle"><b>Inventory Posting New</b></h3>
-                    </div>
-                    <div class="col-md-6 d-flex justify-content-end align-items-center flex-wrap">
-                        @if (ViewBag.BtnAuth != null)
-                        {
 
-                            <!-- Button Rendering Logic -->
-                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
-                            {
-                                var btnName = item["BtnName"]?.ToString().Trim();
-                                var btnauth = item["Auth"]?.ToString();
-                                var icon = item["Icon"]?.ToString();
-                                var ColorClass = item["ColorClass"]?.ToString();
-                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
-                                {
-                                    switch (btnName)
-                                    {
-                                        @*   case "Bulk Upload":
-                                            <button id="btnBulkUpload" data-bs-toggle="modal" data-bs-target="#bulkUploadModal" class="btn @ColorClass mb-1  me-2 mb-1">
-                                                <i class="@icon"></i> @btnName
-                                            </button>
-                                            break; *@
-                                        case "Find":
-                                            <button id="btnFind" data-bs-toggle="modal" data-bs-target="#receiptListModal" class="btn @ColorClass mb-1  me-2 mb-1">
-                                                <i class="@icon"></i> @btnName
-                                            </button>
-                                            break;
-                                        case "Attachments":
-                                            <button id="Attachments" data-bs-toggle="modal" data-bs-target="#Attachment" class="btn @ColorClass mb-1   me-2 mb-1">
-                                                <i class="@icon"></i> @btnName
-                                            </button>
-                                            break;
-                                        case "Export":
-                                            <button id="btnPdf" class="btn btn-outline-danger me-2 mb-1">
-                                                <i class="bi bi-file-pdf me-1"></i> PDF
-                                            </button>
-                                            <button id="btnExcel" class="btn btn-outline-success me-2 mb-1">
-                                                <i class="bi bi-file-earmark-excel me-1"></i> EXCEL
-                                            </button>
-                                            <button id="btnCSV" class="btn btn-outline-success me-2 mb-1">
-                                                <i class="bi bi-file-earmark-excel me-1"></i> CSV
-                                            </button>
-                                            break;
-                                        case "Copy From":
-                                            <div class="dropdown">
-                                                <button id="btnCopyFrom" class="btn @ColorClass mb-1  dropdown-toggle me-2 mb-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="@icon"></i> @btnName
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li class='copyfrombtn' data-flag="IIC" data-bs-toggle="modal"><a class="dropdown-item" href="#">Inventory Counting</a></li>
-                                                </ul>
-                                            </div>
-                                            break;
-                                        @*case "Copy To":
-                                            <button id="btnCopyFrom" class="btn @ColorClass mb-1  me-2 mb-1">
-                                                <i class="@icon"></i> @btnName
-                                            </button>
-                                            break;*@
-                                        default:
+<div class="container-fluid p-3">
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body">
 
-                                            break;
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            <div class="alert alert-primary" role="alert">
+            <div class="row g-3">
 
-                            </div>
-                        }
-
-                    </div>
+                <div class="col-12 col-sm-6 col-md-3" hidden>
+                    <label class="form-label" for="OBJType">OBJ Type</label>
+                    <input type="text" id="OBJType" class="form-control" value="IIPN">
                 </div>
+
+
+
+                <div class="col-12 col-sm-6 col-md-3">
+                    <label class="form-label" for="Docnum">Doc Number</label>
+                    <input type="text" id="Docnum" class="form-control" value="">
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-3">
+                    <label class="form-label" for="CountDate">Count Date</label>
+                    <input type="date" id="CountDate" class="form-control datepicker" value="">
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-3">
+                    <label class="form-label" for="CountTime">Count Time</label>
+                    <input type="time" id="CountTime" class="form-control timepicker" value="">
+                </div>
+
+
+                <div class="col-12 col-sm-6 col-md-3">
+                    <label class="form-label" for="DocumentDate">Document Date</label>
+                    <input type="date" id="DocumentDate" class="form-control datepicker" value="">
+                </div>
+
+                <div class="col-md-3 col-6 mb-2">
+                    <label for="FYearId" class="form-label">Fiscal Year</label>
+                    <select id="FYearId" class="form-select">
+                        <option value="">Select Fiscal Year</option>
+                        <!-- Will be populated dynamically -->
+                    </select>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-3">
+                    <label class="form-label" for="RefNo">Reference No</label>
+                    <input type="text" id="RefNo" class="form-control" value="">
+                </div>
+
+
+                <div class="col-md-3 col-6 mb-2">
+                    <label for="DocStatus" class="form-label">Status</label>
+                    <select id="DocStatus" class="form-select" disabled>
+                        <option value="O">Open</option>
+                        <option value="C">Close</option>
+                    </select>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3">
+                    <label class="form-label" for="Weight">Weight</label>
+                    <input type="number" step="0.01" id="Weight" class="form-control" value="">
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label" for="Remarks">Remarks</label>
+                    <textarea id="Remarks" class="form-control" rows="3"></textarea>
+                </div>
+
             </div>
+
         </div>
     </div>
 </div>
 
 
 
-<div class="inventory-card">
-    <div class="card-header">
-        <h2>Inventory Item</h2>
+
+
+<!-- Mobile Back Button -->
+<a href="/" class="mobile-back-btn" title="Back to Dashboard">
+    <i class="fas fa-arrow-left"></i>
+</a>
+
+<!-- Mobile/Tablet View - Fullscreen centered -->
+<div class="product-card-wrapper">
+    <!-- ACTIVE PRODUCT CARD -->
+    <div class="product-card-container active" id="productCard">
+        <div class="product-card">
+            <img id="productImg" class="card-img-top product-image" alt="Product">
+            <div class="product-card-body">
+                <div class="product-name" id="productName">Loading...</div>
+
+                <div class="product-location">
+                    <strong>Warehouse Location:</strong>
+                    <span id="productWhs"></span>
+                </div>
+
+                <div class="mb-3">
+                    <div class="info-row">
+                        <strong>Item Code:</strong>
+                        <span id="productCode" class="ms-2"></span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Product SKU:</strong>
+                        <span id="productSku" class="ms-2"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Quantity</label>
+                    <input type="number" class="form-control quantity-input"
+                           id="quantityInput" value="0" min="0">
+                    <div class="form-text">Enter the required quantity</div>
+                </div>
+
+                <button class="btn btn-primary w-100" id="btnSave">
+                    Submit & Continue →
+                </button>
+            </div>
+        </div>
     </div>
 
-    <div class="inventory-image-container">
-        <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Inventory Item" class="inventory-image">
-    </div>
+    <!-- COMPLETION CARD -->
+    <div class="product-card-container hidden" id="completionCard">
+        <div class="product-card">
+            <div class="product-card-body text-center p-3">
+                <div class="mb-3">
+                    <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center completion-icon">
+                        <i class="fas fa-check-circle text-success"></i>
+                    </div>
+                </div>
+                <h4 class="mb-2 fw-bold">Processing Complete</h4>
+                <p class="text-muted mb-3">All items have been processed successfully.</p>
+                <div class="text-primary fw-medium">
+                    <i class="fas fa-thumbs-up me-2"></i>Thank You!
+                </div>
 
-    <div class="inventory-details">
-        <div class="detail-row">
-            <div class="detail-label">
-                <i class="fas fa-barcode"></i>
-                Item Code
+                <a href="/" class="btn btn-outline-primary w-100 mt-3">
+                    <i class="fas fa-home me-2"></i>Back to Dashboard
+                </a>
             </div>
-            <div class="detail-value">INV-2023-0567</div>
-        </div>
-
-        <div class="detail-row">
-            <div class="detail-label">
-                <i class="fas fa-cube"></i>
-                Item Name
-            </div>
-            <div class="detail-value">Wireless Bluetooth Headphones</div>
-        </div>
-
-        <div class="detail-row">
-            <div class="detail-label">
-                <i class="fas fa-boxes"></i>
-                Quantity
-            </div>
-            <div class="quantity-display">
-                <input type="number" class="form-control" />
-                
-            </div>
-        </div>
-
-        <div class="detail-row">
-            <div class="detail-label">
-                <i class="fas fa-warehouse"></i>
-                Warehouse Code
-            </div>
-            <div class="detail-value">Central Distribution Center</div>
         </div>
     </div>
+</div>
 
-    <div class="card-footer">
-        <button class="submit-btn" id="submitBtn">
-            <i class="fas fa-check-circle"></i>
-            Update Inventory Count
-        </button>
-        
-    </div>
+@*line table*@
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle text-nowrap" id="mainitemtable">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>DocEntry</th>
+                <th>Status</th>
+                <th>LineNum</th>
+                <th>ItemID</th>
+                <th>EanCode</th>
+                <th>ItemCode</th>
+                <th>ItemName</th>
+                <th>OpenQty</th>
+                <th>LogEmployes</th>
+                <th>WhsCode</th>
+                <th>WhsID</th>
+                <th>StockInWhs</th> 
+                <th>AcctCode</th>
+                <th>Remarks</th>
+                <th>BaseLine</th>
+                <th>BaseObj</th>
+                <th>BaseDocEntry</th>
+                <th>Price</th>
+                <th>Weight</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            
+        </tbody>
+    </table>
 </div>
 
 
 
 <script>
-    // Handle submit button click
-    document.getElementById('submitBtn').addEventListener('click', function () {
-        // Add click effect
-        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-        this.disabled = true;
+    $(function () {
+        $('.datepicker').val(new Date().toISOString().split('T')[0]);
+        loadFiscalYears();
+        loadheaderData();
+        loadRowData();
 
-        // Simulate API call
-        setTimeout(() => {
-            alert('Inventory count submitted successfully!');
-            this.innerHTML = '<i class="fas fa-check-circle"></i> Update Inventory Count';
-            this.disabled = false;
 
-            // For demo purposes, update the quantity with a random value
-            const quantityValue = document.querySelector('.quantity-value');
-            const randomChange = Math.floor(Math.random() * 20) - 10;
-            const currentQty = parseInt(quantityValue.textContent);
-            const newQty = Math.max(0, currentQty + randomChange);
+        $('#btnSave').on('click', function () {
 
-            quantityValue.textContent = newQty + ' Units';
 
-            // Update status based on new quantity
-            const statusElement = document.querySelector('.quantity-status');
-            if (newQty > 50) {
-                statusElement.textContent = 'In Stock';
-               
-            } else if (newQty > 10) {
-                statusElement.textContent = 'Low Stock';
-                
-            } else {
-                statusElement.textContent = 'Critical';
-                
+        });
+
+
+         function loadDocNum(id) {
+             // AJAX call to get warehouses
+             $.ajax({
+                 url: '@Url.Action("GETINVPOSTINGDOCNUMNEW", "Inventory")',
+                 method: 'GET',
+                 data:{id:id},
+                 success: function(response) {
+                     if(response[0].Success=="true"){
+                         $("#Docnum").val(response[0].Message)
+                     }else{
+                            Notify('error', response[0].Message,'');
+                     }
+                 },
+                 error: function(xhr) {
+                             Notify('error', 'Error', xhr.responseText );
+                 }
+             });
+        }
+
+
+
+              function loadFiscalYears() {
+                    $.ajax({
+                         url: '@Url.Action("GETOPENFYEAR", "Inventory")',
+                        method: 'GET',
+                        success: function(response) {
+                            const select = $('#FYearId');
+                            select.empty();
+
+                            response.forEach(function(year) {
+                                select.append(`<option value="${year.FYearId}">${year.FYear}</option>`);
+                            });
+                            loadDocNum($("#FYearId").val())
+                        },
+                        error: function(xhr) {
+                                    Notify('error', 'Error', xhr.responseText );
+                        }
+               });
+        }
+
+              function loadheaderData() {
+                $.ajax({
+                     url: '@Url.Action("GETHEADERDATAINVENTORYPOSTINGNEW", "Inventory")',
+                    method: 'GET',
+                    success: function (response) {
+                        console.log(response);
+
+                        response.forEach(function (item) {
+                            $('#EmployeeId').val(item.EmployeeId);
+                            $('#RefNo').val(item.RefNo);
+                            $('#Weight').val(item.Weight);
+                            $('#Remarks').val(item.Remarks);
+                        });
+                        loadDocNum($("#FYearId").val())
+                    },
+                    error: function(xhr) {
+                                Notify('error', 'Error', xhr.responseText );
+                    }
+           });
+        }
+              function loadRowData() {
+                    $.ajax({
+                        url: '@Url.Action("GETROWDATAINVENTORYPOSTINGNEW", "Inventory")',
+                        type: 'GET',
+                        success: function (response) {
+                            console.log("Response:", response);
+
+                            const tbody = $('#mainitemtable tbody');
+                            tbody.empty();
+
+                            if (!response.row || response.row.length === 0) return;
+
+                            response.row.forEach(function (line, index) {
+
+                                const row = `
+                                <tr data-id="${line.ID}" class="line-item">
+                                    <td>${index + 1}</td>
+
+                                    <td hidden>
+                                        <textarea class="form-control form-control-sm Remarks">${line.Remarks}</textarea>
+                                    </td>
+
+                                    <td hidden>
+                                        <input type="text" class="form-control form-control-sm ItemEan" value="${line.EanCode }">
+                                    </td>
+
+                                    <td>
+                                        <input type="text"
+                                               class="form-control form-control-sm ItemCode"
+                                               data-id="${line.ItemID}"
+                                               value="${line.ItemCode}">
+                                    </td>
+
+                                    <td>
+                                        <input type="text"
+                                               class="form-control form-control-sm ItemName"
+                                               value="${line.ItemName}">
+                                    </td>
+
+                                    <td>
+                                        <input type="number"
+                                               class="form-control form-control-sm text-end OpenQty"
+                                               value="${line.OpenQty}"
+                                               readonly>
+                                    </td>
+
+                                    <td>
+                                        <input type="number"
+                                               class="form-control form-control-sm text-end CountedQty"
+                                               value="${line.CountedQty}">
+                                    </td>
+
+                                    <td>
+                                        <input type="number"
+                                               class="form-control form-control-sm text-end Price"
+                                               value="${line.Price}"
+                                               readonly>
+                                    </td>
+
+                                    <td>
+                                        <input type="number"
+                                               class="form-control form-control-sm text-end Weight"
+                                               value="${line.Weight}"
+                                               readonly>
+                                    </td>
+
+                                    <td hidden><input type="text" class="AcctCode" value="${line.AcctCode}"></td>
+                                    <td hidden><input type="text" class="BaseLine" value="${line.BaseLine}"></td>
+                                    <td hidden><input type="text" class="BaseObj" value="${line.BaseObj}"></td>
+                                    <td hidden><input type="text" class="BaseDocEntry" value="${line.BaseDocEntry}"></td>
+                                    <td hidden><input type="number" class="Status" value="${line.Status}"></td>
+                                </tr>`;
+
+                                $('#mainitemtable tbody').append(row);
+
+                                const $newRow = tbody.find('tr:last');
+
+                            });
+
+                            
+                        },
+                        error: function (xhr) {
+                            Notify('error', 'Error', xhr.responseText);
+                        }
+                    });
+                }
+
+
+
+
+            function savedocument(flag) {
+                removeempty()
+               const headerData = getHeaderData();
+                const lineItems = getLineItems();
+                if (flag == "S") {
+                    if (!validateForm(headerData, lineItems)) {
+                        return;
+                    }
+                }
+                const data = {
+                    header: headerData,
+                    lines: lineItems
+                };
+                console.log("data",data)
+                // AJAX call to save
+                   $.ajax({
+                        url: '@Url.Action("CREATEINVENTORYPOSTINGNEW", "Inventory")' + '?flag=' + flag + '&doctype=' + $("#doctype").val(),
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(data),
+
+                        success: function(response) {
+                            if(response.success){
+                               Notify('success', response.message,'');
+                               currentDocEntry = response.docEntry;
+                               //$('#btnUpdate').prop('disabled', false);
+
+
+                            }else{
+                               Notify('error','Faild To Create ', response.message);
+                            }
+                        },
+                        error: function(xhr) {
+                            const errorMessage = xhr.responseText || 'Error loading ITEM GROUP';
+                            Notify('error', 'Error', errorMessage);
+                            if (flag == "S") {
+                                $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
+                            } else {
+                                $('#btnPark').prop('disabled', false).html('<i class="bi bi-p-circle"></i> Park');
+                            }
+                        },complete: function() {
+                            if (flag == "S") {
+                                $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
+                            } else {
+                                $('#btnPark').prop('disabled', false).html('<i class="bi bi-p-circle"></i> Park');
+                            }
+                        }
+                    });
             }
-        }, 1500);
-    });
 
-    // Change image on hover for demo purposes
-    const imageContainer = document.querySelector('.inventory-image-container');
-    const images = [
-        'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1583394838336-acd977736f90?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1546868871-7041f2a55e12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-    ];
 
-    let currentImageIndex = 0;
+        //get header Data
 
-    imageContainer.addEventListener('click', function () {
-        currentImageIndex = (currentImageIndex + 1) % images.length;
-        this.querySelector('.inventory-image').src = images[currentImageIndex];
+        function getHeaderData() {
+            const formData = {
+                OBJType: $('.OBJType').val(),
+                DocStatus: $('.DocStatus').val(),
+                Docnum: $('.Docnum').val(),
+                CountDate: $('.CountDate').val(),
+                CountTime: $('.CountTime').val(),
+                EanCode: $('.EanCode').val(),
+                ItemCode: $('.ItemCode').val(),
+                ItemName: $('.ItemName').val(),
+                OpenQty: $('.OpenQty').val(),
+                DocumentDate: $('.DocumentDate').val(),
+                WhsId: $('.WhsId').val(),
+                WhsCode: $('.WhsCode').val(),
+                EmployeeID: $('.EmployeeID').val(),
+                FYearId: $('.FYearId').val(),
+                RefNo: $('.RefNo').val(),
+                Weight: $('.Weight').val(),
+                Remarks: $('.Remarks').val()
+            };
+        }
+
+        function getLineItems() {
+            const lineItems = [];
+
+            $('#mainitemtable tbody tr').each(function (index) {
+                const row = $(this);
+
+                lineItems.push({
+
+                    ID: row.data('id') || null,
+                    DocEntry: $('#DocEntry').val() || null,
+                    Status: row.find('.Status').val() || 0,
+                    LineNum: index + 1,
+
+                    ItemID: row.find('.ItemCode').data('id') || null,
+                    EanCode: row.find('.ItemEan').val() || '',
+                    ItemCode: row.find('.ItemCode').val() || '',
+                    ItemName: row.find('.ItemName').val() || '',
+
+                    OpenQty: parseFloat(row.find('.OpenQty').val()) || 0,
+                    StockInWhs: parseFloat(row.find('.StockInWhs').val()) || 0,
+
+                    WhsCode: row.find('.WhsCode').val() || '',
+                    WhsID: row.find('.WhsCode').data('id') || null,
+
+                    AcctCode: row.find('.AcctCode').val() || '',
+                    Remarks: row.find('.Remarks').val() || '',
+
+                    BaseLine: row.find('.BaseLine').val() || null,
+                    BaseObj: row.find('.BaseObj').val() || null,
+                    BaseDocEntry: row.find('.BaseDocEntry').val() || null,
+
+                    Price: parseFloat(row.find('.Price').val()) || 0,
+                    Weight: parseFloat(row.find('.Weight').val()) || 0
+                });
+            });
+
+            return lineItems;
+        }
+
+        const products = [
+            {
+                id: 1,
+                name: "Premium Steel Bars",
+                warehouse: "Main Warehouse - Section A12, Rack 5, Shelf 3",
+                code: "STL-001-2024",
+                sku: "STEEL001-2024-Q1",
+                image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400&h=250&fit=crop"
+            },
+            {
+                id: 2,
+                name: "Aluminum Composite Sheets",
+                warehouse: "Warehouse B - North Wing, Rack C5, Level 2",
+                code: "ALU-002-2024",
+                sku: "ALUM002-2024-Q2",
+                image: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=400&h=250&fit=crop"
+            },
+            {
+                id: 3,
+                name: "Galvanized Iron Coils",
+                warehouse: "Storage Unit 7 - Bay 3, Heavy Materials Section",
+                code: "IRN-003-2024",
+                sku: "IRON003-2024-Q3",
+                image: "https://images.unsplash.com/photo-1581092580497-e0d4cb184827?w=400&h=250&fit=crop"
+            }
+        ];
+
+        let currentIndex = 0;
+        let processedCount = 0;
+        const totalProducts = products.length;
+
+        updateProductCard();
+
+        function updateProductCard() {
+            const product = products[currentIndex];
+
+            $("#productName").text(product.name);
+            $("#productWhs").text(product.warehouse);
+            $("#productCode").text(product.code);
+            $("#productImg").attr("src", product.image);
+            $("#quantityInput").val(0);
+
+            if ($("#productSku").length) {
+                $("#productSku").text(product.sku);
+            }
+
+            const isLastProduct = currentIndex === totalProducts - 1;
+            const $btnSave = $("#btnSave");
+
+            if (isLastProduct) {
+                $btnSave.html('<i class="fas fa-flag-checkered me-2"></i>Complete');
+            } else {
+                $btnSave.html('<i class="fas fa-arrow-right me-2"></i>Continue');
+            }
+        }
+
+        $("#quantityInput").on("input", function () {
+            let value = parseInt($(this).val()) || 0;
+            if (value < 0) {
+                $(this).val(0);
+            }
+        });
+
+        $("#btnSave").on("click", function () {
+            const quantity = parseInt($("#quantityInput").val()) || 0;
+
+            if (quantity < 0) {
+                alert("Please enter a valid quantity (minimum 0)");
+                return;
+            }
+
+            const currentProduct = products[currentIndex];
+
+            const formData = {
+                ProductId: currentProduct.id,
+                ProductName: currentProduct.name,
+                ProductCode: currentProduct.code,
+                Warehouse: currentProduct.warehouse,
+                Quantity: quantity,
+                Timestamp: new Date().toISOString()
+            };
+
+            const $btn = $(this);
+            const originalHtml = $btn.html();
+            $btn.addClass("btn-loading").prop("disabled", true);
+
+            setTimeout(() => {
+                console.log("Submitted to server:", formData);
+
+                $("#productCard").removeClass("active").addClass("slide-out-left");
+
+                setTimeout(() => {
+                    currentIndex++;
+                    processedCount++;
+
+                    if (currentIndex >= totalProducts) {
+                        $("#productCard").addClass("hidden").removeClass("slide-out-left");
+                        $("#completionCard").removeClass("hidden").addClass("active");
+                        $btn.removeClass("btn-loading").prop("disabled", false).html(originalHtml);
+                        return;
+                    }
+
+                    updateProductCard();
+
+                    $("#productCard")
+                        .removeClass("slide-out-left")
+                        .addClass("slide-in-right");
+
+                    setTimeout(() => {
+                        $("#productCard")
+                            .removeClass("slide-in-right")
+                            .addClass("active");
+
+                        $btn.removeClass("btn-loading").prop("disabled", false);
+                    }, 50);
+
+                }, 600);
+            }, 800);
+        });
+
+        $("#quantityInput").on("keypress", function (e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                $("#btnSave").click();
+            }
+        });
+
+        $(".mobile-back-btn").on("click", function (e) {
+            if (currentIndex > 0) {
+                if (!confirm("Are you sure you want to leave? Your progress may be lost.")) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+            return true;
+        });
     });
 </script>

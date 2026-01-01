@@ -75,6 +75,7 @@
     <script src="~/js/xlsx.full.min.js"></script>
 
 
+
     <style>
         #mainitemtable td {
             outline: none; /* no outline if browser tries */
@@ -121,11 +122,11 @@
             border-radius: 10px;
         }
 
-        /* Handle on hover */
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-      
+            /* Handle on hover */
+            ::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
+
 
         #itemSearchTable thead th {
             position: relative;
@@ -379,16 +380,16 @@
         }
     </style>
 
-@*Style for Stock Check Model*@
-        <style>
-            /* Custom modal that takes 80% of screen - START FROM TOP */
-            .modal-80 {
-                max-width: 75%;
-                width: 95%;
-                margin-top: 2%;
-                margin-left: 16%;
-                top: 0;
-            }
+    @*Style for Stock Check Model*@
+    <style>
+        /* Custom modal that takes 80% of screen - START FROM TOP */
+        .modal-80 {
+            max-width: 75%;
+            width: 95%;
+            margin-top: 2%;
+            margin-left: 16%;
+            top: 0;
+        }
 
             .modal-80 .modal-content {
                 height: auto;
@@ -401,36 +402,36 @@
                 max-height: calc(100vh - 120px); /* Account for header and footer */
             }
 
-            /* Remove modal backdrop padding */
-            .modal {
-                padding: 0 !important;
+        /* Remove modal backdrop padding */
+        .modal {
+            padding: 0 !important;
+        }
+
+        /* Remove vertical centering */
+        .modal-dialog-centered {
+            align-items: flex-start !important;
+        }
+
+        /* Responsive adjustments */
+        @@media (max-width: 992px) {
+            .modal-80 {
+                max-width: 100%;
+                width: 100%;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .modal-80 {
+                max-width: 100%;
+                width: 100%;
+                margin: 0;
             }
 
-            /* Remove vertical centering */
-            .modal-dialog-centered {
-                align-items: flex-start !important;
-            }
-
-            /* Responsive adjustments */
-            @@media (max-width: 992px) {
-                .modal-80 {
-                    max-width: 100%;
-                    width: 100%;
+                .modal-80 .modal-content {
+                    height: 100vh;
                 }
-            }
-
-            @@media (max-width: 768px) {
-                .modal-80 {
-                    max-width: 100%;
-                    width: 100%;
-                    margin: 0;
-                }
-
-                    .modal-80 .modal-content {
-                        height: 100vh;
-                    }
-            }
-        </style>
+        }
+    </style>
 
 </head>
 <body class="layout-fixed sidebar-expand-lg sidebar-mini bg-body-tertiary">

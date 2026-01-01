@@ -558,6 +558,7 @@
                var stock = $(this).find("option:selected").data("stock");
                row.find(".StockInWhs").val(stock|| 0)
         })
+
         function LoadUOM(id,row) {
             $.ajax({
                 url: '@Url.Action("GETUOMBYITEM", "Inventory")',
