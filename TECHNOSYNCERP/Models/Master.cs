@@ -68,6 +68,8 @@ namespace TECHNOSYNCERP.Models
         public string MiddleName { get; set; }
         public string LastName { get; set; }
         public string IsActive { get; set; }
+        public string LinkUser { get; set; }
+        public string LinkUserID { get; set; }
         public string Position { get; set; }
         public string RoleID { get; set; }
         public string PhoneNo { get; set; }
@@ -84,6 +86,7 @@ namespace TECHNOSYNCERP.Models
         public string UpdatedByUId { get; set; }
         public string UpdatedByUName { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        public string EmpId { get; internal set; }
     }
     public class Role
     {

@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Reflection;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 using TECHNOSYNCERP.Models;
 
 namespace TECHNOSYNCERP.Controllers
@@ -3974,58 +3978,139 @@ namespace TECHNOSYNCERP.Controllers
 
         public async Task<IActionResult> CREATEEMPLOYEE([FromBody] EmployeeMaster data)
         {
-            string connectionString = _configuration.GetConnectionString("ErpConnection");
+            var connStr = _configuration.GetConnectionString("ErpConnection");
+
+            await using var con = new SqlConnection(connStr);
+            await con.OpenAsync();
+
+            SqlTransaction tran = (SqlTransaction)await con.BeginTransactionAsync();
 
             try
             {
-                // Common audit fields
-                data.UpdatedDate = DateTime.Now;
-                data.UpdatedByUName = HttpContext.Session.GetString("UserName");
-                data.UpdatedByUId = HttpContext.Session.GetString("UserID");
+                string userId = null;
 
-                Genrate_Query generator = new Genrate_Query();
+                if (data.LinkUser == "Y")
+                {
+                    var last4 = data.MobilePhone?.Length >= 4
+                        ? data.MobilePhone[^4..]
+                        : data.MobilePhone;
+
+                    var user = new User
+                    {
+                        UserID = null,
+                        EmpId = null,
+                        FullName = $"{data.FirstName} {data.LastName}".Trim(),
+                        Username = data.FirstName.Trim() + data.LastName.Trim(),
+                        Password = data.FirstName.Trim() + last4,
+                        Mobile = data.MobilePhone,
+                        Role = "U",
+                        IsActive = data.IsActive
+                    };
+
+                    // MUST pass same connection + transaction
+                    userId = await CreateOrUpdateUserAsync(user, con, tran);
+                }
+
+                data.LinkUserID = userId;
+                data.UpdatedDate = DateTime.Now;
+                data.UpdatedByUId = HttpContext.Session.GetString("UserID");
+                data.UpdatedByUName = HttpContext.Session.GetString("UserName");
+
+                var generator = new Genrate_Query();
                 string query;
 
                 if (string.IsNullOrEmpty(data.EmployeeID))
                 {
-                    // New record
                     data.CreatedDate = DateTime.Now;
                     data.CretedByUId = data.UpdatedByUId;
                     data.CretedByUName = data.UpdatedByUName;
                     data.EmployeeID = null;
 
-                    query = generator.GenerateInsertQuery(data, "[Master_EmployeeMaster]", "EmployeeID");
+                    query = generator.GenerateInsertQuery(
+                        data, "[Master_EmployeeMaster]", "EmployeeID");
                 }
                 else
                 {
-                    data.CreatedDate = DateTime.Now; 
-
-                    // Update record
-                    query = generator.GenerateUpdateQuery(data, "[Master_EmployeeMaster]", "EmployeeID", data.EmployeeID, "");
+                    query = generator.GenerateUpdateQuery(
+                        data, "[Master_EmployeeMaster]", "EmployeeID", data.EmployeeID, "");
                 }
 
-                await using (SqlConnection con = new SqlConnection(connectionString))
+                using (var cmd = new SqlCommand(query, con, tran))
                 {
-                    await con.OpenAsync();
-                    await using (SqlCommand cmd = new SqlCommand(query, con))
+                    await cmd.ExecuteNonQueryAsync();
+
+                    if (string.IsNullOrEmpty(data.EmployeeID))
                     {
-                        cmd.CommandTimeout = 300;
-                        await cmd.ExecuteNonQueryAsync();
+                        cmd.CommandText = "SELECT SCOPE_IDENTITY()";
+                        data.EmployeeID = (await cmd.ExecuteScalarAsync())?.ToString();
                     }
                 }
 
-                return Json(new { Success = true, Message = "Employee saved successfully." });
-            }
-            catch (SqlException ex) when (ex.Number == 2627 || ex.Number == 2601)
-            {
-                return Conflict("A record with the same value already exists.");
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    var updateUser = @"UPDATE [Users] 
+                               SET EmpId = @EmpId 
+                               WHERE UserID = @UserID";
+
+                    using var cmd = new SqlCommand(updateUser, con, tran);
+                    cmd.Parameters.AddWithValue("@EmpId", data.EmployeeID);
+                    cmd.Parameters.AddWithValue("@UserID", userId);
+                    await cmd.ExecuteNonQueryAsync();
+                }
+
+                await tran.CommitAsync();   // ✅ NOW THIS WORKS
+                return Json(new { Success = true, EmployeeID = data.EmployeeID });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
+                if (tran != null)
+                    await tran.RollbackAsync();   // ✅ Safe rollback
+
+                return StatusCode(500, ex.Message);
             }
         }
 
+        private async Task<string> CreateOrUpdateUserAsync(
+    User item,
+    SqlConnection con,
+    SqlTransaction tran)
+        {
+            if (string.IsNullOrEmpty(item.UserID))
+            {
+                var insertQuery = @"
+        INSERT INTO [Users]
+        ([Username],[Password],[FullName],[Email],[Mobile],[Role],[IsActive],
+         [CreatedBy],[UpdatedBy],[LicenseValidFrom],[LicenseValidTo],
+         [LicenseStatus],[LicenseGenDate],[Licencekey],[EmpId])
+        VALUES
+        (@Username,@Password,@FullName,@Email,@Mobile,@Role,@IsActive,
+         @CreatedBy,@UpdatedBy,@LicenseValidFrom,@LicenseValidTo,
+         @LicenseStatus,@LicenseGenDate,@Licencekey,@EmpId);
+        SELECT SCOPE_IDENTITY();";
+
+                using var cmd = new SqlCommand(insertQuery, con, tran);
+                cmd.Parameters.AddWithValue("@Username", item.Username ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@Password", item.Password ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@FullName", item.FullName ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@Email", item.Email ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@Mobile", item.Mobile ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@Role", item.Role ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@IsActive", item.IsActive);
+                cmd.Parameters.AddWithValue("@CreatedBy", HttpContext.Session.GetString("UserID"));
+                cmd.Parameters.AddWithValue("@UpdatedBy", HttpContext.Session.GetString("UserID"));
+                cmd.Parameters.AddWithValue("@LicenseValidFrom", (object)item.LicenseValidFrom ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@LicenseValidTo", (object)item.LicenseValidTo ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@LicenseStatus", (object)item.LicenseStatus ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@LicenseGenDate", (object)item.LicenseGenDate ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@Licencekey", (object)item.Licencekey ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@EmpId", (object)item.EmpId ?? DBNull.Value);
+
+                return (await cmd.ExecuteScalarAsync())?.ToString();
+            }
+
+            return item.UserID;
+        }
+               
         public async Task<IActionResult> DELETEEMPLOYEE(string id)
         {
             string ConnectionString = _configuration.GetConnectionString("ErpConnection");

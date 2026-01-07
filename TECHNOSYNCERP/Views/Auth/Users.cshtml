@@ -105,7 +105,7 @@
 
                 <div class="col-md-4">
                     <label for="LicenseValidFrom" class="form-label">License Valid From</label>
-                    <input type="date" class="form-control" readonly id="LicenseValidFrom">
+                    <input type="date" class="form-control " readonly id="LicenseValidFrom">
                 </div>
 
                 <div class="col-md-4">
@@ -241,6 +241,7 @@
             Password: $('#Password').val(),
             FullName: $('#FullName').val(),
             Email: $('#Email').val(),
+            EmpId: $('#UserID').val(),
             Mobile: $('#Mobile').val(),
             Role: $('#Role').val(),
             LicenseValidFrom: $('#LicenseValidFrom').val(),
@@ -248,6 +249,7 @@
             Licencekey: $('#Licencekey').val() ,
             IsActive: $('#IsActive').val()
         };
+        console.log(user);
         $.ajax({
             type: "POST",
             url: postUserUrl,

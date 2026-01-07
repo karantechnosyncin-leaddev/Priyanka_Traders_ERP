@@ -561,6 +561,10 @@
 
 
         public decimal Price { get; set; }             // 0
+        public string Qty { get; set; }             // 0
+        public string OpenQty { get; set; }             // 0
+        public string UOMID { get; set; }             // 0
+        public string UOMCode { get; set; }             // 0
         public string AcctCode { get; set; }           // "10"
 
         public int BaseDocEntry { get; set; }           // 0
@@ -572,6 +576,9 @@
         public string Remarks { get; set; }             // ""
 
         public string Weight { get; set; }             // 100
+        public string CountedQty { get; set; }             // 100
+        public string Variance { get; set; }             // 100
+        public string VariancePer { get; set; }             // 100
 
         public string Status { get; set; }              // "O"
 
@@ -587,8 +594,8 @@
 
     public class INVENTORYPOSTINGNEW
     {
-        public INVENTORYCOUNTINGHEADNEW header { get; set; }
-        public INVENTORYCOUNTINGITEMNEW[] lines { get; set; }
+        public INVENTORYPOSTINGHEADNEW header { get; set; }
+        public INVENTORYPOSTINGITEMNEW[] lines { get; set; }
     }
     public class INVENTORYPOSTINGHEADNEW
     {
@@ -596,12 +603,9 @@
         public string OBJType { get; set; }            // "IICN"
         public string Docnum { get; set; }             // "6"
         public string DocStatus { get; set; }          // "O"
-        public string EmployeeID { get; set; }          // "O"
 
         public string CountDate { get; set; }          // "2025-12-29"
-        public string CountTime { get; set; }          // "12:13"
-        public string ItemCode { get; set; }         
-        public string ItemName { get; set; }         
+        public string CountTime { get; set; }          // "12:13"           
         public string DocumentDate { get; set; }       // "2025-12-29"
 
         public string FYearId { get; set; }            // "1"
@@ -633,22 +637,24 @@
         public string EanCode { get; set; }            // "01"
         public string ItemName { get; set; }           // "1 MODULE GANG BOX"
 
-        public string HSNID { get; set; }              // "00000"
-        public string HSNCode { get; set; }            // "00000"
+        //public string HSNID { get; set; }              // "00000"
+        //public string HSNCode { get; set; }            // "00000"
 
         public string WhsID { get; set; }                 // 1
         public string WhsCode { get; set; }            // "01"
 
-        public decimal StockInWhs { get; set; }        // 7304
+        public string StockInWhs { get; set; }        // 7304
+        public string CountedQty { get; set; }        // 7304
 
         public string EmployeeID { get; set; }         // "1"
+        public string LogEmployes { get; set; }         // "1"
         public string StockTakerName { get; set; }         // "1"
 
 
         public decimal Price { get; set; }             // 0
         public string AcctCode { get; set; }           // "10"
 
-        public int BaseDocEntry { get; set; }           // 0
+        public string BaseDocEntry { get; set; }           // 0
         public string BaseObj { get; set; }             // ""
         public string BaseLine { get; set; }               // 0
 

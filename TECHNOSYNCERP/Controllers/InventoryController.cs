@@ -1165,7 +1165,7 @@ namespace TECHNOSYNCERP.Controllers
             try
             {
                 await using var con = new SqlConnection(connStr);
-                string query = @$"EXEC GET_NextDocNumber '{id}', 'Inventory_Counting_HeadNEW'";
+                string query = @$"EXEC GET_NextDocNumber '{id}', 'Inventory_Counting_Head_NEW'";
 
                 await using var cmd = new SqlCommand(query, con);
                 await con.OpenAsync();
@@ -1827,17 +1827,28 @@ namespace TECHNOSYNCERP.Controllers
                 return StatusCode(500, new { error = ex.Message });
             }
         }
-        public async Task<IActionResult> GETINVPOSTINGDOCNUMNEW(string id)
+        public async Task<IActionResult> GETROWDATAINVENTORYPOSTINGNEW()
         {
             var connStr = _configuration.GetConnectionString("ErpConnection");
             var list = new List<Dictionary<string, string>>();
 
             try
             {
+                var empid = HttpContext.Session.GetString("EmpId");
+
+                if (string.IsNullOrEmpty(empid))
+                    return Ok(list);
+
                 await using var con = new SqlConnection(connStr);
-                string query = @$"EXEC GET_NextDocNumber '{id}', 'Inventory_Posting_Head_New'";
+
+                string query = @"Select * FROM Inventory_Counting_Row_NEW 
+                         Where [Status] ='O' AND EmployeeID = @EmployeeID";
 
                 await using var cmd = new SqlCommand(query, con);
+
+                // IMPORTANT FIX
+                cmd.Parameters.Add("@EmployeeID", SqlDbType.Int).Value = int.Parse(empid);
+
                 await con.OpenAsync();
 
                 await using var reader = await cmd.ExecuteReaderAsync();
@@ -1846,18 +1857,21 @@ namespace TECHNOSYNCERP.Controllers
                     var obj = new Dictionary<string, string>();
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        obj[reader.GetName(i)] = reader.GetValue(i)?.ToString();
+                        obj[reader.GetName(i)] =
+                            reader.IsDBNull(i) ? "" : reader.GetValue(i).ToString();
                     }
                     list.Add(obj);
                 }
 
-                return Json(list);
+                return Ok(list);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { error = ex.Message });
             }
         }
+
+
         [HttpPost]
 
         #region OPENING BALANCE
@@ -3090,7 +3104,7 @@ namespace TECHNOSYNCERP.Controllers
                     header.CretedByUName = HttpContext.Session.GetString("UserName");
                     header.DocEntry = null;
 
-                    await using (var cmd = new SqlCommand(@$"EXEC GET_NextDocNumber '{header.FYearId}','Inventory_Counting_HeadNEW'", con, transaction))
+                    await using (var cmd = new SqlCommand(@$"EXEC GET_NextDocNumber '{header.FYearId}','Inventory_Counting_Head_NEW'", con, transaction))
                     await using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
@@ -3099,12 +3113,12 @@ namespace TECHNOSYNCERP.Controllers
                         }
                     }
 
-                    query = generator.GenerateInsertQuery(header, "[Inventory_Counting_HeadNEW]", "DocEntry");
+                    query = generator.GenerateInsertQuery(header, "[Inventory_Counting_Head_NEW]", "DocEntry");
                 }
                 else
                 {
                     // Update record
-                    query = generator.GenerateUpdateQuery(header, "[Inventory_Counting_HeadNEW]", "DocEntry", header.DocEntry, "");
+                    query = generator.GenerateUpdateQuery(header, "[Inventory_Counting_Head_NEW]", "DocEntry", header.DocEntry, "");
                 }
 
                 await using (var cmd = new SqlCommand(query, con, transaction))
@@ -3119,7 +3133,7 @@ namespace TECHNOSYNCERP.Controllers
                     }
                 }
                 //Delete
-                using (SqlCommand cmd = new SqlCommand($"DELETE FROM [Inventory_CountingNEW_Row] WHERE DocEntry = '{header.DocEntry}'", con, transaction))
+                using (SqlCommand cmd = new SqlCommand($"DELETE FROM [Inventory_Counting_Row_NEW] WHERE DocEntry = '{header.DocEntry}'", con, transaction))
                 {
                     cmd.CommandTimeout = 300;
                     await cmd.ExecuteNonQueryAsync();
@@ -3142,11 +3156,11 @@ namespace TECHNOSYNCERP.Controllers
                             line.CretedByUId = HttpContext.Session.GetString("UserID");
                             line.CretedByUName = HttpContext.Session.GetString("UserName");
                             line.ID = null;
-                            lineQuery = generator.GenerateInsertQuery(line, "[Inventory_CountingNEW_Row]", "ID");
+                            lineQuery = generator.GenerateInsertQuery(line, "[Inventory_Counting_Row_NEW]", "ID");
                         }
                         else
                         {
-                            lineQuery = generator.GenerateUpdateQuery(line, "[Inventory_CountingNEW_Row]", "ID", line.ID, "");
+                            lineQuery = generator.GenerateUpdateQuery(line, "[Inventory_Counting_Row_NEW]", "ID", line.ID, "");
                         }
 
                         await using (var cmd = new SqlCommand(lineQuery, con, transaction))
@@ -3340,12 +3354,9 @@ namespace TECHNOSYNCERP.Controllers
         }
         #endregion
         #region Inventroy Posting New
-        public async Task<IActionResult> CREATEINVENTORYPOSTINGNEW([FromBody] INVENTORYPOSTINGNEW data, string flag, string doctype)
+        public async Task<IActionResult> CREATEINVENTORYPOSTINGNEW([FromBody] INVENTORYPOSTINGNEW data)
         {
-            if (flag == "P")
-            {
-                return await PARK(data, doctype);
-            }
+            
 
             string connectionString = _configuration.GetConnectionString("ErpConnection");
             SqlTransaction transaction = null;
@@ -3440,6 +3451,12 @@ namespace TECHNOSYNCERP.Controllers
                         }
 
                         linenum++;
+                        await using (var cmd = new SqlCommand($"UPDATE Inventory_Counting_Row_NEW SET [Status] ='C' Where   ID='{line.BaseLine}';", con, transaction))
+                        {
+                            cmd.CommandTimeout = 300;
+                            await cmd.ExecuteNonQueryAsync();
+                        }
+                        //Unfreese Logic Heare 
                     }
 
                     await using (var cmd = new SqlCommand($"EXEC [Insert_InvtoryStock] '{data.header.DocEntry}','IIPN'", con, transaction))
@@ -3458,6 +3475,9 @@ namespace TECHNOSYNCERP.Controllers
                             }
                         }
                     }
+                  
+
+
                 }
 
                 await transaction.CommitAsync();
@@ -3479,7 +3499,7 @@ namespace TECHNOSYNCERP.Controllers
                 await con.CloseAsync();
             }
         }
-        public async Task<IActionResult> GETHEADERDATAINVENTORYPOSTINGNEW()
+        public async Task<IActionResult> GETINVPOSTINGDOCNUMNEW(string id)
         {
             var connStr = _configuration.GetConnectionString("ErpConnection");
             var list = new List<Dictionary<string, string>>();
@@ -3487,7 +3507,8 @@ namespace TECHNOSYNCERP.Controllers
             try
             {
                 await using var con = new SqlConnection(connStr);
-                string query = @"SELECT DocStatus,FYearId,RefNo,Weight,Remarks FROM Inventory_Counting_HeadNEW;";
+                string query = @$"EXEC GET_NextDocNumber '{id}', 'Inventory_Posting_Head_New'";
+
                 await using var cmd = new SqlCommand(query, con);
                 await con.OpenAsync();
 
@@ -3509,56 +3530,9 @@ namespace TECHNOSYNCERP.Controllers
                 return StatusCode(500, new { error = ex.Message });
             }
         }
-        public async Task<IActionResult> GETROWDATAINVENTORYPOSTINGNEW()
-        {
-            var connStr = _configuration.GetConnectionString("ErpConnection");
-            var list = new List<Dictionary<string, string>>();
 
-            try
-            {
-                await using var con = new SqlConnection(connStr);
-                string query = @"SELECT [ID]
-                                  ,[Status]
-                                  ,[ItemID]
-                                  ,[EanCode]
-                                  ,[ItemCode]
-                                  ,[ItemName]
-                                  ,[HSNID]
-                                  ,[HSNCode]
-                                  ,[WhsCode]
-                                  ,[WhsID]
-                                  ,[EmployeeID]
-	                              ,[StockTakerName]
-                                  ,[StockInWhs]
-                                  ,[AcctCode]
-                                  ,[Remarks]
-                                  ,[BaseLine]
-                                  ,[BaseObj]
-                                  ,[BaseDocEntry]
-                                  ,[Price]
-                                  ,[Weight]
-	                              FROM Inventory_CountingNEW_Row";
-                await using var cmd = new SqlCommand(query, con);
-                await con.OpenAsync();
+        
 
-                await using var reader = await cmd.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
-                {
-                    var obj = new Dictionary<string, string>();
-                    for (int i = 0; i < reader.FieldCount; i++)
-                    {
-                        obj[reader.GetName(i)] = reader.GetValue(i)?.ToString();
-                    }
-                    list.Add(obj);
-                }
-
-                return Json(list);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = ex.Message });
-            }
-        }
         #endregion
 
 

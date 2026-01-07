@@ -717,7 +717,6 @@
                 url: '@Url.Action("GETEMPLOYEE", "Master")',
                 type: 'GET',
                 success: function (response) {
-                    console.log(response);
                     var tableBody = $('#employeeMasterTable tbody');
                     tableBody.empty();
 
@@ -822,86 +821,149 @@
         $('#Code, #FirstName, #LastName, #Coun_Id, #Stat_Id, #MobilePhone').on('input change', function() {
             $(this).removeClass('is-invalid');
         });
+        $("#LinkUser").change(function () {
+            // Build payload
+            var formData = {
+                EmployeeID: $('#Employee_Id').val(),
+                EmployeeCode: $('#Code').val(),
+                FirstName: $('#FirstName').val().trim(),
+                MiddleName: $('#MiddleName').val().trim(),
+                LastName: $('#LastName').val().trim(),
+                RoleID: $('#EmpRole').val(),
+                Position: $('#Position').val().trim(),
+                PhoneNo: $('#PhoneNo').val().trim(),
+                MobilePhone: $('#MobilePhone').val().trim(),
+                Street: $('#Street').val().trim(),
+                Coun_Id: $('#Coun_Id').val(),
+                Stat_Id: $('#Stat_Id').val(),
+                City: $('#City').val().trim(),
+                ZipCode: $('#ZipCode').val().trim(),
+                Addres: $('#Addres').val().trim(),
+                IsActive: $('#IsActive').is(':checked') ? "A" : "I",
+                LinkUser: $('#LinkUser').is(':checked') ? "Y" : "N"
 
+
+            };
+               const getUsersUrl = '@Url.Action("GETUSERS", "Auth")'
+               const postUserUrl = '@Url.Action("Users", "Auth")'
+                 if (formData.LinkUser == "Y") {
+                     const user = {
+                         UserID: null,
+                         EmpId: $('#Employee_Id').val(),
+                         Username: $('#FirstName').val() + $('#LastName').val(),
+                         Password: $('#FirstName').val().trim() + $('#MobilePhone').val().trim().slice(-4),
+                         FullName: $('#FirstName').val() + ' ' + $('#MiddleName').val() + ' ' + $('#LastName').val(),
+                         Email:"",
+                         Mobile: $('#MobilePhone').val(),
+                         Role: "U",
+                         LicenseValidFrom:"",
+                         LicenseValidTo: "",
+                         Licencekey:"",
+                         IsActive: "1",
+                     };
+
+
+                     $.ajax({
+                         type: "POST",
+                         url: '@Url.Action("Users", "Auth")',
+                         contentType: "application/json; charset=utf-8",
+                         data: JSON.stringify(user),
+                         success: function (data) {
+                             if (data.success) {
+                                 Notify('success', 'Success', data.message);
+                             } else {
+                                 Notify('error', 'Error', data.message);
+                             }
+                         },
+                         error: function (xhr) {
+                             const errorMessage = xhr.responseJSON?.message || "Unknown error";
+                             Notify('error', 'Error', data.message);
+                         }
+                     });
+                 }
+        })
         // ------------------------
         // Save/Update employee
         // ------------------------
         $('#btnSave').click(function () {
-    // run validation
-    if (!validateForm()) {
-        Notify('warning', 'Validation Error', 'Please correct the highlighted fields before saving.');
-        return;
-    }
+                // run validation
+                if (!validateForm()) {
+                    Notify('warning', 'Validation Error', 'Please correct the highlighted fields before saving.');
+                    return;
+                }
 
-    // Duplicate check (client-side)
-    var codeVal = $('#Code').val().trim();
-    var firstVal = $('#FirstName').val().trim();
-    var lastVal = $('#LastName').val().trim();
-    var currentEmployeeId = $('#Employee_Id').val();
+                // Duplicate check (client-side)
+                var codeVal = $('#Code').val().trim();
+                var firstVal = $('#FirstName').val().trim();
+                var lastVal = $('#LastName').val().trim();
+                var currentEmployeeId = $('#Employee_Id').val();
 
-    var dup = checkDuplicateOnTable(codeVal, firstVal, lastVal, currentEmployeeId);
-    if (dup.codeExists || dup.nameExists) {
-        let msg = '';
-        if (dup.codeExists && dup.nameExists) msg = 'Both Code and Name already exist.';
-        else if (dup.codeExists) msg = 'Employee Code already exists.';
-        else msg = 'Employee with same name already exists.';
-        Swal.fire({ icon: 'warning', title: 'Duplicate Entry', text: msg, timer: 2500, timerProgressBar: true });
-        return;
-    }
+                var dup = checkDuplicateOnTable(codeVal, firstVal, lastVal, currentEmployeeId);
+                if (dup.codeExists || dup.nameExists) {
+                    let msg = '';
+                    if (dup.codeExists && dup.nameExists) msg = 'Both Code and Name already exist.';
+                    else if (dup.codeExists) msg = 'Employee Code already exists.';
+                    else msg = 'Employee with same name already exists.';
+                    Swal.fire({ icon: 'warning', title: 'Duplicate Entry', text: msg, timer: 2500, timerProgressBar: true });
+                    return;
+                }
 
-    // Build payload
-    var formData = {
-        EmployeeID: $('#Employee_Id').val(),
-        EmployeeCode: $('#Code').val(),
-        FirstName: $('#FirstName').val().trim(),
-        MiddleName: $('#MiddleName').val().trim(),
-        LastName: $('#LastName').val().trim(),
-        RoleID: $('#EmpRole').val(),
-        Position: $('#Position').val().trim(),
-        PhoneNo: $('#PhoneNo').val().trim(),
-        MobilePhone: $('#MobilePhone').val().trim(),
-        Street: $('#Street').val().trim(),
-        Coun_Id: $('#Coun_Id').val(),
-        Stat_Id: $('#Stat_Id').val(),
-        City: $('#City').val().trim(),
-        ZipCode: $('#ZipCode').val().trim(),
-        Addres: $('#Addres').val().trim(),
-        IsActive: $('#IsActive').is(':checked') ? "A" : "I"
-    };
+                // Build payload
+                var formData = {
+                    EmployeeID: $('#Employee_Id').val(),
+                    EmployeeCode: $('#Code').val(),
+                    FirstName: $('#FirstName').val().trim(),
+                    MiddleName: $('#MiddleName').val().trim(),
+                    LastName: $('#LastName').val().trim(),
+                    RoleID: $('#EmpRole').val(),
+                    Position: $('#Position').val().trim(),
+                    PhoneNo: $('#PhoneNo').val().trim(),
+                    MobilePhone: $('#MobilePhone').val().trim(),
+                    Street: $('#Street').val().trim(),
+                    Coun_Id: $('#Coun_Id').val(),
+                    Stat_Id: $('#Stat_Id').val(),
+                    City: $('#City').val().trim(),
+                    ZipCode: $('#ZipCode').val().trim(),
+                    Addres: $('#Addres').val().trim(),
+                    IsActive: $('#IsActive').is(':checked') ? "A" : "I",
+                    LinkUser: $('#LinkUser').is(':checked') ? "Y" : "N"
+                };
+                          // Replace with actual URL if not Razor view
 
-    var isEdit = formData.EmployeeID && formData.EmployeeID.length > 0;
 
-    $.ajax({
-        url: '@Url.Action("CREATEEMPLOYEE", "Master")',
-        type: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(formData),
-        beforeSend: function() {
-            $('#btnSave').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Processing...');
-        },
-        success: function (response) {
-            if (response && response.success) {
-                Notify('success', 'Success', response.message || (isEdit ? 'Employee updated successfully!' : 'Employee created successfully!'));
-                // Reset form & reload
-                $('#employeeMasterForm')[0].reset();
-                $('#Stat_Id').empty().append('<option value="">Select State</option>').prop('disabled', true);
-                $('#Employee_Id').val('');
-                $('#btnDelete').prop('disabled', true);
-                loadEmployee();
-                loadCountries(); // Reload countries to reset selection
-            } else {
-                Notify('warning', 'Warning', response.message || 'Operation completed but with warnings.');
-            }
-        },
-        error: function(xhr, status, error) {
-            const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error saving employee';
-            Notify('error', 'Error', errorMessage);
-        },
-        complete: function() {
-            $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
-        }
-    });
-});
+                var isEdit = formData.EmployeeID && formData.EmployeeID.length > 0;
+
+                $.ajax({
+                    url: '@Url.Action("CREATEEMPLOYEE", "Master")',
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(formData),
+                    beforeSend: function() {
+                        $('#btnSave').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Processing...');
+                    },
+                    success: function (response) {
+                        if (response && response.success) {
+                            Notify('success', 'Success', response.message || (isEdit ? 'Employee updated successfully!' : 'Employee created successfully!'));
+                            // Reset form & reload
+                            $('#employeeMasterForm')[0].reset();
+                            $('#Stat_Id').empty().append('<option value="">Select State</option>').prop('disabled', true);
+                            $('#Employee_Id').val('');
+                            $('#btnDelete').prop('disabled', true);
+                            loadEmployee();
+                            loadCountries(); // Reload countries to reset selection
+                        } else {
+                            Notify('warning', 'Warning', response.message || 'Operation completed but with warnings.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error saving employee';
+                        Notify('error', 'Error', errorMessage);
+                    },
+                    complete: function() {
+                        $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
+                    }
+                });
+            });
         // ------------------------
         // Delete employee
         // ------------------------
@@ -972,7 +1034,6 @@
                     // optional loading
                 },
                 success: function (response) {
-                    console.log(response);
                     if (response && response.length > 0) {
                         var employee = response[0];
 
@@ -990,6 +1051,8 @@
                         $('#City').val(employee.City || '');
                         $('#Addres').val(employee.Addres || '');
                         $('#IsActive').prop('checked', (employee.IsActive === "A"));
+                        $('#LinkUser').prop('checked', (employee.IsActive === "Y"));
+
 
                         // Country/state: set country then wait for states to load and set state
                         if (employee.Coun_Id) {
@@ -1040,73 +1103,9 @@
         });
 
 
-        // ------------------------
-        // Link User
-        // ------------------------
 
-        @*$('#btnSave').on('click', function () {
 
-            // Check if Link User is checked
-            if ($('#chkLinkUser').is(':checked')) {
 
-                 // Build payload
-                var formData = {
-                 EmployeeID: $('#Employee_Id').val(),
-                 EmployeeCode: $('#Code').val(),
-                 FirstName: $('#FirstName').val().trim(),
-                 MiddleName: $('#MiddleName').val().trim(),
-                 LastName: $('#LastName').val().trim(),
-                 RoleID: $('#EmpRole').val(),
-                 Position: $('#Position').val().trim(),
-                 PhoneNo: $('#PhoneNo').val().trim(),
-                 MobilePhone: $('#MobilePhone').val().trim(),
-                 Street: $('#Street').val().trim(),
-                 Coun_Id: $('#Coun_Id').val(),
-                 Stat_Id: $('#Stat_Id').val(),
-                 City: $('#City').val().trim(),
-                 ZipCode: $('#ZipCode').val().trim(),
-                 Addres: $('#Addres').val().trim(),
-                 IsActive: $('#IsActive').is(':checked') ? "A" : "I"
-             };
-
-                var isEdit = formData.EmployeeID && formData.EmployeeID.length > 0;
-
-                 $.ajax({
-                     url: '@Url.Action("CREATEEMPLOYEE", "Master")',
-                     type: "POST",
-                     contentType: "application/json",
-                     data: JSON.stringify(formData),
-                     beforeSend: function() {
-                         $('#btnSave').prop('disabled', true).html('<i class="bi bi-hourglass"></i> Processing...');
-                     },
-                     success: function (response) {
-                         if (response && response.success) {
-                             alert("Hello");
-                             Notify('success', 'Success', response.message || (isEdit ? 'Employee updated successfully!' : 'Employee created successfully!'));
-                             // Reset form & reload
-                             $('#employeeMasterForm')[0].reset();
-                             $('#Stat_Id').empty().append('<option value="">Select State</option>').prop('disabled', true);
-                             $('#Employee_Id').val('');
-                             $('#btnDelete').prop('disabled', true);
-                             loadEmployee();
-                             loadCountries(); // Reload countries to reset selection
-                         } else {
-                             Notify('warning', 'Warning', response.message || 'Operation completed but with warnings.');
-                         }
-                     },
-                     error: function(xhr, status, error) {
-                         const errorMessage = xhr.responseJSON?.message || xhr.responseText || 'Error saving employee';
-                         Notify('error', 'Error', errorMessage);
-                     },
-                     complete: function() {
-                         $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
-                     }
-                 });
-
-            } else {
-                console.log('Link User not checked, skipping AJAX call');
-            }
-        });*@
 
 
     });

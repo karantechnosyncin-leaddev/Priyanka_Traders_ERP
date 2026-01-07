@@ -27,6 +27,7 @@
         public string CreatedBy { get; set; }
         public string LastLogin { get; set; }
         public string IsActive { get; set; }
+        public string EmpId { get; set; }
     }
     public class LicenseData
     { 

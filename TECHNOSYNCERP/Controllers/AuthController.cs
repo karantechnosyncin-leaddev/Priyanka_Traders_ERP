@@ -605,11 +605,11 @@ namespace TECHNOSYNCERP.Controllers
                         INSERT INTO [Users] 
                         ([Username], [Password], [FullName], [Email], [Mobile], [Role], [IsActive], 
                          [CreatedBy], [UpdatedBy], [LicenseValidFrom], [LicenseValidTo], [LicenseStatus], 
-                         [LicenseGenDate], [Licencekey]) 
+                         [LicenseGenDate], [Licencekey],[EmpId]) 
                         VALUES 
                         (@Username, @Password, @FullName, @Email, @Mobile, @Role, @IsActive,
-                         @CreatedBy, @UpdatedBy, @LicenseValidFrom, @LicenseValidTo, @LicenseStatus, 
-                         @LicenseGenDate, @Licencekey);
+                         @CreatedBy, @UpdatedBy, @LicenseValidFrom, @LicenseValidTo, @LicenseStatus,
+                         @LicenseGenDate, @Licencekey ,@empid );
                         SELECT SCOPE_IDENTITY();";
 
                             await using (var cmd = new SqlCommand(insertQuery, con, (SqlTransaction)transaction))
@@ -628,6 +628,7 @@ namespace TECHNOSYNCERP.Controllers
                                 cmd.Parameters.AddWithValue("@LicenseStatus", (object)item.LicenseStatus ?? DBNull.Value);
                                 cmd.Parameters.AddWithValue("@LicenseGenDate", (object)item.LicenseGenDate ?? DBNull.Value);
                                 cmd.Parameters.AddWithValue("@Licencekey", (object)item.Licencekey ?? DBNull.Value);
+                                cmd.Parameters.AddWithValue("@empid ", (object)item.EmpId ?? DBNull.Value);
 
                                 // Execute and get the new UserID
                                 var newId = await cmd.ExecuteScalarAsync();
@@ -650,7 +651,8 @@ namespace TECHNOSYNCERP.Controllers
                             [UpdatedDate] = @UpdatedDate,
                             [LicenseValidFrom] = @LicenseValidFrom,
                             [LicenseValidTo] = @LicenseValidTo,
-                            [Licencekey] = @Licencekey
+                            [Licencekey] = @Licencekey,
+                            [EmpId] = @empid
                         WHERE UserID = @UserID";
 
                             await using (var cmd = new SqlCommand(updateQuery, con, (SqlTransaction)transaction))
@@ -668,7 +670,7 @@ namespace TECHNOSYNCERP.Controllers
                                 cmd.Parameters.AddWithValue("@LicenseValidTo", (object)item.LicenseValidTo ?? DBNull.Value);
                                 cmd.Parameters.AddWithValue("@Licencekey", (object)item.Licencekey ?? DBNull.Value);
                                 cmd.Parameters.AddWithValue("@UserID", item.UserID);
-
+                                cmd.Parameters.AddWithValue("@empid ", (object)item.EmpId ?? DBNull.Value);
                                 await cmd.ExecuteNonQueryAsync();
                             }
                         }

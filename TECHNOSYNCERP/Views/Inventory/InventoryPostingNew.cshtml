@@ -1,430 +1,605 @@
-﻿
-<style>
-    /* Mobile Back Button */
-    .mobile-back-btn {
-        position: fixed;
-        top: 10px;
-        left: 10px;
-        z-index: 1000;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: white;
-        border: 1px solid #dee2e6;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        transition: all 0.3s;
-    }
+﻿@{
+    Layout = null;
+}
 
-        .mobile-back-btn:hover {
-            background: #f8f9fa;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .mobile-back-btn i {
-            color: #495057;
-            font-size: 1.2rem;
-        }
-
-    /* Common styles */
-    .product-card-wrapper {
-        width: 100%;
-        max-width: 420px;
-        margin: 0 auto;
-        position: relative;
-        min-height: 450px;
-    }
-
-    .product-card-container {
-        position: absolute;
-        width: 100%;
-        top: 0;
-        left: 0;
-        transition: transform 0.6s ease, opacity 0.6s ease;
-    }
-
-    .product-card {
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
-        border: none;
-        background: white;
-    }
-
-    .slide-out-left {
-        transform: translateX(-100%);
-        opacity: 0;
-    }
-
-    .slide-in-right {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-
-    .hidden {
-        display: none !important;
-    }
-
-    .active {
-        transform: translateX(0);
-        opacity: 1;
-    }
-
-    .product-image {
-        height: 160px;
-        object-fit: contain;
-        background: #f8f9fa;
-        padding: 15px;
-    }
-
-    /* Mobile-specific styles */
-    @@media (max-width: 991.98px) {
-        body {
-            background: #f5f6fa;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .product-card-wrapper {
-            margin-top: 10px;
-        }
-
-        .product-card-body {
-            padding: 1.25rem;
-        }
-
-        .product-name {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 10px;
-            line-height: 1.3;
-        }
-
-        .product-location {
-            font-size: 0.9rem;
-            color: #7f8c8d;
-            margin-bottom: 15px;
-            line-height: 1.4;
-            padding: 8px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            border-left: 3px solid #3498db;
-        }
-
-            .product-location strong {
-                color: #2c3e50;
-                display: block;
-                margin-bottom: 3px;
-                font-size: 0.9rem;
-            }
-
-        .info-row {
-            margin-bottom: 8px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
-        }
-
-            .info-row:last-child {
-                border-bottom: none;
-            }
-
-        .quantity-input {
-            font-size: 1rem;
-            font-weight: 600;
-            text-align: center;
-            padding: 10px;
-        }
-
-        .form-text {
-            font-size: 0.85rem;
-            margin-top: 5px;
-        }
-
-        .btn {
-            padding: 10px;
-            font-size: 0.95rem;
-        }
-    }
-
-    /* Desktop-specific styles */
-    @@media (min-width: 992px) {
-        .mobile-back-btn {
-            display: none;
-        }
-
-        .desktop-container {
-            padding: 20px 0;
-        }
-
-        .product-card-wrapper {
-            max-width: 450px;
-            min-height: 500px;
-            margin-top: 100px;
-            margin-bottom: 100px;
-        }
-
-        .product-image {
-            height: 180px;
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.5;
+            min-height: 100vh;
             padding: 20px;
         }
 
-        .product-card-body {
-            padding: 1.5rem;
-        }
-
-        .product-name {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 12px;
-            line-height: 1.3;
-            border-bottom: 1px solid #f0f0f0;
-            padding-bottom: 10px;
-        }
-
-        .warehouse-section {
-            margin-bottom: 20px;
-            padding: 12px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 8px;
-            border-left: 3px solid #3498db;
-        }
-
-        .warehouse-label {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 1rem;
-        }
-
-            .warehouse-label i {
-                color: #3498db;
-                font-size: 0.9rem;
-            }
-
-        .warehouse-value {
-            color: #555;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            padding-left: 22px;
-        }
-
-        .details-section {
+        .header-container {
             background: white;
-            border-radius: 8px;
-            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .header-title {
+            color: #2c3e50;
+            font-weight: 600;
             margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f4f8;
         }
 
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #f5f5f5;
+        .inventory-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
+            width: 100%;
+            max-width: 480px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin: 0 auto;
         }
 
-            .detail-row:last-child {
-                border-bottom: none;
+            .inventory-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.1);
             }
 
-        .detail-label {
-            font-weight: 600;
-            color: #555;
-            min-width: 100px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.9rem;
-        }
-
-            .detail-label i {
-                font-size: 0.85rem;
-            }
-
-        .detail-value {
-            color: #2c3e50;
-            font-weight: 600;
-            text-align: right;
-            word-break: break-word;
-            font-size: 0.9rem;
-        }
-
-        .quantity-input {
-            font-size: 1.1rem;
-            padding: 12px;
-            text-align: center;
-        }
-
-        .quantity-section {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-        }
-
-        .quantity-label {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-            .quantity-label i {
-                color: #3498db;
-                font-size: 0.9rem;
-            }
-
-        .quantity-input-container {
+        .card-header {
+            background: linear-gradient(135deg, #4a6fa5 0%, #3a5985 100%);
+            color: white;
+            padding: 20px;
             position: relative;
         }
 
-        .quantity-input {
-            padding-right: 40px;
-            padding-left: 40px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            transition: all 0.3s;
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
         }
 
-            .quantity-input:focus {
-                border-color: #3498db;
-                box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        .inventory-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        .item-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .item-code {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .product-image-section {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .product-image {
+            max-width: 70%;
+            max-height: 80%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+            .product-image:hover {
+                transform: scale(1.03);
             }
 
-        .quantity-btn {
+        .image-zoom-btn {
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 32px;
-            height: 32px;
-            border: 1px solid #ddd;
-            background: white;
-            color: #555;
-            border-radius: 4px;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.8rem;
+            color: #4a6fa5;
+            font-size: 1.1rem;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
         }
 
-            .quantity-btn:hover {
-                background: #3498db;
-                color: white;
-                border-color: #3498db;
+            .image-zoom-btn:hover {
+                background: white;
+                transform: scale(1.1);
             }
 
-        .quantity-minus {
-            left: 4px;
-        }
-
-        .quantity-plus {
-            right: 4px;
-        }
-
-        .form-text {
-            font-size: 0.85rem;
-            margin-top: 8px;
-        }
-
-        .btn {
-            padding: 12px;
-            font-size: 1rem;
-        }
-    }
-
-    /* Loading animation */
-    .btn-loading {
-        position: relative;
-        color: transparent !important;
-    }
-
-        .btn-loading:after {
-            content: '';
+        .image-counter {
             position: absolute;
-            width: 16px;
-            height: 16px;
-            top: 50%;
-            left: 50%;
-            margin: -8px 0 0 -8px;
-            border: 2px solid #fff;
+            bottom: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .card-content {
+            padding: 25px;
+        }
+
+        .item-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .quantity-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #eef1f6;
+        }
+
+        .quantity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .quantity-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .system-qty {
+            font-size: 0.9rem;
+            color: #4a6fa5;
+            font-weight: 600;
+            background: #e8edf7;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            border-radius: 10px;
+            padding: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .qty-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: #4a6fa5;
+            color: white;
+            border-radius: 8px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .qty-btn:hover {
+                background: #3a5985;
+                transform: scale(1.05);
+            }
+
+            .qty-btn:active {
+                transform: scale(0.95);
+            }
+
+        .qty-value {
+            width: 100%;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2c3e50;
+            border: none;
+            background: transparent;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+            .action-btn.primary {
+                background: linear-gradient(135deg, #4a6fa5 0%, #3a5985 100%);
+                color: white;
+            }
+
+                .action-btn.primary:hover {
+                    background: linear-gradient(135deg, #3a5985 0%, #2c4870 100%);
+                    box-shadow: 0 5px 15px rgba(58, 89, 133, 0.3);
+                }
+
+        .card-footer {
+            padding: 20px;
+            background: #f8fafc;
+            border-top: 1px solid #eef1f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .last-counted {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .last-counted i {
+                font-size: 0.9rem;
+            }
+
+        /* Completion Card Styles */
+        .completion-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .celebration-header {
+            background: linear-gradient(135deg, #4a6fa5 0%, #3a5985 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .celebration-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 20px;
+            background: #ffd700;
+            opacity: 0.8;
+        }
+
+        .completion-content {
+            padding: 40px 30px;
+        }
+
+        .stock-taker-celebration {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .stock-taker-avatar {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 0.8s linear infinite;
+            background: linear-gradient(135deg, #4a6fa5 0%, #3a5985 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0 auto 15px;
         }
 
-    @@keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
-    }
-
-    .completion-icon {
-        width: 100px !important;
-        height: 100px !important;
-    }
-
-        .completion-icon i {
-            font-size: 2.5rem !important;
+        .achievement-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 25px 0;
         }
 
-    .alert {
-        padding: 10px 15px;
-        font-size: 0.9rem;
-    }   
-</style>
+        .stat-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #4a6fa5;
+        }
 
-<div class="container-fluid p-3">
-    <div class="card shadow-sm border-0 rounded-4">
-        <div class="card-body">
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4a6fa5;
+            margin-bottom: 5px;
+        }
 
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .thank-you-message {
+            font-size: 1.1rem;
+            color: #495057;
+            margin: 30px 0;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .completion-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .completion-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .completion-btn.primary {
+            background: linear-gradient(135deg, #4a6fa5 0%, #3a5985 100%);
+            color: white;
+        }
+
+        .completion-btn.secondary {
+            background: #f8f9fa;
+            color: #495057;
+            border: 2px solid #dee2e6;
+        }
+
+        .completion-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animations */
+        @@keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @@keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @@keyframes slideOutLeft {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @@keyframes confettiFall {
+            0% { transform: translateY(-100px) rotate(0deg); }
+            100% { transform: translateY(500px) rotate(360deg); }
+        }
+
+        .slide-in-right {
+            animation: slideInRight 0.5s ease-out forwards;
+        }
+
+        .slide-out-left {
+            animation: slideOutLeft 0.5s ease-out forwards;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        /* Responsive adjustments */
+        @@media (max-width: 768px) {
+            .header-container {
+                padding: 15px;
+            }
+
+            .item-details {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .product-image-section {
+                height: 200px;
+            }
+
+            .card-content {
+                padding: 20px;
+            }
+
+            .card-actions {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+            }
+
+            .item-title {
+                font-size: 1.3rem;
+            }
+
+            .qty-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .qty-value {
+                font-size: 1.2rem;
+            }
+
+            .achievement-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .completion-card, .inventory-card {
+                max-width: 100%;
+            }
+
+            .completion-actions {
+                flex-direction: column;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .header-title {
+                font-size: 1.3rem;
+            }
+
+            .product-image-section {
+                height: 180px;
+            }
+
+            .card-header {
+                padding: 15px;
+            }
+
+            .card-content {
+                padding: 15px;
+            }
+
+            .quantity-section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Form Section -->
+        <div class="header-container" hidden>
+            <h2 class="header-title">Inventory Count Document</h2>
             <div class="row g-3">
-
-                <div class="col-12 col-sm-6 col-md-3" hidden>
-                    <label class="form-label" for="OBJType">OBJ Type</label>
-                    <input type="text" id="OBJType" class="form-control" value="IIPN">
+                <!-- OBJType -->
+                <div class="col-md-4">
+                    <label for="OBJType" class="form-label">Object Type</label>
+                    <input type="text" class="form-control" id="OBJType" name="OBJType" value="IINP">
+                </div>
+                <!-- DocEntry -->
+                <div class="col-md-4">
+                    <label for="DocEntry" class="form-label">Doc Entry</label>
+                    <input type="number" class="form-control" id="DocEntry" name="DocEntry" value="">
+                </div>
+                <!-- Docnum -->
+                <div class="col-md-4">
+                    <label for="Docnum" class="form-label">Document Number</label>
+                    <input type="number" class="form-control" id="Docnum" name="Docnum" value="">
                 </div>
 
-
-
-                <div class="col-12 col-sm-6 col-md-3">
-                    <label class="form-label" for="Docnum">Doc Number</label>
-                    <input type="text" id="Docnum" class="form-control" value="">
+                <!-- CountDate -->
+                <div class="col-md-4">
+                    <label for="CountDate" class="form-label">Count Date</label>
+                    <input type="date" class="form-control datepicker" id="CountDate" name="CountDate" value="">
+                </div>
+                <!-- CountTimee -->
+                <div class="col-md-4">
+                    <label for="CountTime" class="form-label">Count Time</label>
+                    <input type="time" class="form-control timepicker   " id="CountTime" name="CountTime">
                 </div>
 
-                <div class="col-12 col-sm-6 col-md-3">
-                    <label class="form-label" for="CountDate">Count Date</label>
-                    <input type="date" id="CountDate" class="form-control datepicker" value="">
-                </div>
-
-                <div class="col-12 col-sm-6 col-md-3">
-                    <label class="form-label" for="CountTime">Count Time</label>
-                    <input type="time" id="CountTime" class="form-control timepicker" value="">
-                </div>
-
-
-                <div class="col-12 col-sm-6 col-md-3">
-                    <label class="form-label" for="DocumentDate">Document Date</label>
-                    <input type="date" id="DocumentDate" class="form-control datepicker" value="">
+                <!-- DocumentDate -->
+                <div class="col-md-4">
+                    <label for="DocumentDate" class="form-label">Document Date</label>
+                    <input type="date" class="form-control datepicker" id="DocumentDate" name="DocumentDate" value="">
                 </div>
 
                 <div class="col-md-3 col-6 mb-2">
@@ -435,556 +610,638 @@
                     </select>
                 </div>
 
-                <div class="col-12 col-sm-6 col-md-3">
-                    <label class="form-label" for="RefNo">Reference No</label>
-                    <input type="text" id="RefNo" class="form-control" value="">
+                <!-- RefNo -->
+                <div class="col-md-4">
+                    <label for="RefNo" class="form-label">Reference No</label>
+                    <input type="text" class="form-control" id="RefNo" name="RefNo">
                 </div>
 
+                <!-- Weight -->
+                <div class="col-md-4">
+                    <label for="Weight" class="form-label">Weight</label>
+                    <input type="number" step="0.01" class="form-control" id="Weight" name="Weight">
+                </div>
 
-                <div class="col-md-3 col-6 mb-2">
+                <!-- DocStatus -->
+                <div class="col-md-4 col-6 mb-2">
                     <label for="DocStatus" class="form-label">Status</label>
                     <select id="DocStatus" class="form-select" disabled>
-                        <option value="O">Open</option>
                         <option value="C">Close</option>
+                        <option value="O">Open</option>
                     </select>
                 </div>
-                <div class="col-12 col-sm-6 col-md-3">
-                    <label class="form-label" for="Weight">Weight</label>
-                    <input type="number" step="0.01" id="Weight" class="form-control" value="">
+                <!-- Remarks -->
+                <div class="col-md-8">
+                    <label for="Remarks" class="form-label">Remarks</label>
+                    <textarea class="form-control" id="Remarks" name="Remarks" rows="2"></textarea>
                 </div>
-
-                <div class="col-12">
-                    <label class="form-label" for="Remarks">Remarks</label>
-                    <textarea id="Remarks" class="form-control" rows="3"></textarea>
-                </div>
-
             </div>
-
         </div>
-    </div>
-</div>
 
-
-
-
-
-<!-- Mobile Back Button -->
-<a href="/" class="mobile-back-btn" title="Back to Dashboard">
-    <i class="fas fa-arrow-left"></i>
-</a>
-
-<!-- Mobile/Tablet View - Fullscreen centered -->
-<div class="product-card-wrapper">
-    <!-- ACTIVE PRODUCT CARD -->
-    <div class="product-card-container active" id="productCard">
-        <div class="product-card">
-            <img id="productImg" class="card-img-top product-image" alt="Product">
-            <div class="product-card-body">
-                <div class="product-name" id="productName">Loading...</div>
-
-                <div class="product-location">
-                    <strong>Warehouse Location:</strong>
-                    <span id="productWhs"></span>
-                </div>
-
-                <div class="mb-3">
-                    <div class="info-row">
-                        <strong>Item Code:</strong>
-                        <span id="productCode" class="ms-2"></span>
-                    </div>
-                    <div class="info-row">
-                        <strong>Product SKU:</strong>
-                        <span id="productSku" class="ms-2"></span>
+        <!-- Inventory Card Container -->
+        <div id="inventory-card-container">
+            <div class="inventory-card" id="inventory-card">
+                <div class="card-header">
+                    <div class="header-top">
+                        <div class="inventory-title">Inventory Item</div>
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-medium">Quantity</label>
-                    <input type="number" class="form-control quantity-input"
-                           id="quantityInput" value="0" min="0">
-                    <div class="form-text">Enter the required quantity</div>
-                </div>
+                <div class="product-image-section">
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
+                         alt="Wireless Bluetooth Headphones"
+                         class="product-image"
+                         id="main-product-image">
 
-                <button class="btn btn-primary w-100" id="btnSave">
-                    Submit & Continue →
-                </button>
-            </div>
-        </div>
-    </div>
+                    <button class="image-zoom-btn" id="zoom-btn">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
 
-    <!-- COMPLETION CARD -->
-    <div class="product-card-container hidden" id="completionCard">
-        <div class="product-card">
-            <div class="product-card-body text-center p-3">
-                <div class="mb-3">
-                    <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center completion-icon">
-                        <i class="fas fa-check-circle text-success"></i>
+                    <div class="image-counter">
+                        <span id="current-image">1</span>/<span id="total-images">3</span>
                     </div>
                 </div>
-                <h4 class="mb-2 fw-bold">Processing Complete</h4>
-                <p class="text-muted mb-3">All items have been processed successfully.</p>
-                <div class="text-primary fw-medium">
-                    <i class="fas fa-thumbs-up me-2"></i>Thank You!
+
+                <div class="card-content">
+                    <div class="item-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Item Code</span>
+                            <span class="detail-value ItemCodeDisplay"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Item Name</span>
+                            <span class="detail-value ItemNameDisplay"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Warehouse Name</span>
+                            <span class="detail-value WhsCodeDisplay"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Stock In Warehouse</span>
+                            <span class="detail-value StockInWhsDisplay"></span>
+                        </div>
+                    </div>
+
+                    <div class="quantity-section">
+                        <div class="quantity-header">
+                            <div class="quantity-title">Counted Quantity</div>
+                            @*<div class="system-qty" id="system-qty-display">System: 0</div>*@
+                        </div>
+
+                        <div class="container-fluid">
+                            <div class="row g-3">
+                                <div class="col-12 d-flex justify-content-center align-items-center mb-3">
+                                    <button class="qty-btn minus-btn">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <div class="col-9">
+                                        <input type="number" class="form-control form-control-lg qty-value mx-2" value="0" style="max-width: 250px;">
+                                    </div>
+                                    <button class="qty-btn plus-btn">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+
+                                <div class="col-md-6" hidden>
+                                    <label class="form-label">ID</label>
+                                    <input type="number" class="form-control ID">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">Doc Entry</label>
+                                    <input type="number" class="form-control DocEntry">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">Status</label>
+                                    <input type="text" class="form-control Status" value="C">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">Line No</label>
+                                    <input type="number" class="form-control LineNum">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">Item ID</label>
+                                    <input type="number" class="form-control ItemID">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">EAN Code</label>
+                                    <input type="text" class="form-control EanCode">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">Item Code</label>
+                                    <input type="number" class="form-control ItemCode">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">Item Name</label>
+                                    <input type="text" class="form-control ItemName">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">Stock Taker</label>
+                                    <input type="text" class="form-control LogEmployes" id="StockTakerInput">
+                                </div>
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">EmployeeID</label>
+                                    <input type="text" class="form-control EmployeeID">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">Warehouse Code</label>
+                                    <input type="text" class="form-control WhsCode">
+                                </div>
+
+                                <div class="col-md-6" hidden>
+                                    <label class="form-label">Warehouse ID</label>
+                                    <input type="number" class="form-control WhsID">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">Stock In Warehouse</label>
+                                    <input type="number" class="form-control StockInWhs">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">Account Code</label>
+                                    <input type="number" class="form-control AcctCode">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">Remarks</label>
+                                    <input type="text" class="form-control Remarks">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">Base Line</label>
+                                    <input type="number" class="form-control BaseLine">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">Base Object</label>
+                                    <input type="text" class="form-control BaseObj" value="IICN">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">Base Doc Entry</label>
+                                    <input type="number" class="form-control BaseDocEntry">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">Price</label>
+                                    <input type="number" step="0.01" class="form-control Price">
+                                </div>
+
+                                <div class="col-md-6"hidden>
+                                    <label class="form-label">Weight</label>
+                                    <input type="number" step="0.01" class="form-control Weight">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <button class="action-btn primary" id="confirm-btn">
+                            <i class="fas fa-check-circle"></i>
+                            Confirm Count
+                        </button>
+                    </div>
                 </div>
 
-                <a href="/" class="btn btn-outline-primary w-100 mt-3">
-                    <i class="fas fa-home me-2"></i>Back to Dashboard
-                </a>
+                <div class="card-footer">
+                    <div class="last-counted" id="last-counted-text">
+                        <i class="far fa-clock"></i>
+                        Ready to count
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-@*line table*@
+   
 
-<div class="table-responsive">
-    <table class="table table-bordered table-hover align-middle text-nowrap" id="mainitemtable">
-        <thead class="table-light">
-            <tr>
-                <th>ID</th>
-                <th>DocEntry</th>
-                <th>Status</th>
-                <th>LineNum</th>
-                <th>ItemID</th>
-                <th>EanCode</th>
-                <th>ItemCode</th>
-                <th>ItemName</th>
-                <th>OpenQty</th>
-                <th>LogEmployes</th>
-                <th>WhsCode</th>
-                <th>WhsID</th>
-                <th>StockInWhs</th> 
-                <th>AcctCode</th>
-                <th>Remarks</th>
-                <th>BaseLine</th>
-                <th>BaseObj</th>
-                <th>BaseDocEntry</th>
-                <th>Price</th>
-                <th>Weight</th>
-            </tr>
-        </thead>
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 
-        <tbody>
-            
-        </tbody>
-    </table>
-</div>
+    <script>
+        $(document).ready(function () {
+            // Global variables
+            var countingData = [];
+            var currentIndex = 0;
+            var processedItems = [];
+            var totalItemCount = 0;   // ✅ ADD THIS
+            var stockTakerName = "";
 
 
+            // Set current date
+            $('.datepicker').val(new Date().toISOString().split('T')[0]);
 
-<script>
-    $(function () {
-        $('.datepicker').val(new Date().toISOString().split('T')[0]);
-        loadFiscalYears();
-        loadheaderData();
-        loadRowData();
+            //timepicker
+            setCurrentTime();
+            function setCurrentTime() {
+                let now = new Date();
+                let hours = String(now.getHours()).padStart(2, '0');
+                let minutes = String(now.getMinutes()).padStart(2, '0');
+                let currentTime = hours + ":" + minutes;
 
+                $('.timepicker').val(currentTime);
+            }
 
-        $('#btnSave').on('click', function () {
+            // Load Financial Year
+            loadFiscalYears();
 
-
-        });
-
-
-         function loadDocNum(id) {
-             // AJAX call to get warehouses
-             $.ajax({
-                 url: '@Url.Action("GETINVPOSTINGDOCNUMNEW", "Inventory")',
-                 method: 'GET',
-                 data:{id:id},
-                 success: function(response) {
-                     if(response[0].Success=="true"){
-                         $("#Docnum").val(response[0].Message)
-                     }else{
-                            Notify('error', response[0].Message,'');
-                     }
-                 },
-                 error: function(xhr) {
-                             Notify('error', 'Error', xhr.responseText );
-                 }
-             });
-        }
-
-
-
-              function loadFiscalYears() {
-                    $.ajax({
-                         url: '@Url.Action("GETOPENFYEAR", "Inventory")',
-                        method: 'GET',
-                        success: function(response) {
-                            const select = $('#FYearId');
-                            select.empty();
-
-                            response.forEach(function(year) {
-                                select.append(`<option value="${year.FYearId}">${year.FYear}</option>`);
-                            });
-                            loadDocNum($("#FYearId").val())
-                        },
-                        error: function(xhr) {
-                                    Notify('error', 'Error', xhr.responseText );
-                        }
-               });
-        }
-
-              function loadheaderData() {
+            function loadFiscalYears() {
                 $.ajax({
-                     url: '@Url.Action("GETHEADERDATAINVENTORYPOSTINGNEW", "Inventory")',
+                    url: '@Url.Action("GETOPENFYEAR", "Inventory")',
                     method: 'GET',
+                    success: function(response) {
+                        const select = $('#FYearId');
+                        select.empty();
+                        response.forEach(function(year) {
+                            select.append(`<option value="${year.FYearId}">${year.FYear}</option>`);
+                        });
+                        loadDocNum($("#FYearId").val());
+                    },
+                    error: function(xhr) {
+                        console.error('Error loading fiscal years:', xhr.responseText);
+                    }
+                });
+            }
+
+            $("#FYearId").change(function () {
+                loadDocNum($(this).val());
+            });
+
+            function loadDocNum(id) {
+                $.ajax({
+                    url: '@Url.Action("GETINVPOSTINGDOCNUMNEW", "Inventory")',
+                    method: 'GET',
+                    data: {id: id},
+                    success: function(response) {
+                        if(response[0].Success == "true") {
+                            $("#Docnum").val(response[0].Message);
+                        } else {
+                            console.error('Error loading document number:', response[0].Message);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error loading document number:', xhr.responseText);
+                    }
+                });
+            }
+
+            // Load inventory data
+            loadInventoryPostingRows();
+
+            function loadInventoryPostingRows() {
+                $.ajax({
+                    url: '@Url.Action("GETROWDATAINVENTORYPOSTINGNEW", "Inventory")',
+                    type: 'GET',
                     success: function (response) {
                         console.log(response);
 
-                        response.forEach(function (item) {
-                            $('#EmployeeId').val(item.EmployeeId);
-                            $('#RefNo').val(item.RefNo);
-                            $('#Weight').val(item.Weight);
-                            $('#Remarks').val(item.Remarks);
-                        });
-                        loadDocNum($("#FYearId").val())
+                        if (!response || response.length === 0) {
+                            console.log('No data found');
+                            showCompletionCard();
+                            return;
+                        }
+
+                        countingData = response;
+                        totalItemCount = response.length;   // ✅ ADD THIS
+                        currentIndex = 0;
+                        loadCard(currentIndex);
                     },
-                    error: function(xhr) {
-                                Notify('error', 'Error', xhr.responseText );
+                    error: function (xhr) {
+                        console.error('Error loading inventory data:', xhr.responseText);
                     }
-           });
-        }
-              function loadRowData() {
-                    $.ajax({
-                        url: '@Url.Action("GETROWDATAINVENTORYPOSTINGNEW", "Inventory")',
-                        type: 'GET',
-                        success: function (response) {
-                            console.log("Response:", response);
-
-                            const tbody = $('#mainitemtable tbody');
-                            tbody.empty();
-
-                            if (!response.row || response.row.length === 0) return;
-
-                            response.row.forEach(function (line, index) {
-
-                                const row = `
-                                <tr data-id="${line.ID}" class="line-item">
-                                    <td>${index + 1}</td>
-
-                                    <td hidden>
-                                        <textarea class="form-control form-control-sm Remarks">${line.Remarks}</textarea>
-                                    </td>
-
-                                    <td hidden>
-                                        <input type="text" class="form-control form-control-sm ItemEan" value="${line.EanCode }">
-                                    </td>
-
-                                    <td>
-                                        <input type="text"
-                                               class="form-control form-control-sm ItemCode"
-                                               data-id="${line.ItemID}"
-                                               value="${line.ItemCode}">
-                                    </td>
-
-                                    <td>
-                                        <input type="text"
-                                               class="form-control form-control-sm ItemName"
-                                               value="${line.ItemName}">
-                                    </td>
-
-                                    <td>
-                                        <input type="number"
-                                               class="form-control form-control-sm text-end OpenQty"
-                                               value="${line.OpenQty}"
-                                               readonly>
-                                    </td>
-
-                                    <td>
-                                        <input type="number"
-                                               class="form-control form-control-sm text-end CountedQty"
-                                               value="${line.CountedQty}">
-                                    </td>
-
-                                    <td>
-                                        <input type="number"
-                                               class="form-control form-control-sm text-end Price"
-                                               value="${line.Price}"
-                                               readonly>
-                                    </td>
-
-                                    <td>
-                                        <input type="number"
-                                               class="form-control form-control-sm text-end Weight"
-                                               value="${line.Weight}"
-                                               readonly>
-                                    </td>
-
-                                    <td hidden><input type="text" class="AcctCode" value="${line.AcctCode}"></td>
-                                    <td hidden><input type="text" class="BaseLine" value="${line.BaseLine}"></td>
-                                    <td hidden><input type="text" class="BaseObj" value="${line.BaseObj}"></td>
-                                    <td hidden><input type="text" class="BaseDocEntry" value="${line.BaseDocEntry}"></td>
-                                    <td hidden><input type="number" class="Status" value="${line.Status}"></td>
-                                </tr>`;
-
-                                $('#mainitemtable tbody').append(row);
-
-                                const $newRow = tbody.find('tr:last');
-
-                            });
-
-                            
-                        },
-                        error: function (xhr) {
-                            Notify('error', 'Error', xhr.responseText);
-                        }
-                    });
-                }
-
-
-
-
-            function savedocument(flag) {
-                removeempty()
-               const headerData = getHeaderData();
-                const lineItems = getLineItems();
-                if (flag == "S") {
-                    if (!validateForm(headerData, lineItems)) {
-                        return;
-                    }
-                }
-                const data = {
-                    header: headerData,
-                    lines: lineItems
-                };
-                console.log("data",data)
-                // AJAX call to save
-                   $.ajax({
-                        url: '@Url.Action("CREATEINVENTORYPOSTINGNEW", "Inventory")' + '?flag=' + flag + '&doctype=' + $("#doctype").val(),
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(data),
-
-                        success: function(response) {
-                            if(response.success){
-                               Notify('success', response.message,'');
-                               currentDocEntry = response.docEntry;
-                               //$('#btnUpdate').prop('disabled', false);
-
-
-                            }else{
-                               Notify('error','Faild To Create ', response.message);
-                            }
-                        },
-                        error: function(xhr) {
-                            const errorMessage = xhr.responseText || 'Error loading ITEM GROUP';
-                            Notify('error', 'Error', errorMessage);
-                            if (flag == "S") {
-                                $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
-                            } else {
-                                $('#btnPark').prop('disabled', false).html('<i class="bi bi-p-circle"></i> Park');
-                            }
-                        },complete: function() {
-                            if (flag == "S") {
-                                $('#btnSave').prop('disabled', false).html('<i class="bi bi-save"></i> Save');
-                            } else {
-                                $('#btnPark').prop('disabled', false).html('<i class="bi bi-p-circle"></i> Park');
-                            }
-                        }
-                    });
+                });
             }
 
+            function loadCard(index) {
+                if (index < 0 || index >= countingData.length) {
+                    showCompletionCard();
+                    return;
+                }
 
-        //get header Data
+                const row = countingData[index];
 
-        function getHeaderData() {
-            const formData = {
-                OBJType: $('.OBJType').val(),
-                DocStatus: $('.DocStatus').val(),
-                Docnum: $('.Docnum').val(),
-                CountDate: $('.CountDate').val(),
-                CountTime: $('.CountTime').val(),
-                EanCode: $('.EanCode').val(),
-                ItemCode: $('.ItemCode').val(),
-                ItemName: $('.ItemName').val(),
-                OpenQty: $('.OpenQty').val(),
-                DocumentDate: $('.DocumentDate').val(),
-                WhsId: $('.WhsId').val(),
-                WhsCode: $('.WhsCode').val(),
-                EmployeeID: $('.EmployeeID').val(),
-                FYearId: $('.FYearId').val(),
-                RefNo: $('.RefNo').val(),
-                Weight: $('.Weight').val(),
-                Remarks: $('.Remarks').val()
-            };
-        }
+                // Store stock taker name from first item (assuming all items have same stock taker)
+                if (index === 0 && row.StockTakerName) {
+                    stockTakerName = row.StockTakerName;
+                    $('#StockTakerInput').val(stockTakerName);
+                }
 
-        function getLineItems() {
-            const lineItems = [];
+                // Update display fields
+                $('.ItemCodeDisplay').text(row.ItemCode || 'N/A');
+                $('.ItemNameDisplay').text(row.ItemName || 'N/A');
+                $('.WhsCodeDisplay').text(row.WhsCode || 'N/A');
+                $('.StockInWhsDisplay').text(row.StockInWhs || 0);
+                $('#system-qty-display').text(`System: ${row.StockInWhs || 0}`);
 
-            $('#mainitemtable tbody tr').each(function (index) {
-                const row = $(this);
+                // Update input fields
+                $('.ID').val(row.ID || '');
+                $('.DocEntry').val(row.DocEntry || '');
+                $('.Status').val('C');
+                $('.LineNum').val(row.LineNum || 0);
+                $('.ItemID').val(row.ItemID || '');
+                $('.EanCode').val(row.EanCode || '');
+                $('.ItemCode').val(row.ItemCode || '');
+                $('.ItemName').val(row.ItemName || '');
+                $('.LogEmployes').val(row.StockTakerName || '');
+                $('.EmployeeID').val(row.EmployeeID || '');
+                $('.WhsCode').val(row.WhsCode || '');
+                $('.WhsID').val(row.WhsID || '');
+                $('.StockInWhs').val(row.StockInWhs || 0);
+                $('.AcctCode').val(row.AcctCode || '');
+                $('.Remarks').val(row.Remarks || '');
+                $('.BaseLine').val(row.BaseLine || 0);
+                $('.BaseObj').val('IICN');
+                $('.BaseDocEntry').val(row.DocEntry || 0);
+                $('.Price').val(row.Price || 0);
+                $('.Weight').val(row.Weight || 0);
+                $('.qty-value').val(row.CountedQty || 0);
 
-                lineItems.push({
+                // Update counter display
+                $('#last-counted-text').html(`
+                    <i class="far fa-clock"></i>
+                    Item ${currentIndex + 1} of ${countingData.length}
+                `);
+            }
 
-                    ID: row.data('id') || null,
-                    DocEntry: $('#DocEntry').val() || null,
-                    Status: row.find('.Status').val() || 0,
-                    LineNum: index + 1,
-
-                    ItemID: row.find('.ItemCode').data('id') || null,
-                    EanCode: row.find('.ItemEan').val() || '',
-                    ItemCode: row.find('.ItemCode').val() || '',
-                    ItemName: row.find('.ItemName').val() || '',
-
-                    OpenQty: parseFloat(row.find('.OpenQty').val()) || 0,
-                    StockInWhs: parseFloat(row.find('.StockInWhs').val()) || 0,
-
-                    WhsCode: row.find('.WhsCode').val() || '',
-                    WhsID: row.find('.WhsCode').data('id') || null,
-
-                    AcctCode: row.find('.AcctCode').val() || '',
-                    Remarks: row.find('.Remarks').val() || '',
-
-                    BaseLine: row.find('.BaseLine').val() || null,
-                    BaseObj: row.find('.BaseObj').val() || null,
-                    BaseDocEntry: row.find('.BaseDocEntry').val() || null,
-
-                    Price: parseFloat(row.find('.Price').val()) || 0,
-                    Weight: parseFloat(row.find('.Weight').val()) || 0
-                });
+            // Quantity controls
+            $('.plus-btn').on('click', function () {
+                let val = parseInt($('.qty-value').val()) || 0;
+                $('.qty-value').val(val + 1);
             });
 
-            return lineItems;
-        }
+            $('.minus-btn').on('click', function () {
+                let val = parseInt($('.qty-value').val()) || 0;
+                if (val > 0) {
+                    $('.qty-value').val(val - 1);
+                }
+            });
 
-        const products = [
-            {
-                id: 1,
-                name: "Premium Steel Bars",
-                warehouse: "Main Warehouse - Section A12, Rack 5, Shelf 3",
-                code: "STL-001-2024",
-                sku: "STEEL001-2024-Q1",
-                image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400&h=250&fit=crop"
-            },
-            {
-                id: 2,
-                name: "Aluminum Composite Sheets",
-                warehouse: "Warehouse B - North Wing, Rack C5, Level 2",
-                code: "ALU-002-2024",
-                sku: "ALUM002-2024-Q2",
-                image: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=400&h=250&fit=crop"
-            },
-            {
-                id: 3,
-                name: "Galvanized Iron Coils",
-                warehouse: "Storage Unit 7 - Bay 3, Heavy Materials Section",
-                code: "IRN-003-2024",
-                sku: "IRON003-2024-Q3",
-                image: "https://images.unsplash.com/photo-1581092580497-e0d4cb184827?w=400&h=250&fit=crop"
-            }
-        ];
+            $('.qty-value').on('click', function () {
+                $(this).select();
+            });
 
-        let currentIndex = 0;
-        let processedCount = 0;
-        const totalProducts = products.length;
+            // Confirm button with animation
+                $('#confirm-btn').on('click', function () {
 
-        updateProductCard();
+                    const $btn = $(this);
+                    $btn.prop('disabled', true).text('Processing...');
 
-        function updateProductCard() {
-            const product = products[currentIndex];
-
-            $("#productName").text(product.name);
-            $("#productWhs").text(product.warehouse);
-            $("#productCode").text(product.code);
-            $("#productImg").attr("src", product.image);
-            $("#quantityInput").val(0);
-
-            if ($("#productSku").length) {
-                $("#productSku").text(product.sku);
-            }
-
-            const isLastProduct = currentIndex === totalProducts - 1;
-            const $btnSave = $("#btnSave");
-
-            if (isLastProduct) {
-                $btnSave.html('<i class="fas fa-flag-checkered me-2"></i>Complete');
-            } else {
-                $btnSave.html('<i class="fas fa-arrow-right me-2"></i>Continue');
-            }
-        }
-
-        $("#quantityInput").on("input", function () {
-            let value = parseInt($(this).val()) || 0;
-            if (value < 0) {
-                $(this).val(0);
-            }
-        });
-
-        $("#btnSave").on("click", function () {
-            const quantity = parseInt($("#quantityInput").val()) || 0;
-
-            if (quantity < 0) {
-                alert("Please enter a valid quantity (minimum 0)");
-                return;
-            }
-
-            const currentProduct = products[currentIndex];
-
-            const formData = {
-                ProductId: currentProduct.id,
-                ProductName: currentProduct.name,
-                ProductCode: currentProduct.code,
-                Warehouse: currentProduct.warehouse,
-                Quantity: quantity,
-                Timestamp: new Date().toISOString()
-            };
-
-            const $btn = $(this);
-            const originalHtml = $btn.html();
-            $btn.addClass("btn-loading").prop("disabled", true);
-
-            setTimeout(() => {
-                console.log("Submitted to server:", formData);
-
-                $("#productCard").removeClass("active").addClass("slide-out-left");
-
-                setTimeout(() => {
-                    currentIndex++;
-                    processedCount++;
-
-                    if (currentIndex >= totalProducts) {
-                        $("#productCard").addClass("hidden").removeClass("slide-out-left");
-                        $("#completionCard").removeClass("hidden").addClass("active");
-                        $btn.removeClass("btn-loading").prop("disabled", false).html(originalHtml);
+                    const payload = {
+                        header: getHeaderData(),
+                        lines: [getLineItems()] || []   // ✅ FIX: never null
+                    };
+                    console.log(payload)
+                    if (!payload.header || payload.lines.length === 0) {
+                        alert('Header or line items missing');
+                        $btn.prop('disabled', false).text('Confirm');
                         return;
                     }
+                    $.ajax({
+                        url: '@Url.Action("CREATEINVENTORYPOSTINGNEW", "Inventory")',
+                        type: 'POST',
+                        contentType: 'application/json; charset=utf-8',
+                        dataType: 'json',
+                        data: JSON.stringify(payload),
+                        success: function (response) {
+                            if (response && response.success === true) {
+                                showSuccessMessage('Item saved successfully');
+                                removeSavedItem();   // ✅ ONLY this
+                            } else {
+                                alert(response?.Message || 'Save failed');
+                            }
+                            $btn.prop('disabled', false).text('Confirm');
+                        },
 
-                    updateProductCard();
+                        error: function (xhr) {
+                            console.error('Error saving item:', xhr.responseText);
+                            alert(xhr.responseText || 'Server error');
+                            $btn.prop('disabled', false).text('Confirm'); // ✅ FIX
+                        }
+                    });
+                });
+            function removeSavedItem() {
+                const $card = $('#inventory-card');
 
-                    $("#productCard")
-                        .removeClass("slide-out-left")
-                        .addClass("slide-in-right");
+                $card.addClass('slide-out-left');
 
-                    setTimeout(() => {
-                        $("#productCard")
-                            .removeClass("slide-in-right")
-                            .addClass("active");
+                setTimeout(() => {
+                    processedItems.push(countingData[currentIndex]);
+                    countingData.splice(currentIndex, 1);
 
-                        $btn.removeClass("btn-loading").prop("disabled", false);
-                    }, 50);
+                    if (countingData.length > 0) {
+                        if (currentIndex >= countingData.length) {
+                            currentIndex = countingData.length - 1;
+                        }
+                        loadCard(currentIndex);
+                        $card.removeClass('slide-out-left').addClass('slide-in-right');
 
-                }, 600);
-            }, 800);
-        });
-
-        $("#quantityInput").on("keypress", function (e) {
-            if (e.which === 13) {
-                e.preventDefault();
-                $("#btnSave").click();
+                        setTimeout(() => {
+                            $card.removeClass('slide-in-right');
+                        }, 400);
+                    } else {
+                        showCompletionCard();
+                    }
+                }, 300);
             }
-        });
 
-        $(".mobile-back-btn").on("click", function (e) {
-            if (currentIndex > 0) {
-                if (!confirm("Are you sure you want to leave? Your progress may be lost.")) {
-                    e.preventDefault();
+
+            // Helper functions
+            function validateData(data) {
+                // Add validation logic
+                if (!data.header || !data.lineItem) {
                     return false;
                 }
+
+                if (data.quantity <= 0) {
+                    alert('Quantity must be greater than 0');
+                    return false;
+                }
+
+                // Add more validation as needed
+                return true;
             }
-            return true;
+            function showSuccessMessage(message) {
+                // Create and show success message
+                const $msg = $('<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                               '<strong>Success!</strong> ' + message +
+                               '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                               '</div>');
+
+                $('#message-container').html($msg);
+
+                // Auto-hide after 3 seconds
+                setTimeout(function() {
+                    $msg.alert('close');
+                }, 3000);
+            }
+            function animateToNextCard() {
+                const $card = $('#inventory-card');
+                $card.addClass('slide-out-left');
+                setTimeout(function() {
+                    currentIndex++;
+                    if (currentIndex < countingData.length) {
+                        loadCard(currentIndex);
+                        $card.removeClass('slide-out-left').addClass('slide-in-right');
+                        setTimeout(function() {
+                            $card.removeClass('slide-in-right');
+                        }, 500);
+                    } else {
+                        // All items processed, show completion card
+                        showCompletionCard();
+                    }
+                }, 300);
+            }
+
+            function showCompletionCard() {
+                const totalItems = totalItemCount;
+                const completedItems = processedItems.length;
+                const completionRate = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+
+                // Get stock taker initials
+                const initials = stockTakerName ? getInitials(stockTakerName) : 'ST';
+
+                // Create confetti effect
+                createConfetti();
+
+                $('#inventory-card-container').html(`
+                <div class="completion-card fade-in">
+                    <div class="celebration-header" style="padding: 25px 20px;">
+                        <div class="celebration-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3 class="mb-1">✅ Counting Complete</h3>
+                        <p class="mb-0">Great job, ${stockTakerName || 'Team'}!</p>
+                    </div>
+
+                    <div class="completion-content" style="padding: 25px;">
+                        <div class="achievement-stats" style="margin: 15px 0;">
+                            <div class="stat-item">
+                                <div class="stat-value">${totalItems}</div>
+                                <div class="stat-label">Total</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${completedItems}</div>
+                                <div class="stat-label">Done</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${completionRate}%</div>
+                                <div class="stat-label">Complete</div>
+                            </div>
+                        </div>
+
+                        <div class="thank-you-message" style="margin: 15px 0; font-size: 0.95rem;">
+                            <p class="mb-2">All items counted successfully.</p>
+                            <p class="mb-0">Thank you for your efforts!</p>
+                        </div>
+
+                        <div class="completion-actions" style="margin-top: 20px;">
+                            <button class="completion-btn primary" id="finish-btn">
+                                <i class="fas fa-check"></i>
+                                Finish
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `);
+
+                // Bind completion card events
+                $('#finish-btn').on('click', function () {
+                    $(this).html('<i class="fas fa-spinner fa-spin"></i>');
+                    $(this).prop('disabled', true);
+
+                    // Simulate save process
+                    setTimeout(() => {
+                        $(this).html('<i class="fas fa-check"></i> Done');
+                    }, 1000);
+                });
+            }
+
+            // Get initials from name
+            function getInitials(name) {
+                if (!name) return 'ST';
+                return name.split(' ')
+                    .map(part => part.charAt(0))
+                    .join('')
+                    .toUpperCase()
+                    .substring(0, 2);
+            }
+
+            // Create confetti effect
+            function createConfetti() {
+                const colors = ['#ffd700', '#ff6b6b', '#4a6fa5', '#28a745', '#ff9ff3'];
+                const container = $('#inventory-card-container');
+
+                for (let i = 0; i < 30; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animation = `confettiFall ${Math.random() * 2 + 1}s linear forwards`;
+                    confetti.style.opacity = Math.random() * 0.7 + 0.3;
+                    confetti.style.width = Math.random() * 10 + 5 + 'px';
+                    confetti.style.height = Math.random() * 20 + 10 + 'px';
+
+                    container.append(confetti);
+
+                    // Remove after animation
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }
+            }
+
+            // Function to get all Header data
+            function getHeaderData() {
+                return {
+                    OBJType: String($('#OBJType').val() ?? ""),
+                    DocEntry: String($('#DocEntry').val() ?? ""),
+                    Docnum: String($('#Docnum').val() ?? ""),
+                    CountDate: String($('#CountDate').val() ?? ""),
+                    CountTime: String($('#CountTime').val() ?? ""),
+                    DocumentDate: String($('#DocumentDate').val() ?? ""),
+                    FYearId: String($('#FYearId').val() ?? ""),
+                    RefNo: String($('#RefNo').val() ?? ""),
+                    Weight: String($('#Weight').val() || "0"),
+                    DocStatus: String($('#DocStatus').val() ?? ""),
+                    Remarks: String($('#Remarks').val() ?? "")
+                };
+            }
+            function getLineItems() {
+                return {
+                    ID: "",
+                    DocEntry: String(""),
+                    Status: String($('.Status').val() ?? "C"),
+                    LineNum: String($('.LineNum').val() ?? "0"),
+                    ItemID: String($('.ItemID').val() ?? ""),
+                    EanCode: String($('.EanCode').val() ?? ""),
+                    ItemCode: String($('.ItemCode').val() ?? ""),
+                    ItemName: String($('.ItemName').val() ?? ""),
+                    LogEmployes: String($('.LogEmployes').val() ?? ""),
+                    EmployeeID: String($('.EmployeeID').val() ?? ""),
+                    WhsCode: String($('.WhsCode').val() ?? ""),
+                    WhsID: String($('.WhsID').val() ?? ""),
+                    StockInWhs: String($('.StockInWhs').val() ?? "0"),
+                    CountedQty: String($('.qty-value').val() ?? "0"),
+                    AcctCode: String($('.AcctCode').val() ?? ""),
+                    Remarks: String($('.Remarks').val() ?? ""),
+                    BaseLine: String($('.ID').val() ?? "0"),
+                    BaseObj: String($('.BaseObj').val() ?? ""),
+                    BaseDocEntry: String($('.BaseDocEntry').val() ?? "0"),
+                    Price: parseFloat($('.Price').val()) || 0,
+                    Weight: String($('.Weight').val() || "0")
+                };
+            }
         });
-    });
-</script>
+    </script>
+</body>
+</html>

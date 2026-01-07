@@ -118,7 +118,8 @@ namespace TECHNOSYNCERP.Controllers
                                 Role = reader["Role"].ToString(),
                                 Mobile = reader["Mobile"].ToString(),
                                 Email = reader["Email"].ToString(),
-                                CompName = reader["CompName"].ToString()
+                                CompName = reader["CompName"].ToString(),
+                                EmpId = reader["EmpId"].ToString(),
                             };
                         }
                     }
@@ -135,6 +136,7 @@ namespace TECHNOSYNCERP.Controllers
             HttpContext.Session.SetString("Email", user.Email);
             HttpContext.Session.SetString("CompName", user.CompName);
             HttpContext.Session.SetString("SessionId", sessionId);
+            HttpContext.Session.SetString("EmpId", user.EmpId);
 
             var authData = GetAuth(user.UserID);
             var authBytes = JsonSerializer.SerializeToUtf8Bytes(authData);

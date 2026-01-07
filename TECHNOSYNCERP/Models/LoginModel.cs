@@ -13,6 +13,7 @@
         public string Mobile { get; set; }
         public string Email { get; set; }
         public string CompName { get; set; }
+        public string EmpId { get; set; }
     }
 
     public class AuthModel

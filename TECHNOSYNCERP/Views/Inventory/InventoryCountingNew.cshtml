@@ -630,7 +630,7 @@
             header: headerData,
             lines: lineItems
         };
-        console.log(data)
+        console.log("Data", data);
         // AJAX call to save
         $.ajax({
             url: '@Url.Action("CREATEINVENTORYCOUNTINGNEW", "Inventory")' + '?flag=' + flag + '&doctype=' + $("#doctype").val(),
@@ -722,6 +722,14 @@
 
                     HSNID: row.find('.ItemHSN').val() || "",
                     HSNCode: row.find('.ItemHSN').val() || "",
+                    Qty: row.find('.Qty').val() || "0",
+                    OpenQty: row.find('.OpenQty').val() || "0",
+                    CountedQty: row.find('.CountedQty').val() || "0",
+                    Variance: row.find('.Variance').val() || "0",
+                    VariancePer: row.find('.VariancePer').val() || "0",
+                    CountedQty: row.find('.CountedQty').val() || "0",
+                    UOMID: row.find('.UOMID').val() || "0",
+                    UOMCode: row.find('.UOMCode').val() || "0",
 
                     WhsID: row.find('.WhsCode').val() || "",
                     WhsCode: row.find('.WhsCode option:selected').data("code") || "",
@@ -735,7 +743,7 @@
                     Price: parseFloat(row.find('.Price').val()) || "0",
 
                     AcctCode: row.find('.AcctCode').val() || "",
-                    BaseDocEntry: row.find('.BaseDocEntry').val() || "0", 
+                    BaseDocEntry: row.find('.BaseDocEntry').val() || "0",
                     BaseObj: row.find('.BaseObj').val() || "",
                     BaseLine:row.find('.BaseLine').val() || "0",
 
@@ -750,7 +758,7 @@
             return lineItems;
         }
 
-
+            
         function validateForm(header, lines) {
             if (!header.CountDate) {
                 Notify('error', 'Posting date is required', '');
@@ -1319,7 +1327,7 @@
                          </div>
                      </td>
                      <td><input type="text" style='width:300px!important;' class="form-control form-control-sm ItemName" value="${line.ItemName}"></td>
-                        
+
                     <td>
                         <select style='width:150px!important;' class="form-select form-select-sm WhsCode">
                             <option value="">Select</option>
@@ -1461,7 +1469,7 @@
                         });
 
                         // ✅ Attach event handler (only once if possible, or inside a separate setup)
-                        $('#ResumeModaltbl').off('click', '.select-findrow').on('click', '.select-findrow', function () {
+                        $('#ResumeModaltbl').off('click', '.select-findrow').on('click', '.select-findrow',function () {
                             const docEntry = $(this).data('docentry');
                             const row = $(this).closest("tr");
                             var data = row.find(".Payload").text();
@@ -1474,7 +1482,6 @@
                     }
                 });
                 function loadresume(response, docEntry) {
-                    console.log("resume",response);
                     isEditMode = true;
                     var item = response.header;
                     // Populate header fields
