@@ -258,7 +258,7 @@ namespace TECHNOSYNCERP.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
-        public async Task<IActionResult> BarcodePrint()
+        public async Task<IActionResult> QrcodePrint()
         {
             if (HttpContext.Session.GetString("UserID") != "")
             {
@@ -1870,6 +1870,52 @@ namespace TECHNOSYNCERP.Controllers
                 return StatusCode(500, new { error = ex.Message });
             }
         }
+        public async Task<IActionResult> GETGRPOITEM(string DocNum)
+        {
+            var connStr = _configuration.GetConnectionString("ErpConnection");
+            var list = new List<Dictionary<string, string>>();
+
+            try
+            {
+                await using var con = new SqlConnection(connStr);
+
+                string query = @"
+            SELECT 
+                T2.ItemCode,
+                T2.ItemName,
+                T2.Quantity,
+                T1.DocEntry,
+                T1.DocNum
+            FROM Purchase_GRPO_Head AS T1
+            INNER JOIN Purchase_GRPO_Row AS T2 
+                ON T1.DocEntry = T2.DocEntry
+            WHERE T1.DocNum = @DocNum";
+
+                await using var cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@DocNum", DocNum);
+
+                await con.OpenAsync();
+
+                await using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    var obj = new Dictionary<string, string>();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        obj[reader.GetName(i)] = reader.GetValue(i)?.ToString();
+                    }
+                    list.Add(obj);
+                }
+
+                return Json(list);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+
 
 
         [HttpPost]
