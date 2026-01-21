@@ -714,6 +714,37 @@ namespace TECHNOSYNCERP.Controllers
                 throw;
             }
         }
+        public IActionResult GETCARDIMAGE(int ItemID, string ITM)
+        {
+            string imageUrl = string.Empty;
+
+            string conStr = _configuration.GetConnectionString("ErpConnection");
+
+            string query = @"SELECT * 
+                     FROM Attachments 
+                     WHERE DocId = @DocId 
+                       AND ObjType = @ObjType";
+
+            using (SqlConnection con = new SqlConnection(conStr))
+            using (SqlCommand cmd = new SqlCommand(query, con))
+            {
+                cmd.Parameters.Add("@DocId", SqlDbType.Int).Value = ItemID;
+                cmd.Parameters.Add("@ObjType", SqlDbType.VarChar).Value = ITM;
+
+                con.Open();
+
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    if (dr.Read())
+                    {
+                        imageUrl = dr["FilePath"].ToString();
+                    }
+                }
+            }
+
+            return Json(new { imageUrl });
+        }
+
         #region SALES QUOTATION
 
         public async Task<IActionResult> CREATESALESQUOT([FromBody] SALESQUOT data, string flag, string doctype)

@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Reflection;
 using System.Reflection.PortableExecutable;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -3976,6 +3977,219 @@ namespace TECHNOSYNCERP.Controllers
 
         #region Employee Master
 
+        public async Task<IActionResult> LinkEmp([FromBody] User data)
+
+        {
+
+            var connStr = _configuration.GetConnectionString("ErpConnection");
+
+            var item = data;
+
+            await using (var con = new SqlConnection(connStr))
+
+            {
+
+                await con.OpenAsync();
+
+                await using (var transaction = await con.BeginTransactionAsync())
+
+                {
+
+                    try
+
+                    {
+
+                        if (string.IsNullOrEmpty(item.UserID) || item.UserID == "0")
+
+                        {
+
+                            // Insert new user
+
+                            var insertQuery = @"
+
+                     INSERT INTO [Users] 
+
+                     ([Username], [Password], [FullName], [Email], [Mobile], [Role], [IsActive], 
+
+                      [CreatedBy], [UpdatedBy], [LicenseValidFrom], [LicenseValidTo], [LicenseStatus], 
+
+                      [LicenseGenDate], [Licencekey], [EmpId]) 
+
+                     VALUES 
+
+                     (@Username, @Password, @FullName, @Email, @Mobile, @Role, @IsActive,
+
+                      @CreatedBy, @UpdatedBy, @LicenseValidFrom, @LicenseValidTo, @LicenseStatus, 
+
+                      @LicenseGenDate, @Licencekey, @EmpId);
+
+                     SELECT SCOPE_IDENTITY();";
+
+                            await using (var cmd = new SqlCommand(insertQuery, con, (SqlTransaction)transaction))
+
+                            {
+
+                                cmd.Parameters.AddWithValue("@Username", item.Username ?? (object)DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@Password", (object)item.Password ?? DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@FullName", (object)item.FullName ?? DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@Email", (object)item.Email ?? DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@Mobile", (object)item.Mobile ?? DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@Role", (object)item.Role ?? DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@IsActive", item.IsActive);
+
+                                cmd.Parameters.AddWithValue("@CreatedBy", HttpContext.Session.GetString("UserID"));
+
+                                cmd.Parameters.AddWithValue("@UpdatedBy", HttpContext.Session.GetString("UserID"));
+
+                                cmd.Parameters.AddWithValue("@LicenseValidFrom", (object)item.LicenseValidFrom ?? DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@LicenseValidTo", (object)item.LicenseValidTo ?? DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@LicenseStatus", (object)item.LicenseStatus ?? DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@LicenseGenDate", (object)item.LicenseGenDate ?? DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@Licencekey", (object)item.Licencekey ?? DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@EmpId", item.EmpId);
+
+                                // Execute and get the new UserID
+
+                                var newId = await cmd.ExecuteScalarAsync();
+
+                                item.UserID = newId?.ToString();
+
+                            }
+
+                        }
+
+                        else
+
+                        {
+
+                            // Update existing user
+
+                            var updateQuery = @"
+
+                     UPDATE [Users] SET 
+
+                         [Username] = @Username,
+
+                         [Password] = @Password,
+
+                         [FullName] = @FullName,
+
+                         [Email] = @Email,
+
+                         [Mobile] = @Mobile,
+
+                         [Role] = @Role,
+
+                         [IsActive] = @IsActive,
+
+                         [UpdatedBy] = @UpdatedBy,
+
+                         [UpdatedDate] = @UpdatedDate,
+
+                         [EmpId] = @EmpId,
+
+                     WHERE UserID = @UserID";
+
+                            await using (var cmd = new SqlCommand(updateQuery, con, (SqlTransaction)transaction))
+
+                            {
+
+                                cmd.Parameters.AddWithValue("@Username", item.Username ?? (object)DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@Password", (object)item.Password ?? DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@FullName", (object)item.FullName ?? DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@Email", (object)item.Email ?? DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@Mobile", (object)item.Mobile ?? DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@Role", (object)item.Role ?? DBNull.Value);
+
+                                cmd.Parameters.AddWithValue("@IsActive", item.IsActive);
+
+                                cmd.Parameters.AddWithValue("@CreatedBy", HttpContext.Session.GetString("UserID"));
+
+                                cmd.Parameters.AddWithValue("@UpdatedBy", HttpContext.Session.GetString("UserID"));
+
+                                cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
+
+                                cmd.Parameters.AddWithValue("@UserID", item.UserID);
+
+                                cmd.Parameters.AddWithValue("@EmpId", item.EmpId);
+
+                                await cmd.ExecuteNonQueryAsync();
+
+                            }
+
+                        }
+
+                        if (!string.IsNullOrEmpty(item.EmpId))
+
+                        {
+
+                            var updateUser = @"UPDATE [Master_EmployeeMaster] 
+
+                            SET [LinkUserID] = @LinkUserID,
+
+                             [LinkUser] = 'Y' 
+
+                            WHERE EmployeeID = @EmpId";
+
+                            using var cmd = new SqlCommand(updateUser, con, (SqlTransaction)transaction);
+
+                            cmd.Parameters.AddWithValue("@EmpId", item.EmpId);
+
+                            cmd.Parameters.AddWithValue("@LinkUserID", item.UserID);
+
+                            await cmd.ExecuteNonQueryAsync();
+
+                        }
+
+                        await transaction.CommitAsync();
+
+                        return Json(new { success = true, message = "User updated successfully.", users = data });
+
+                    }
+
+                    catch (SqlException ex)
+
+                    {
+
+                        await transaction.RollbackAsync();
+
+                        return Json(new { success = false, message = "Database error: " + ex.Message });
+
+                    }
+
+                    catch (Exception ex)
+
+                    {
+
+                        await transaction.RollbackAsync();
+
+                        return Json(new { success = false, message = "Unexpected error: " + ex.Message });
+
+                    }
+
+                }
+
+            }
+
+        }
+
+
         public async Task<IActionResult> CREATEEMPLOYEE([FromBody] EmployeeMaster data)
         {
             var connStr = _configuration.GetConnectionString("ErpConnection");
@@ -3997,14 +4211,14 @@ namespace TECHNOSYNCERP.Controllers
 
                     var user = new User
                     {
-                        UserID = null,
+                        UserID = data.LinkUserID,
                         EmpId = null,
                         FullName = $"{data.FirstName} {data.LastName}".Trim(),
                         Username = data.FirstName.Trim() + data.LastName.Trim(),
                         Password = data.FirstName.Trim() + last4,
                         Mobile = data.MobilePhone,
                         Role = "U",
-                        IsActive = data.IsActive
+                        IsActive = data.IsActive == "A" ? "1" : "0"
                     };
 
                     // MUST pass same connection + transaction
@@ -4049,8 +4263,8 @@ namespace TECHNOSYNCERP.Controllers
                 if (!string.IsNullOrEmpty(userId))
                 {
                     var updateUser = @"UPDATE [Users] 
-                               SET EmpId = @EmpId 
-                               WHERE UserID = @UserID";
+                    SET EmpId = @EmpId 
+                    WHERE UserID = @UserID";
 
                     using var cmd = new SqlCommand(updateUser, con, tran);
                     cmd.Parameters.AddWithValue("@EmpId", data.EmployeeID);
@@ -4071,22 +4285,22 @@ namespace TECHNOSYNCERP.Controllers
         }
 
         private async Task<string> CreateOrUpdateUserAsync(
-    User item,
-    SqlConnection con,
-    SqlTransaction tran)
+             User item,
+             SqlConnection con,
+             SqlTransaction tran)
         {
             if (string.IsNullOrEmpty(item.UserID))
             {
                 var insertQuery = @"
-        INSERT INTO [Users]
-        ([Username],[Password],[FullName],[Email],[Mobile],[Role],[IsActive],
-         [CreatedBy],[UpdatedBy],[LicenseValidFrom],[LicenseValidTo],
-         [LicenseStatus],[LicenseGenDate],[Licencekey],[EmpId])
-        VALUES
-        (@Username,@Password,@FullName,@Email,@Mobile,@Role,@IsActive,
-         @CreatedBy,@UpdatedBy,@LicenseValidFrom,@LicenseValidTo,
-         @LicenseStatus,@LicenseGenDate,@Licencekey,@EmpId);
-        SELECT SCOPE_IDENTITY();";
+             INSERT INTO [Users]
+             ([Username],[Password],[FullName],[Email],[Mobile],[Role],[IsActive],
+              [CreatedBy],[UpdatedBy],[LicenseValidFrom],[LicenseValidTo],
+              [LicenseStatus],[LicenseGenDate],[Licencekey],[EmpId])
+             VALUES
+             (@Username,@Password,@FullName,@Email,@Mobile,@Role,@IsActive,
+              @CreatedBy,@UpdatedBy,@LicenseValidFrom,@LicenseValidTo,
+              @LicenseStatus,@LicenseGenDate,@Licencekey,@EmpId);
+             SELECT SCOPE_IDENTITY();";
 
                 using var cmd = new SqlCommand(insertQuery, con, tran);
                 cmd.Parameters.AddWithValue("@Username", item.Username ?? (object)DBNull.Value);
@@ -4107,10 +4321,46 @@ namespace TECHNOSYNCERP.Controllers
 
                 return (await cmd.ExecuteScalarAsync())?.ToString();
             }
-
-            return item.UserID;
+            else
+            {
+                var updateQuery = @"
+             UPDATE [Users]
+             SET
+                 Password = @Password,
+                 FullName = @FullName,
+                 Email = @Email,
+                 Mobile = @Mobile,
+                 Role = @Role,
+                 IsActive = @IsActive,
+                 UpdatedBy = @UpdatedBy,
+                 UpdatedDate = GETDATE(),
+                 LicenseValidFrom = @LicenseValidFrom,
+                 LicenseValidTo = @LicenseValidTo,
+                 LicenseStatus = @LicenseStatus,
+                 LicenseGenDate = @LicenseGenDate,
+                 Licencekey = @Licencekey,
+                 EmpId = @EmpId
+             WHERE UserID = @UserID";
+                using var cmd = new SqlCommand(updateQuery, con, tran);
+                cmd.Parameters.AddWithValue("@UserID", item.UserID);
+                cmd.Parameters.AddWithValue("@Password", item.Password ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@FullName", item.FullName ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@Email", item.Email ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@Mobile", item.Mobile ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@Role", item.Role ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@IsActive", item.IsActive);
+                cmd.Parameters.AddWithValue("@UpdatedBy", HttpContext.Session.GetString("UserID"));
+                cmd.Parameters.AddWithValue("@LicenseValidFrom", (object)item.LicenseValidFrom ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@LicenseValidTo", (object)item.LicenseValidTo ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@LicenseStatus", (object)item.LicenseStatus ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@LicenseGenDate", (object)item.LicenseGenDate ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@Licencekey", (object)item.Licencekey ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@EmpId", (object)item.EmpId ?? DBNull.Value);
+                await cmd.ExecuteNonQueryAsync();
+                return item.UserID;
+            }
         }
-               
+
         public async Task<IActionResult> DELETEEMPLOYEE(string id)
         {
             string ConnectionString = _configuration.GetConnectionString("ErpConnection");

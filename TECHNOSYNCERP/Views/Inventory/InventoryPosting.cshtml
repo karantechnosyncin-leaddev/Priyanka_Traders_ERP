@@ -979,23 +979,7 @@
                 });
                 $('#TotalWeight').val(totalWeight.toFixed(2));
             }
-         function validateduplicateitem(id) {
-                 var index = 1;
-                 var isDuplicate = false;
-                 $('#mainitemtable tbody tr').each(function() {
-                     var row = $(this);
-                     // Corrected the data attribute access
-                     var tablid = row.find(".ItemCode").attr('data-id'); // or .attr('data-id') depending on your HTML
-                     if (id == tablid) {
-                         Notify('error', 'Item Already Selected In Line No ' + index, '');
-                         isDuplicate = true;
-                         return false; // This breaks the each loop
-                     }
-                     index++;
-                 });
-             return !isDuplicate; // Return true if no duplicate found
-
-            }
+   
         }
         //Find Mode
  {

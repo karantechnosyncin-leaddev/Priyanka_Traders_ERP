@@ -648,10 +648,33 @@
                 </div>
 
                 <div class="product-image-section">
-                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
-                         alt="Wireless Bluetooth Headphones"
-                         class="product-image"
-                         id="main-product-image">
+                    <div class="product-image-section p-2">
+
+                        <div class="position-relative rounded overflow-hidden bg-white shadow-sm"
+                             style="height: 220px;">
+
+                            <!-- Slides will be injected dynamically -->
+
+                            <button type="button"
+                                    class="carousel-nav-button carousel-prev-btn position-absolute top-50 start-0 translate-middle-y rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center"
+                                    id="carouselPrevBtn">
+                                <i class="fas fa-chevron-left fa-xs"></i>
+                            </button>
+
+                            <button type="button"
+                                    class="carousel-nav-button carousel-next-btn position-absolute top-50 end-0 translate-middle-y rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center"
+                                    id="carouselNextBtn">
+                                <i class="fas fa-chevron-right fa-xs"></i>
+                            </button>
+
+                        </div>
+
+                        <div class="carousel-indicator-dots d-flex justify-content-center gap-1 mt-2">
+                            <!-- dots injected dynamically -->
+                        </div>
+
+                    </div>
+
 
                     <button class="image-zoom-btn" id="zoom-btn">
                         <i class="fas fa-search-plus"></i>
@@ -830,6 +853,8 @@
 
     <script>
         $(document).ready(function () {
+            let itemCardAutoSlideTimer = null;
+            const ITEM_CARD_SLIDE_INTERVAL = 2000; // 3 seconds
             // Global variables
             var countingData = [];
             var currentIndex = 0;
@@ -929,6 +954,10 @@
                 }
 
                 const row = countingData[index];
+                var cardItemCode = row.ItemID || '';
+                console.log(cardItemCode);
+                loadCardImage(cardItemCode);
+
 
                 // Store stock taker name from first item (assuming all items have same stock taker)
                 if (index === 0 && row.StockTakerName) {
@@ -1217,7 +1246,9 @@
                 };
             }
             function getLineItems() {
+                
                 return {
+                    
                     ID: "",
                     DocEntry: String(""),
                     Status: String($('.Status').val() ?? "C"),
@@ -1240,7 +1271,157 @@
                     Price: parseFloat($('.Price').val()) || 0,
                     Weight: String($('.Weight').val() || "0")
                 };
+                
+               
             }
+            console.log("cardItemCode",cardItemCode);
+
+             function loadCardImage(cardItemCode) {
+
+                if (!cardItemCode) return;
+
+                $.ajax({
+                    url: '@Url.Action("GETATTACHMENTS", "Attachment")',
+                    type: 'POST',
+                    data: {
+                        docId: cardItemCode,
+                        ObjType: 'ITM'
+                    },
+                    success: function (res) {
+                        console.log("Image", res);
+
+                        // ✅ MATCH HTML
+                        const $card = $('#inventory-card');
+                        const $imageContainer = $card.find('.position-relative.rounded.overflow-hidden');
+                        const $dots = $card.find('.carousel-indicator-dots');
+
+                        // Clear old slides
+                        $imageContainer.find('.carousel-image-slide').remove();
+                        $dots.empty();
+
+                        // 🔴 No images
+                        if (!res || res.length === 0) {
+                            $imageContainer.append(`
+                                <div class="carousel-image-slide active-slide
+                                     d-flex align-items-center justify-content-center">
+                                    <img class="img-fluid Card"
+                                         src="https://ito-group.com/wp-content/uploads/2025/04/no-image.jpg">
+                                </div>
+                            `);
+
+                            $dots.append(`<div class="carousel-dot active-dot"></div>`);
+                            initItemCardCarousel();
+                            return;
+                        }
+
+                        // 🖼 Images from DB
+                        res.forEach((img, index) => {
+
+                            const imgSrc = `data:image/${img.Extension};base64,${img.base64data}`;
+
+                            $imageContainer.append(`
+                                <div class="carousel-image-slide
+                                    ${index === 0 ? 'active-slide' : ''}
+                                    d-flex align-items-center justify-content-center">
+                                    <img class="img-fluid Card" src="${imgSrc}">
+                                </div>
+                            `);
+
+                            $dots.append(`
+                                <div class="carousel-dot ${index === 0 ? 'active-dot' : ''}"
+                                     data-slide-index="${index}">
+                                </div>
+                            `);
+                        });
+
+                        initItemCardCarousel();
+                    },
+                    error: function (xhr) {
+                        console.error('Image load failed:', xhr.responseText);
+                    }
+                });
+            }
+
+            function initItemCardCarousel() {
+
+                const $card = $('#inventory-card');
+                const $slides = $card.find('.carousel-image-slide');
+                const $dots = $card.find('.carousel-dot');
+                const $nextBtn = $card.find('#carouselNextBtn');
+                const $prevBtn = $card.find('#carouselPrevBtn');
+
+                if ($slides.length === 0) return;
+
+                // Hide arrows if single image
+                if ($slides.length <= 1) {
+                    $nextBtn.hide();
+                    $prevBtn.hide();
+                    stopAutoSlide();
+                    return;
+                } else {
+                    $nextBtn.show();
+                    $prevBtn.show();
+                }
+
+                let currentIndex = $slides.index($slides.filter('.active-slide'));
+                if (currentIndex < 0) currentIndex = 0;
+
+                function showSlide(index) {
+                    $slides.removeClass('active-slide');
+                    $dots.removeClass('active-dot');
+
+                    $slides.eq(index).addClass('active-slide');
+                    $dots.eq(index).addClass('active-dot');
+
+                    currentIndex = index;
+                }
+
+                showSlide(currentIndex);
+
+                // ▶ NEXT
+                $nextBtn.off('click').on('click', function () {
+                    showSlide((currentIndex + 1) % $slides.length);
+                });
+
+                // ◀ PREV
+                $prevBtn.off('click').on('click', function () {
+                    showSlide((currentIndex - 1 + $slides.length) % $slides.length);
+                });
+
+                // ● DOT
+                $dots.off('click').on('click', function () {
+                    showSlide($(this).data('slide-index'));
+                });
+
+                // 🔥 AUTO SLIDE
+                startAutoSlide(() => {
+                    showSlide((currentIndex + 1) % $slides.length);
+                });
+
+                // ⏸ Pause on hover
+                $card.off('mouseenter').on('mouseenter', stopAutoSlide);
+                $card.off('mouseleave').on('mouseleave', () => {
+                    startAutoSlide(() => {
+                        showSlide((currentIndex + 1) % $slides.length);
+                    });
+                });
+            }
+
+            function startAutoSlide(callback) {
+                stopAutoSlide();
+                itemCardAutoSlideTimer = setInterval(callback, ITEM_CARD_SLIDE_INTERVAL);
+            }
+
+            function stopAutoSlide() {
+                if (itemCardAutoSlideTimer) {
+                    clearInterval(itemCardAutoSlideTimer);
+                    itemCardAutoSlideTimer = null;
+                }
+            }
+
+
+
+
         });
     </script>
 </body>

@@ -67,52 +67,60 @@
     <div class="row mt-2">
         <div class="col-12">
             <div class="card p-2 rounded shadow-sm">
-                <div class="row">
-                    <div class="col-md-6 d-flex align-items-center">
-                        <h3 id="doctitle"><b> <i class="bi bi-upc-scan me-2"></i>QrCode Printing</b></h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 mt-3">
-            <div class="card p-3 rounded shadow-sm">
-                <!-- Action Buttons -->
-                <div class="row mb-3">
-                    <!-- Left Section (Details) -->
-                    <div class="col-12 col-md-7 mb-3">
+                <div class="row align-items-center">
 
+                    <!-- Title -->
+                    <div class="col-md-6">
+                        <h3 id="doctitle" class="mb-0">
+                            <b>
+                                <i class="bi bi-upc-scan me-2"></i>QrCode Printing
+                            </b>
+                        </h3>
                     </div>
-                    <!-- Right Section (Buttons) -->
-                    <div class="col-12 col-md-5 text-end justify-content-md-end justify-content-start flex-wrap">
+
+                    <!-- Buttons -->
+                    <div class="col-md-6 d-flex justify-content-md-end justify-content-start flex-wrap gap-2">
                         @if (ViewBag.BtnAuth != null)
                         {
-                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                            foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
                             {
-                                var btnName = item["BtnName"]?.ToString().Trim();
+                                var btnName = item["BtnName"]?.ToString()?.Trim();
                                 var btnauth = item["Auth"]?.ToString();
                                 var icon = item["Icon"]?.ToString();
-                                var ColorClass = item["ColorClass"]?.ToString();
+                                var colorClass = item["ColorClass"]?.ToString();
 
                                 if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
                                 {
-                                    switch (btnName)
+                                    if (btnName == "PrintingLog")
                                     {
-                                        case "Reset":
-                                            <button id="btnReset" class="btn @ColorClass mb-2 me-2">
-                                                <i class="@icon"></i> Reset
-                                            </button>
-                                            break;
+                                        <button data-bs-toggle="modal" data-bs-target="#LogModal" id="btnPrintingLog" class="btn @colorClass">
+                                            <i class="@icon"></i> Printing Log
+                                        </button>
+                                    }
+                                    else if (btnName == "Reset")
+                                    {
+                                        <button id="btnReset" class="btn @colorClass">
+                                            <i class="@icon"></i> Reset
+                                        </button>
                                     }
                                 }
                             }
                         }
                         else
                         {
-                            <div class="alert alert-primary w-100" role="alert">
+                            <div class="alert alert-primary w-100 mb-0" role="alert">
                                 No actions available
                             </div>
                         }
                     </div>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="col-12 mt-3">
+            <div class="card p-3 rounded shadow-sm">
+                <div class="row mb-2">
                     <div class="container-fluid">
                         <div class="app-card">
                             <div class="p-3 p-sm-">
@@ -138,7 +146,7 @@
                                                 <input class="form-control" id="grpoNumber" placeholder="Enter GRPO number">
                                             </div>
                                             <div class="col-md-3 col-sm-12 text-md-center mb-2">
-                                                <button class="btn btn-danger generate-btn mt-4 " id="GenerateQRGRPO">Generate QR Code</button>
+                                                <button class="btn btn-danger generate-btn mt-4">Generate QR Code</button>
                                             </div>
                                         </div>
 
@@ -149,7 +157,7 @@
                                                         <th style="width:40px"><input type="checkbox" id="selectAll"></th>
                                                         <th>Item Code</th>
                                                         <th>Item Name</th>
-                                                        <th>GRPO Qty</th>
+                                                        <th>Group Qty</th>
                                                         <th>Sales Employee</th>
                                                     </tr>
                                                 </thead>
@@ -162,57 +170,231 @@
 
                                     <!-- ITEM -->
                                     <div class="tab-pane fade" id="item" role="tabpanel">
-                                        <form class="row g-3 align-items-end">
-                                            <div class="col-md-2 col-sm-6">
-                                                <label class="form-label">Item Code :</label>
-                                                <input class="form-control item-code-input" placeholder="Enter item code" id="txtItemCode">
+                                        <div class="row">
+                                            <!-- Input Form -->
+                                            <div class="col-md-12">
+                                                <form class="row g-3 align-items-end mb-4">
+                                                    <div class="col-md-3 col-sm-6">
+                                                        <label class="form-label">Item Code :</label>
+                                                        <input class="form-control item-code-input" placeholder="Enter item code" id="txtItemCode">
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-6">
+                                                        <label class="form-label">Item Name :</label>
+                                                        <input class="form-control item-name-input" placeholder="Enter item name" id="txtItemName">
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-6">
+                                                        <label class="form-label" for="itemSalesEmployee">Sales Employee :</label>
+                                                        <select class="form-select" id="itemSalesEmployee"><option>-No Sales Employee-</option></select>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-6">
+                                                        <label class="form-label">Copies :</label>
+                                                        <input class="form-control" id="itemCopies" value="1" min="1">
+                                                    </div>
+                                                </form>
                                             </div>
-                                            <div class="col-md-3 col-sm-6">
-                                                <label class="form-label">Item Name :</label>
-                                                <input class="form-control item-name-input" placeholder="Enter item name" id="txtItemName">
+
+                                            <!-- Preview Section -->
+                                            <div class="col-md-12">
+                                                <div class="card">
+                                                    <div class="card-header bg-light">
+                                                        <h5 class="card-title mb-0">QR Code Preview</h5>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="row align-items-center">
+                                                            <div class="col-md-4 text-center">
+                                                                <div class="preview-container border rounded p-3 mb-3 d-flex justify-content-center align-items-center"
+                                                                     id="qrPreviewContainer" style="min-height:160px">
+
+                                                                    <div class="preview-placeholder text-muted text-center" id="qrPreviewPlaceholder">
+                                                                        <i class="bi bi-qr-code fs-1 d-block mb-2"></i>
+                                                                        <span>QR Code preview will appear here</span>
+                                                                    </div>
+
+                                                                    <div class="d-none w-100 h-100 rounded" id="qrmainpriview"></div>
+                                                                </div>
+
+                                                                <div>
+
+                                                                </div>
+                                                                <div class="row g-2">
+                                                                    <div class="col-12 col-sm-6">
+                                                                        <button class="btn btn-success w-100" id="downloadQrCode" disabled>Download QR Code</button>
+                                                                    </div>
+                                                                    <div class="col-12 col-sm-6">
+                                                                        <button class="btn btn-info text-white w-100" id="generateItemQR" disabled>QR Code</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-8">
+                                                                <div class="preview-details">
+                                                                    <h6>Item Details:</h6>
+                                                                    <table class="table table-sm">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <th scope="row" style="width: 40%">Item Code:</th>
+                                                                                <td id="previewItemCode" class="text-muted">Not set</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th scope="row">Item Name:</th>
+                                                                                <td id="previewItemName" class="text-muted">Not set</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th scope="row">Sales Employee:</th>
+                                                                                <td id="previewSalesEmployee" class="text-muted">Not set</td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="col-md-3 col-sm-6">
-                                                <label class="form-label" for="itemSalesEmployee">Sales Employee :</label>
-                                                <select class="form-select" id="itemSalesEmployee"><option>-No Sales Employee-</option></select>
-                                            </div>
-                                            <div class="col-md-2 col-sm-6">
-                                                <label class="form-label">Copies :</label>
-                                                <input class="form-control" id="itemCopies" value="1">
-                                            </div>
-                                            <div class="col-md-2 col-sm-12 text-end">
-                                                <button type="button" class="btn btn-primary mt-2" id="generateItemQR">Generate QR Code</button>
-                                            </div>
-                                        </form>
+                                        </div>
                                     </div>
 
                                     <!-- BOX -->
                                     <div class="tab-pane fade" id="box" role="tabpanel">
-                                        <form class="row g-3 align-items-end">
-                                            <div class="col-md-2 col-sm-6">
-                                                <label class="form-label">Item Code :</label>
-                                                <input class="form-control item-code-input" placeholder="Enter item code" id="boxTabCode">
+                                        <div class="row">
+                                            <!-- Input Form -->
+                                            <div class="col-md-12">
+                                                <form class="row g-3 align-items-end mb-4">
+                                                    <div class="col-md-2 col-sm-6">
+                                                        <label class="form-label">Item Code :</label>
+                                                        <input class="form-control item-code-input" placeholder="Enter item code" id="boxTabCode">
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-6">
+                                                        <label class="form-label">Item Name :</label>
+                                                        <input class="form-control item-code-input" placeholder="Enter item name" id="boxTabName">
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-6">
+                                                        <label class="form-label" for="boxSalesEmployee">Sales Employee :</label>
+                                                        <select class="form-select" id="boxSalesEmployee"><option>-No Sales Employee-</option></select>
+                                                    </div>
+                                                    <div class="col-md-2 col-sm-6">
+                                                        <label class="form-label">Copies :</label>
+                                                        <input class="form-control" id="boxCopies" value="1" min="1">
+                                                    </div>
+                                                    <div class="col-md-2 col-sm-6">
+                                                        <label class="form-label">Quantity :</label>
+                                                        <input class="form-control" id="boxQuantity" value="1" min="1">
+                                                    </div>
+                                                </form>
                                             </div>
-                                            <div class="col-md-3 col-sm-6">
-                                                <label class="form-label">Item Name :</label>
-                                                <input class="form-control item-code-input" placeholder="Enter item name" id="boxTabName">
+
+                                            <!-- Preview Section -->
+                                            <div class="col-md-12">
+                                                <div class="card">
+                                                    <div class="card-header bg-light">
+                                                        <h5 class="card-title mb-0">Barcode Preview</h5>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="row align-items-center">
+                                                            <div class="col-md-5 text-center">
+                                                                <div class="preview-container border rounded p-3 mb-3"
+                                                                     id="barcodePreviewContainer" style="min-height:160px">
+
+                                                                    <div class="preview-placeholder text-muted" id="barcodePreviewPlaceholder">
+                                                                        <i class="bi bi-upc-scan fs-1 d-block mb-2"></i>
+                                                                        <span>Barcode preview will appear here</span>
+                                                                    </div>
+
+                                                                    <div class="d-none w-100" id="BarcodePreviewImage"></div>
+                                                                </div>
+
+                                                                <div class="row g-2">
+                                                                    <div class="col-6">
+                                                                        <button class="btn btn-success w-100" id="downloadBarcode" disabled>
+                                                                            Download Barcode
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <button class="btn btn-info w-100 text-white" id="generateBoxBarcode" disabled>
+                                                                            Print Barcode
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <div class="preview-details">
+                                                                    <h6>Box Details:</h6>
+                                                                    <table class="table table-sm">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <th scope="row" style="width: 40%">Item Code:</th>
+                                                                                <td id="previewBoxCode" class="text-muted">Not set</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th scope="row">Item Name:</th>
+                                                                                <td id="previewBoxName" class="text-muted">Not set</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th scope="row">Sales Employee:</th>
+                                                                                <td id="previewBoxSalesEmployee" class="text-muted">Not set</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th scope="row">Quantity per Box:</th>
+                                                                                <td id="previewBoxQuantity" class="text-muted">-</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th scope="row">Copies:</th>
+                                                                                <td id="previewBoxCopies" class="text-muted">1</td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="col-md-3 col-sm-6">
-                                                <label class="form-label" for="boxSalesEmployee">Sales Employee :</label>
-                                                <select class="form-select" id="boxSalesEmployee"><option>-No Sales Employee-</option></select>
-                                            </div>
-                                            <div class="col-md-1 col-sm-6">
-                                                <label class="form-label">Copies :</label>
-                                                <input class="form-control" id="boxCopies" value="1">
-                                            </div>
-                                            <div class="col-md-1 col-sm-6">
-                                                <label class="form-label">Quantity :</label>
-                                                <input class="form-control" id="boxQuantity" value="1">
-                                            </div>
-                                            <div class="col-md-2 text-end">
-                                                <button type="button" class="btn btn-primary mt-2" id="generateBoxBarcode">Generate Barcode</button>
-                                            </div>
-                                        </form>
+                                        </div>
                                     </div>
+
+                                    <style>
+                                        .preview-container {
+                                            min-height: 200px;
+                                            flex-direction: column;
+                                            justify-content: center;
+                                            align-items: center;
+                                            background-color: #f8f9fa;
+                                        }
+
+                                        .preview-placeholder {
+                                            text-align: center;
+                                        }
+
+                                            .preview-placeholder i {
+                                                color: #6c757d;
+                                            }
+
+                                        .preview-details {
+                                            padding: 15px;
+                                            background-color: #f8f9fa;
+                                            border-radius: 5px;
+                                        }
+
+                                            .preview-details h6 {
+                                                color: #495057;
+                                                margin-bottom: 15px;
+                                                padding-bottom: 8px;
+                                                border-bottom: 1px solid #dee2e6;
+                                            }
+
+                                        .table-sm th {
+                                            font-weight: 600;
+                                            color: #495057;
+                                        }
+
+                                        .table-sm td {
+                                            font-weight: 500;
+                                        }
+
+                                        #qrPreviewImage, #barcodePreviewImage {
+                                            max-height: 200px;
+                                            width: auto;
+                                        }
+                                    </style>
                                 </div>
                             </div>
                         </div>
@@ -243,10 +425,67 @@
         </div>
     </div>
 </div>
+<!--LOG Modal -->
+<div class="modal fade" id="LogModal" tabindex="-1" aria-labelledby="LogModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="LogModal">Stiker Printing Log</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-2">
+                    <div class="col-md-3  mb-2">
+                        <label for="Type" class="form-label ">Type</label>
+                        <select class="form-control " id="flogtype">
+                            <option value="">Select</option>
+                            <option value="GRPOWISE">GRPO WISE</option>
+                            <option value="ITEMWISE">ITEM WISE</option>
+                            <option value="BOXWISE">BOX WISE</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3  mb-2">
+                        <label for="ffromdate" class="form-label ">From Date</label>
+                        <input id="ffromdate" class="form-control datepicker" type="date" />
+                    </div>
+                    <div class="col-md-3  mb-2">
+                        <label for="ftodate" class="form-label">To Date</label>
+                        <input id="ftodate" class="form-control datepicker" type="date" />
+                    </div>
+                    <div class="col-md-3  mb-2 text-end   mt-3 ">
+                        <button class="btn btn-outline-primary me-2" id="FindBtnSearch"><i class="bi bi-search me-2"></i>Find</button>
+                        <button class="btn btn-outline-secondary me-2" id="FindBtnReset"><i class="bi bi-arrow-counterclockwise me-2"></i>Reset</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped w-100 display nowrap" id="logtable">
+                        <thead>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Employee Name</th>
+                                <th>GRPO No</th>
+                                <th>GRPO Qty</th>
+                                <th>Printed Qty</th>
+                                <th>Tab Type</th>
+                                <th>Create Date</th>
+                                <th>Created By</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- JsBarcode -->
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <script>
     $(document).ready(function () {
@@ -255,25 +494,7 @@
         var ItemData = [];
         var GrpoData = []; // Store GRPO data
 
-        @*// Function to load GRPOWise
-        function loadDocNum(id) {
-            // AJAX call to get GRPOWise
-            $.ajax({
-                url: '@Url.Action("GETGRPONUM", "Inventory")',
-                method: 'GET',
-                data:{id:id},
-                success: function (response) {
-                    if(response[0].Success=="true"){
-                        $("#Docnum").val(response[0].Message)
-                    }else{
-                           Notify('error', response[0].Message,'');
-                    }
-                },
-                error: function(xhr) {
-                            Notify('error', 'Error', xhr.responseText );
-                }
-            });
-        }*@
+
 
         function loadItemMasterTable() {
             $.ajax({
@@ -282,7 +503,6 @@
                 contentType: "application/json; charset=utf-8",
                 cache: false,
                 success: function (data) {
-                    console.log(data)
                     ItemData = data || [];
                 },
                 error: function(xhr) {
@@ -291,7 +511,7 @@
             });
         }
 
-        @*function loadGrpoData() {
+        function loadGrpoData() {
             $.ajax({
                 type: "GET",
                 url: '@Url.Action("FINDMODE", "Purchase")',
@@ -305,327 +525,129 @@
                     Notify('error', 'Error', xhr.responseText || 'Error loading GRPO data');
                 }
             });
-        }*@
-
-
-
+        }
 
 
         // Initialize on page load
         loadItemMasterTable();
-
+        loadGrpoData();
 
         // ==================== GRPO NUMBER AUTOCOMPLETE ====================
+        $(document).on('input', "#grpoNumber", function () {
 
+            var $input = $(this);
+            var value = $input.val().toLowerCase().replace(/_/g, ' ');
+            var suggestions = [];
 
-
-             loadEmployeeDropdown()
-             function loadEmployeeDropdown() {
-                 $.ajax({
-                     url: '@Url.Action("GETEMPLOYEEDROPDOWN", "Inventory")',
-                     type: 'GET',
-                     success: function (response) {
-                         GrpoSalesEmployeeData = Array.isArray(response) ? response : [];
-
-                         const $ddl = $("#itemSalesEmployee,#boxSalesEmployee");
-                         $ddl.empty().append('<option value="">Select Employee</option>');
-
-                         response.forEach(function (emp) {
-                             $ddl.append(`
-                                 <option value="${emp.EmployeeID}" data-code="${emp.EmployeeCode}">
-                                     ${emp.FirstName} ${emp.LastName}
-                                 </option>
-                             `);
-                         });
-                     },
-                     error: function (xhr) {
-                         Notify('error', 'Error', xhr.responseText);
-                     }
-                 });
-        }
-
-        // 🔹 Input typing
-        $(document).on('input', '.GrpoSalesEmployee', function () {
-
-            const $input = $(this);
-            $activeGrpoSalesEmployeeInput = $input;
-
-            const search = $input.val().toLowerCase();
-            const rowIndex = $input.closest('tr').index();
-            const suggestionId = 'GrpoSalesEmployeeSuggestions-' + rowIndex;
-
-            if (!$('#' + suggestionId).length) {
-                $('<div>', {
-                    id: suggestionId,
-                    class: 'GrpoSalesEmployee-suggestions'
-                }).appendTo('body');
+            // Unique container ID for GRPO Number
+            var suggestionContainerId = 'GrpoNumberSuggestions';
+            if (!$('#' + suggestionContainerId).length) {
+                $('<div id="' + suggestionContainerId + '" class="suggestions-container"></div>').appendTo('body');
             }
 
-            const $container = $('#' + suggestionId).empty();
+            var $suggestionContainer = $('#' + suggestionContainerId);
+            $suggestionContainer.empty();
 
-            if (!search || GrpoSalesEmployeeData.length === 0) {
-                $container.hide();
-                return;
-            }
+            if (Array.isArray(GrpoData) && GrpoData.length > 0) {
+                if (value.length > 0) {
+                    var searchTokens = value.split(/\s+/);
+                    suggestions = GrpoData.filter(function (data) {
+                        if (data && typeof data === 'object') {
+                            // Adjust these property names based on your actual GRPO data structure
+                            var grpoNumber = (data.GRPONumber || data.DocNum || data.Number || data.DocEntry || '').toString().toLowerCase();
+                            var vendor = (data.VendorName || data.CardName || data.SupplierName || '').toString().toLowerCase();
+                            var allTokens = grpoNumber.split(/\s+|[_-]+/).concat(vendor.split(/\s+|[_-]+/));
 
-            // 🔍 Search by Code, FirstName, LastName
-            const matches = GrpoSalesEmployeeData.filter(emp => {
-                const fullName = `${emp.FirstName} ${emp.LastName}`.toLowerCase();
-                return (
-
-                    emp.EmployeeCode.toLowerCase().includes(search) ||
-                    emp.EmployeeID.toLowerCase().includes(search) ||
-                    emp.FirstName.toLowerCase().includes(search) ||
-                    emp.LastName.toLowerCase().includes(search) ||
-                    fullName.includes(search)
-                );
-            }).slice(0, 10);
-
-            if (matches.length === 0) {
-                $container.hide();
-                return;
-            }
-
-            // 📌 Build suggestion list
-            matches.forEach(emp => {
-                const fullName = `${emp.FirstName} ${emp.LastName}`;
-                const EmpID = `${emp.EmployeeID}`
-                $container.append(`
-            <div class="GrpoSalesEmployee-item"
-                data-code="${emp.EmployeeCode}"
-                data-empid="${emp.EmployeeID.toString()}"
-                data-name="${fullName}">
-                <strong>${emp.EmployeeCode}</strong> - ${fullName}
-            </div>
-        `);
-            });
-
-            const offset = $input.offset();
-            $container.css({
-                top: offset.top + $input.outerHeight(),
-                left: offset.left,
-                width: $input.outerWidth(),
-                position: 'absolute',
-                zIndex: 1050
-            }).show();
-        });
-
-
-        // 🔹 Click suggestion → bind to same row
-        $(document).on('click', '.GrpoSalesEmployee-item', function () {
-
-            const empName = $(this).data('name');      // John Doe
-            const empCode = $(this).data('code');      // EMP001
-            const empId = $(this).data('empid');     // 123
-
-            if (!$activeGrpoSalesEmployeeInput) return;
-
-            // ✅ Show name/code in input
-            $activeGrpoSalesEmployeeInput
-                .val(empName)
-                .attr('data-empid', empId.toString())   // ⭐ STORE EmployeeID HERE
-                .attr('data-code', empCode); // optional
-
-            // Hide suggestions
-            $('.GrpoSalesEmployee-suggestions').hide();
-        });
-
-
-        // 🔹 Hide on outside click
-        $(document).on('click', function (e) {
-            if (!$(e.target).closest('.GrpoSalesEmployee, .GrpoSalesEmployee-suggestions').length) {
-                $('.GrpoSalesEmployee-suggestions').hide();
-            }
-        });
-
-
-
-
-
-
-
-
-             $(document).on('input', "#grpoNumber", function () {
-
-                var $input = $(this);
-                var value = $input.val().toLowerCase().replace(/_/g, ' ');
-                var suggestions = [];
-
-                // Unique container ID for GRPO Number
-                var suggestionContainerId = 'GrpoNumberSuggestions';
-                if (!$('#' + suggestionContainerId).length) {
-                    $('<div id="' + suggestionContainerId + '" class="suggestions-container"></div>').appendTo('body');
+                            return searchTokens.every(function (token) {
+                                return allTokens.some(function (grpoToken) {
+                                    return grpoToken.includes(token);
+                                });
+                            });
+                        }
+                        return false;
+                    }).sort(function (a, b) {
+                        // Sort by GRPO number or date - adjust based on your data structure
+                        var aNum = a.GRPONumber || a.DocNum || a.DocEntry || '';
+                        var bNum = b.GRPONumber || b.DocNum || b.DocEntry || '';
+                        return bNum.toString().localeCompare(aNum.toString());
+                    }).slice(0, 50);
                 }
 
-                var $suggestionContainer = $('#' + suggestionContainerId);
-                $suggestionContainer.empty();
+                if (suggestions.length > 0) {
+                    suggestions.forEach(function (data) {
+                        // Adjust these property names based on your actual GRPO data structure
+                        var grpoNumber = data.GRPONumber || data.DocNum || data.Number || data.DocEntry || 'N/A';
+                        var vendor = data.VendorName || data.CardName || data.SupplierName || 'N/A';
+                        var date = data.DocDate || data.Date || data.CreateDate || '';
+                        var grpoId = data.GRPOId || data.DocEntry || data.Id || '';
 
-                if (Array.isArray(GrpoData) && GrpoData.length > 0) {
-                    if (value.length > 0) {
-                        var searchTokens = value.split(/\s+/);
-                        suggestions = GrpoData.filter(function (data) {
-                            if (data && typeof data === 'object') {
-                                // Adjust these property names based on your actual GRPO data structure
-                                var grpoNumber = (data.GRPONumber || data.DocNum || data.Number || data.DocEntry || '').toString().toLowerCase();
-                                var vendor = (data.VendorName || data.CardName || data.SupplierName || '').toString().toLowerCase();
-                                var allTokens = grpoNumber.split(/\s+|[_-]+/).concat(vendor.split(/\s+|[_-]+/));
+                        $suggestionContainer.append(
+                            `<div class="suggestion-item grpo-number-set"
+                                  data-grponumber="${grpoNumber}"
+                                  data-vendor="${vendor}"
+                                  data-date="${date}"
+                                  data-grpoid="${grpoId}">
+                                 <span class="grpo-number"><b>GRPO: ${grpoNumber}</b></span><br/>
+                                 <small class="text-muted">Vendor: ${vendor}</small>
+                                 ${date ? `<br/><small class="text-muted">Date: ${formatDate(date)}</small>` : ''}
+                             </div>`
+                        );
+                    });
 
-                                return searchTokens.every(function (token) {
-                                    return allTokens.some(function (grpoToken) {
-                                        return grpoToken.includes(token);
-                                    });
-                                });
-                            }
-                            return false;
-                        }).sort(function (a, b) {
-                            // Sort by GRPO number or date - adjust based on your data structure
-                            var aNum = a.GRPONumber || a.DocNum || a.DocEntry || '';
-                            var bNum = b.GRPONumber || b.DocNum || b.DocEntry || '';
-                            return bNum.toString().localeCompare(aNum.toString());
-                        }).slice(0, 50);
-                    }
-
-                    if (suggestions.length > 0) {
-                        suggestions.forEach(function (data) {
-                            // Adjust these property names based on your actual GRPO data structure
-                            var grpoNumber = data.GRPONumber || data.DocNum || data.Number || data.DocEntry || 'N/A';
-                            var vendor = data.VendorName || data.CardName || data.SupplierName || 'N/A';
-                            var date = data.DocDate || data.Date || data.CreateDate || '';
-                            var grpoId = data.GRPOId || data.DocEntry || data.Id || '';
-
-                            $suggestionContainer.append(
-                                `<div class="suggestion-item grpo-number-set"
-                                      data-grponumber="${grpoNumber}"
-                                      data-vendor="${vendor}"
-                                      data-date="${date}"
-                                      data-grpoid="${grpoId}">
-                                     <span class="grpo-number"><b>GRPO: ${grpoNumber}</b></span><br/>
-                                     <small class="text-muted">Vendor: ${vendor}</small>
-                                     ${date ? `<br/><small class="text-muted">Date: ${formatDate(date)}</small>` : ''}
-                                 </div>`
-                            );
-                        });
-
-                        var offset = $input.offset();
-                        $suggestionContainer.css({
-                            top: offset.top + $input.outerHeight(),
-                            left: offset.left,
-                            width: $input.outerWidth(),
-                            position: 'absolute',
-                            "z-index": 1000,
-                            "max-height": "300px",
-                            "overflow-y": "auto"
-                        }).show();
-                    } else {
-                        $suggestionContainer.hide();
-                    }
+                    var offset = $input.offset();
+                    $suggestionContainer.css({
+                        top: offset.top + $input.outerHeight(),
+                        left: offset.left,
+                        width: $input.outerWidth(),
+                        position: 'absolute',
+                        "z-index": 1000,
+                        "max-height": "300px",
+                        "overflow-y": "auto"
+                    }).show();
                 } else {
                     $suggestionContainer.hide();
                 }
-            });
-
-
-            // GRPO Number Click handler - Load GRPO items
-            $(document).on('click', '.grpo-number-set', function () {
-                var grpoNumber = $(this).data('grponumber');
-                var vendor = $(this).data('vendor');
-                var grpoId = $(this).data('grpoid');
-
-                // Set the GRPO number
-                $("#grpoNumber").val(grpoNumber);
-                $("#grpoNumber").attr("data-grpo-id", grpoId);
-
-                // Hide suggestions
-                $("#GrpoNumberSuggestions").hide();
-
-                // Load GRPO items
-                loadGrpoItems(grpoId, grpoNumber);
-            });
-
-            // Hide GRPO suggestions when clicking outside
-            $(document).on('click', function (e) {
-                if (!$(e.target).closest('.suggestions-container, #grpoNumber').length) {
-                    $('#GrpoNumberSuggestions').hide();
-                }
-            });
-
-            // Format date for display
-            function formatDate(dateString) {
-                if (!dateString) return '';
-                try {
-                    const date = new Date(dateString);
-                    if (isNaN(date.getTime())) return dateString;
-                    return date.toLocaleDateString();
-                } catch (e) {
-                    return dateString;
-                }
-        }
-                // Load GRPO items when GRPO number changes
-        $("#grpoNumber").on("input", function () {
-            LoadGrpoNumber($(this).val());   // ❌ called first
-            if ($("#grpoNumber").val().trim() === "") {
-                $("#grpoTbody").html("");
-                return;
+            } else {
+                $suggestionContainer.hide();
             }
         });
 
-        function LoadGrpoNumber(DocNum) {
 
-         $.ajax({
-             url: '@Url.Action("GETGRPOITEM","Inventory")',
-             method: 'GET',
-             data: { DocNum: DocNum },
-             success: function (response) {
-                 console.log(response);
-                 $("#grpoTbody").empty();
+        // GRPO Number Click handler - Load GRPO items
+        $(document).on('click', '.grpo-number-set', function () {
+            var grpoNumber = $(this).data('grponumber');
+            var vendor = $(this).data('vendor');
+            var grpoId = $(this).data('grpoid');
 
-                 if (response && response.length > 0) {
-                     // Populate table with GRPO items
-                     response.forEach(function (item, index) {
-                         var row = `
-                         <tr>
-                             <td class="text-center">
-                                 <input type="checkbox" class="row-checkbox">
-                             </td>
-                             <td>
-                                 <input class="form-control form-control-sm item-code-input"
-                                        value="${item.ItemCode || ''}"
-                                        placeholder="Item code" readonly>
-                             </td>
-                             <td>
-                                 <input class="form-control form-control-sm item-name-input"
-                                        value="${item.ItemName || ''}"
-                                        placeholder="Item name" readonly>
-                             </td>
-                             <td>
-                                 <input class="form-control form-control-sm group-qty-input"
-                                        type="number"
-                                        value="${item.Quantity || 1}"
-                                        min="1">
-                             </td>
-                              <td>
-                              <input type="text"  class="form-control form-control-sm GrpoSalesEmployee   ">
-                              </td>
-                         </tr>`;
-                         $("#grpoTbody").append(row);
-                     });
+            // Set the GRPO number
+            $("#grpoNumber").val(grpoNumber);
+            $("#grpoNumber").attr("data-grpo-id", grpoId);
 
-                     Notify('success', 'Success', `Loaded ${response.length} items from GRPO: ${DocNum}`);
-                 } else {
-                     // If no data returned, show empty table
-                     $("#grpoTbody").html('<tr><td colspan="5" class="text-center">No items found for this GRPO</td></tr>');
-                     Notify('warning', 'No Data', `No items found for GRPO: ${DocNum}`);
-                 }
-             },
-             error: function(xhr) {
-                 console.error("Error loading GRPO items:", xhr);
-                 //Notify('error', 'Error', xhr.responseText || 'Error loading GRPO items');
-             }
-         });
+            // Hide suggestions
+            $("#GrpoNumberSuggestions").hide();
+
+            // Load GRPO items
+            loadGrpoItems(grpoId, grpoNumber);
+        });
+
+        // Hide GRPO suggestions when clicking outside
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('.suggestions-container, #grpoNumber').length) {
+                $('#GrpoNumberSuggestions').hide();
+            }
+        });
+
+        // Format date for display
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return dateString;
+                return date.toLocaleDateString();
+            } catch (e) {
+                return dateString;
+            }
         }
-
-
-
 
         // ==================== ITEM WISE TAB - SEPARATED AUTOCOMPLETE ====================
         var $activeInput = null;
@@ -810,78 +832,60 @@
 
             }
         });
-
         // ----------------------- RESET FUNCTIONALITY -----------------------
         $("#btnReset").on("click", function () {
             let activeTab = $(".tab-pane.active").attr("id");
-
-            switch (activeTab) {
-                case "grpo":
-                    $("#grpoNumber").val("");
-                    $("#grpoTbody").empty();
-                    Notify('success', 'Reset', 'GRPO tab has been reset');
-                    break;
-                case "item":
-                    $('#txtItemCode').val("");
-                    $('#txtItemName').val("");
-                    $('#itemSalesEmployee').prop("selectedIndex", 0);
-                    $('#itemCopies').val("1");
-                    Notify('success', 'Reset', 'ITEM tab has been reset');
-                    break;
-                case "box":
-                    $('#boxTabCode').val("");
-                    $('#boxTabName').val("");
-                    $('#boxSalesEmployee').prop("selectedIndex", 0);
-                    $('#boxCopies').val("1");
-                    $('#boxQuantity').val("1");
-                    Notify('success', 'Reset', 'BOX tab has been reset');
-                    break;
-            }
+            $("#grpoNumber").val("");
+            $("#grpoTbody").empty();
+            $('#txtItemCode').val("");
+            $('#txtItemName').val("");
+            $('#itemSalesEmployee').prop("selectedIndex", 0);
+            $('#itemCopies').val("1");
+            $('#boxTabCode').val("");
+            $('#boxTabName').val("");
+            $('#boxSalesEmployee').prop("selectedIndex", 0);
+            $('#boxCopies').val("1");
+            $('#boxQuantity').val("1");
+            $('#selectAll').prop("checked", false);
+            $('#qrmainpriview').addClass('d-none');
+            $('#qrPreviewPlaceholder').removeClass('d-none');
+            $('#previewItemCode').text('Not set');
+            $('#previewItemName').text('Not set');
+            $('#previewSalesEmployee').text( 'Not set');
+            $('#downloadBarcode, #generateBoxBarcode').prop('disabled', true);
+            $("#generateItemQR,#downloadQrCode").prop("disabled", true);
+            // Update preview details
+            $('#previewBoxCode').text('Not set');
+            $('#previewBoxName').text('Not set');
+            $('#previewBoxSalesEmployee').text( 'Not set' );
+            $('#previewBoxQuantity').text( '-');
+            $('#previewBoxCopies').text('1');
+            $('#BarcodePreviewImage').addClass('d-none');
+            $('#barcodePreviewPlaceholder').removeClass('d-none');
         });
+        // Generate QR Code for ITEM tab
+        {
+            $("#generateItemQR").click(function () {
 
-        // ==================== QR CODE GENERATION FUNCTIONS ====================
-
-        //Genratye Qr Code For Grpo Tab
-            {
-                $('.generate-btn').on('click', function () {
-
-                    const grpoNumber = $('#grpoNumber').val();
-                    if (!grpoNumber) {
-                        Notify('warning', 'Warning', 'Please enter GRPO number');
-                        return;
-                    }
-
-                    const selectedRows = $('#grpoTbody .row-checkbox:checked');
-                    if (selectedRows.length === 0) {
-                        Notify('warning', 'Warning', 'Please select at least one item');
-                        return;
-                    }
-
-                    const itemsToPrint = [];
-
-                    selectedRows.each(function () {
-                        const $row = $(this).closest('tr');
-
-                        itemsToPrint.push({
-                            itemCode: $row.find('.item-code-input').val(),
-                            itemName: $row.find('.item-name-input').val(),
-                            groupQty: parseInt($row.find('.group-qty-input').val()) || 1,
-                            salesEmployee: $row.find('.sales-employee-input').val() || '',
-                            salesEmployeeID: $row.find('.sales-employee-input').attr('data-id') || '',
-                            grpoNumber: grpoNumber
-                        });
-                    });
-
-                    generateQRCodes(itemsToPrint);
-                });
-                function generateQRCodes(data) {
-
-                    if (!data || data.length === 0) {
-                        Swal.fire('Please Select Rows In Table', '', 'warning');
-                        return;
-                    }
-
-                    function formatText(text, maxLength = 17) {
+                var ItemCode1 = $("#txtItemCode").val();
+                var descrio = $("#txtItemName").val();
+                var Copies = $("#itemCopies").val();
+                var QRSalesEmp1 = $("#itemSalesEmployee").val();
+                var QRSalesEmpName1 = $("#itemSalesEmployee option:selected").text().trim() || "";
+                if (!ItemCode1) {
+                    alert("Please provide an Item Code.");
+                    return;
+                }
+                else if (QRSalesEmp1 === "-1") {
+                    Swal.fire(
+                        "Please select a Sales Employee for Item No " + ItemCode1,
+                        "",
+                        "warning"
+                    );
+                    return;
+                }
+                try {
+                    function lineBreakAfter2UnderscoreAndSpace(text, maxLength = 17) {
                         text = text.replace(/_/g, ' ');
                         const words = text.split(' ');
                         let result = '';
@@ -891,513 +895,1029 @@
                             if ((line + ' ' + word).trim().length <= maxLength) {
                                 line += (line ? ' ' : '') + word;
                             } else {
-                                result += line + '<br>';
+                                result += line + '\n';
                                 line = word;
                             }
                         }
-                        return (result + line).trim();
+
+                        if (line) {
+                            result += line;
+                        }
+
+                        return result.trim();
                     }
+                    var tempDiv = document.createElement("div");
+                    var qrCode = new QRCode(tempDiv, {
+                        text: ItemCode1,
+                        width: 48,
+                        height: 48,
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                    setTimeout(function () {
+                        var qrCodeHTML = tempDiv.innerHTML;
+                        var printhtml = "";
+                        for (var i = 0; i < Copies; i++) {
 
-                    const tempContainer = document.createElement('div');
-                    tempContainer.style.display = 'none';
-                    document.body.appendChild(tempContainer);
+                            var printhtml = "";
+                            // Prepare the Print HTML
+                            for (var i = 0; i < Copies; i++) {
+                                printhtml += `
 
-                    const htmlFragments = [];
-                    const qrPromises = [];
+                                <style>
+                                                /* Page size for 50mm x 25mm */
+                                                    @@page {
+                                                        size: 50mm 25mm;
+                                                        margin: 0; /* Remove margins */
+                                                    }
+                                                    @@media print {
+                                                        body {
+                                                                margin: 0;
+                                                                padding: 0;
+                                                                width: 50mm;
+                                                                height: 25mm;
+                                                                font-family: Arial, sans-serif;
+                                                            }
+                                                            .Main {
+                                                                display: flex;
+                                                                align-items: center;
+                                                                justify-content: space-between;
+                                                                width: 100%;
+                                                                height: 100%;
+                                                                box-sizing: border-box;
+                                                                padding: 5px;
+                                                                margin: 0;
+                                                            }
+                                                            .Qrcode_sec {
+                                                                width: 30%; /* Adjusted to fit */
+                                                                height: 100%;
+                                                                display: flex;
+                                                                align-items: center;
+                                                                justify-content: center;
+                                                            }
+                                                            .Bulkqrcode{
+                                                                text-align:right;
+                                                            }
+                                                            .Discripiton_sec {
+                                                                width: 70%; /* Adjusted to fit */
+                                                                height: 100%;
+                                                                display: flex;
+                                                                flex-direction: column;
+                                                                justify-content: center;
+                                                                padding: 0 5px;
+                                                                text-align:left;
+                                                                box-sizing: border-box;
+                                                            }
+                                                            .Discriptiontext {
+                                                                width: 100%; /* Adjusted to fit */
+                                                                height: 100%;
+                                                                font-size: 12px; /* Adjust font size to fit content */
+                                                                font-weight: bold;
+                                                                line-height: 1.2;
 
-                    data.forEach((item, i) => {
+                                                            }
+                                                            .ItemCodelable {
+                                                                font-size: 11px; /* Adjust font size */
+                                                                font-weight: bold;
+                                                                margin: 0;
+                                                                padding: 0;
+                                                                margin-top: -10px;
+                                                            }
+                                                            .Slplable {
+                                                                font-size: 8px; /* Adjust font size */
+                                                                font-weight: bold;
+                                                                margin: 0;
+                                                                padding: 0;
+                                                                margin-top: 0px;
+                                                            }
+                                                    }
 
-                        const qty = parseInt(item.groupQty);
-                        const description = formatText(item.itemName);
+                                            </style>
 
-                        for (let j = 0; j < qty; j++) {
+                                <div class="p-1 Main">
+                                <div class="Discripiton_sec">
+                                <div class="Discriptiontext"><br>${lineBreakAfter2UnderscoreAndSpace(descrio)}</div>
+                                </div>
+                                <div class="Qrcode_sec">
+                                <div class="Bulkqrcode QRCode">
+                                                                    ${qrCodeHTML}<br>
+                                <h6 class="ItemCodelable">${ItemCode1}</h6>
+                                <h6 class="Slplable">S.(${QRSalesEmp1})</h6>
+                                </div>
+                                </div>
+                                </div>
 
-                            qrPromises.push(new Promise((resolve) => {
+                            `;
 
-                                const qrDiv = document.createElement('div');
-                                tempContainer.appendChild(qrDiv);
+                        }
+                        }
+                        var printWindow = window.open("", "", "width=1000,height=1000");
+                        printWindow.document.open();
+                        printWindow.document.write(printhtml);
+                        printWindow.document.close();
+                        printWindow.print();
+                        printWindow.close();
+                         // ---- LOG AFTER PRINT ----
+                        var lines = [{
+                            ItemCode: ItemCode1,
+                            ItemName: descrio,
+                            GRPO_DocEntry: "0",
+                            GRPO_NO: "0",
+                            GRPO_QTY: "0",
+                            Printed_QTY: Copies.toString(),
+                            EmployeeID: QRSalesEmp1,
+                            EmployeeName: QRSalesEmpName1,
+                            TabType: "ITEMWISE"
+                        }];
 
-                                new QRCode(qrDiv, {
-                                    text: item.itemCode,          // ✅ FIXED
-                                    width: 48,
-                                    height: 48,
-                                    correctLevel: QRCode.CorrectLevel.H
-                                });
+                        printWindow.addEventListener("unload", () => {
+                            $.ajax({
+                                type: "POST",
+                                url: '@Url.Action("ADDBARCODEPRINTLOG","Inventory")',
+                                contentType: "application/json; charset=utf-8",
+                                data: JSON.stringify(lines),
+                                cache: true,
+                                success: function () {
+                                    $("#btnReset").click();
+                                },
+                                error: function (xhr) {
+                                    $("#error").text(xhr.responseJSON.error);
+                                }
+                            });
+                        });
 
-                                const checker = setInterval(() => {
-                                    if (qrDiv.querySelector('canvas, img')) {
-                                        clearInterval(checker);
+                    }, 500);
 
-                                        htmlFragments.push(`
-    <div class="Main">
-    <div class="Discripiton_sec">
-    <div class="Discriptiontext">${description}</div>
-    </div>
-    <div class="Qrcode_sec">
-    <div class="Bulkqrcode">
-                                            ${qrDiv.innerHTML}
-    <div class="ItemCodelable">${item.itemCode}</div>
-    <div class="Slplable">S.(${item.salesEmployeeID})</div>
-    </div>
-    </div>
-    </div>
-                            `);
+                } catch (error) {
+                    console.error("Printing error:", error);
+                }
+            });
 
-                                        resolve();
-                                    }
-                                }, 10);
+            $("#printQrButton").click(function () {
+                var printWindow = window.open("", "", "width=1000,height=1000");
+                var contentToPrint = $("#printContainer").html();
+                printWindow.document.open();
+                printWindow.document.write(contentToPrint);
+                printWindow.document.close();
+                printWindow.print();
+                printWindow.close();
+            });
+        }
+        //Genratye Qr Code For Grpo Tab
+        {
+            $('.generate-btn').on('click', function () {
+                const grpoNumber = $('#grpoNumber').val();
+                if (!grpoNumber) {
+                    Notify('warning', 'Warning', 'Please enter GRPO number');
+                    return;
+                }
+                const selectedRows = $('#grpoTbody .row-checkbox:checked');
+                if (selectedRows.length === 0) {
+                    Notify('warning', 'Warning', 'Please select at least one item');
+                    return;
+                }
+                const itemsToPrint = [];
+                selectedRows.each(function () {
+                    const $row = $(this).closest('tr');
+                    itemsToPrint.push({
+                        ItemCode: $row.find('.item-code-input').val(),
+                        ItemName: $row.find('.item-name-input').val(),
+                        GRPO_DocEntry: $row.attr("data-entry") || "",
+                        GRPO_NO: grpoNumber,
+                        GRPO_QTY: $row.find('.group-qty-input').val() || "",
+                        Printed_QTY: $row.find('.group-qty-input').val() || "",
+                        EmployeeName: $row.find('.sales-employee-input').val() || '',
+                        EmployeeID: $row.find('.sales-employee-input').attr('data-code') || '',
+                        TabType: "GRPOWISE"
+                    });
+                });
+                generateQRCodes(itemsToPrint);
+            });
 
-                            }));
+            function generateQRCodes(data) {
+
+                if (!data || data.length === 0) {
+                    Swal.fire('Please Select Rows In Table', '', 'warning');
+                    return;
+                }
+
+                function formatText(text, maxLength = 17) {
+                    text = text.replace(/_/g, ' ');
+                    const words = text.split(' ');
+                    let result = '';
+                    let line = '';
+
+                    for (let word of words) {
+                        if ((line + ' ' + word).trim().length <= maxLength) {
+                            line += (line ? ' ' : '') + word;
+                        } else {
+                            result += line + '<br>';
+                            line = word;
+                        }
+                    }
+                    return (result + line).trim();
+                }
+
+                const tempContainer = document.createElement('div');
+                tempContainer.style.display = 'none';
+                document.body.appendChild(tempContainer);
+
+                const htmlFragments = [];
+                const qrPromises = [];
+
+                data.forEach((item, i) => {
+
+                    const qty = parseInt(item.GRPO_QTY);
+                    const description = formatText(item.ItemName);
+
+                    for (let j = 0; j < qty; j++) {
+
+                        qrPromises.push(new Promise((resolve) => {
+
+                            const qrDiv = document.createElement('div');
+                            tempContainer.appendChild(qrDiv);
+
+                            new QRCode(qrDiv, {
+                                text: item.ItemCode,          // ✅ FIXED
+                                width: 48,
+                                height: 48,
+                                correctLevel: QRCode.CorrectLevel.H
+                            });
+
+                            const checker = setInterval(() => {
+                                if (qrDiv.querySelector('canvas, img')) {
+                                    clearInterval(checker);
+
+                                    htmlFragments.push(`
+                                        <div class="Main">
+                                            <div class="Discripiton_sec">
+                                                <div class="Discriptiontext">${description}</div>
+                                            </div>
+                                            <div class="Qrcode_sec">
+                                                <div class="Bulkqrcode">
+                                                    ${qrDiv.innerHTML}
+                                                    <div class="ItemCodelable">${item.ItemCode}</div>
+                                                    <div class="Slplable">S.(${item.EmployeeID})</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `);
+
+                                    resolve();
+                                }
+                            }, 10);
+
+                        }));
+                    }
+                });
+                Promise.all(qrPromises).then(() => {
+                    document.body.removeChild(tempContainer);
+                    const printHTML = `
+                        <style>
+                            @@page {
+                                size: 50mm 25mm;
+                                margin: 0;
+                            }
+
+                            body {
+                                margin: 0;
+                                padding: 0;
+                                font-family: Arial, sans-serif;
+                            }
+
+                            .Main {
+                                width: 50mm;
+                                height: 25mm;
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                padding: 4px;
+                                box-sizing: border-box;
+                                page-break-after: always;
+                            }
+
+                            .Discripiton_sec {
+                                width: 65%;
+                                font-size: 11px;
+                                font-weight: bold;
+                                line-height: 1.2;
+                            }
+
+                            .Qrcode_sec {
+                                width: 35%;
+                                text-align: center;
+                            }
+
+                            .ItemCodelable {
+                                font-size: 12px;
+                                font-weight: bold;
+                                margin-top: 2px;
+                            }
+
+                            .Slplable {
+                                font-size: 8px;
+                                font-weight: bold;
+                            }
+                        </style>
+
+                        ${htmlFragments.join('')}
+
+                    `;
+                    const printWindow = window.open('', '', 'width=800,height=600');
+                    printWindow.document.open();
+                    printWindow.document.write(printHTML);
+                    printWindow.document.close();
+                    printWindow.focus();
+                    printWindow.print();
+                    printWindow.close();
+                     // ---- LOG AFTER PRINT ----
+                     setTimeout(() => {
+                         $.ajax({
+                             type: "POST",
+                             url: '@Url.Action("ADDBARCODEPRINTLOG","Inventory")',
+                             contentType: "application/json; charset=utf-8",
+                             data: JSON.stringify(data),
+                             success: function (data) {
+                                 $("#btnReset").click();
+                             }
+                         });
+                         printWindow.close();
+                     }, 300);
+                });
+            }
+        }
+        // ================= GENERATE BOX BARCODE =================
+        {
+            $('#generateBoxBarcode').on('click', function () {
+
+                function formatDescription(text, maxLength = 17) {
+                    text = text.replace(/_/g, ' ');
+                    const words = text.split(' ');
+                    let lines = [], line = '';
+
+                    words.forEach(word => {
+                        if ((line + ' ' + word).trim().length <= maxLength) {
+                            line += (line ? ' ' : '') + word;
+                        } else {
+                            lines.push(line);
+                            line = word;
                         }
                     });
 
-                    Promise.all(qrPromises).then(() => {
-                        document.body.removeChild(tempContainer);
-                        const printHTML = `
-    <style>
-                    @@page {
-                        size: 50mm 25mm;
-                        margin: 0;
-                    }
-
-                    body {
-                        margin: 0;
-                        padding: 0;
-                        font-family: Arial, sans-serif;
-                    }
-
-                    .Main {
-                        width: 50mm;
-                        height: 25mm;
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        padding: 4px;
-                        box-sizing: border-box;
-                        page-break-after: always;
-                    }
-
-                    .Discripiton_sec {
-                        width: 65%;
-                        font-size: 11px;
-                        font-weight: bold;
-                        line-height: 1.2;
-                    }
-
-                    .Qrcode_sec {
-                        width: 35%;
-                        text-align: center;
-                    }
-
-                    .ItemCodelable {
-                        font-size: 12px;
-                        font-weight: bold;
-                        margin-top: 2px;
-                    }
-
-                    .Slplable {
-                        font-size: 8px;
-                        font-weight: bold;
-                    }
-    </style>
-                ${htmlFragments.join('')}
-            `;
-
-                        const printWindow = window.open('', '', 'width=800,height=600');
-                        printWindow.document.open();
-                        printWindow.document.write(printHTML);
-                        printWindow.document.close();
-
-                        printWindow.focus();
-                        printWindow.print();
-                        printWindow.close();
-                    });
+                    if (line) lines.push(line);
+                    return lines.join('<br>');
                 }
 
+                const barcodeData = $('#boxTabCode').val()?.trim();
+                const itemName = $('#boxTabName').val()?.trim();
+                const qty = parseInt($('#boxQuantity').val(), 10);
+                const copies = parseInt($('#boxCopies').val(), 10);
+                const salesEmpId = $('#boxSalesEmployee').val();
+                const salesEmpName = $('#boxSalesEmployee option:selected').text().trim() || "";
+
+                // -------- VALIDATION --------
+                if (!barcodeData || !itemName || isNaN(qty) || isNaN(copies) || copies <= 0) {
+                    Swal.fire("Invalid input", "Please enter all required values", "warning");
+                    return;
+                }
+
+                if (salesEmpId === "-1") {
+                    Swal.fire("Warning", `Please select a Sales Employee for Item ${barcodeData}`, "warning");
+                    return;
+                }
+
+                const description = formatDescription(itemName);
+                const barcodeText = `${barcodeData}_${qty}`;
+                let html = '';
+
+                // -------- BARCODE GENERATION --------
+                for (let i = 0; i < copies; i++) {
+
+                    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+
+                    JsBarcode(svg, barcodeText, {
+                        format: "CODE128",
+                        width: 1,
+                        height: 20,
+                        displayValue: true,
+                        fontSize: 11
+                    });
+
+                    html += `
+                    <div class="Main">
+                        <div class="Description_sec">
+                            <div class="DescriptionText">${description}</div>
+                        </div>
+                        <div class="Barcode_sec">${svg.outerHTML}</div>
+                        <div class="slplable">
+                            <small>S. (${salesEmpId})</small>
+                        </div>
+                    </div>`;
+                }
+
+                // -------- PRINT CONTENT --------
+                const printHTML = `
+                    <style>
+                        @@page { size: 50mm 25mm; margin: 0; }
+                        body { margin: 0; font-family: Arial, sans-serif; }
+                        .Main {
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: space-between;
+                            width: 50mm;
+                            height: 25mm;
+                            padding: 5px;
+                            box-sizing: border-box;
+                        }
+                        .Barcode_sec { text-align: center; }
+                        .DescriptionText { font-size: 8px; font-weight: bold; text-align: center; }
+                        .slplable { font-size: 9px; font-weight: bold; text-align: center; }
+                    </style>
+                ${html}`;
+                const printWindow = window.open('', '_blank', 'width=600,height=400');
+                printWindow.document.write(printHTML);
+                printWindow.document.close();
+                printWindow.onload = () => {
+                printWindow.focus();
+                printWindow.print();
+                    // ---- LOG AFTER PRINT ----
+                    setTimeout(() => {
+                        var lines = [{
+                            ItemCode: barcodeData,
+                            ItemName: itemName,
+                            GRPO_DocEntry: "0",
+                            GRPO_NO: "0",
+                            GRPO_QTY: "0",
+                            Printed_QTY: copies.toString(),
+                            EmployeeID: salesEmpId,
+                            EmployeeName: salesEmpName,
+                            TabType: "BOXWISE"
+                        }];
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Action("ADDBARCODEPRINTLOG","Inventory")',
+                            contentType: "application/json; charset=utf-8",
+                            data: JSON.stringify(lines),
+                            success: function (data) {
+                                $("#btnReset").click();
+                            }
+                        });
+                        printWindow.close();
+                    }, 300);
+                };
+            });
+        }
+        // Load GRPO items when GRPO number changes
+        $("#grpoNumber").on("input", function () {
+            if ($("#grpoNumber").val().trim() === "") {
+                $("#grpoTbody").html("");
+                return;
             }
-
-        // Generate QR Code for ITEM tab
-            {
-                $("#generateItemQR").click(function () {
-
-                    var ItemCode1 = $("#txtItemCode").val();
-                    var descrio = $("#txtItemName").val();
-                    var Copies = $("#itemCopies").val();
-                    var QRSalesEmp1 = $("#itemSalesEmployee").val();
-                    var QRSalesEmpName1 = $("#itemSalesEmployee option:selected").text();
-
-                    if (!ItemCode1) {
-                        alert("Please provide an Item Code.");
-                        return;
+            LoadGrpoNumber($(this).val());
+        });
+        function LoadGrpoNumber(DocNum) {
+            $.ajax({
+                url: '@Url.Action("GETGRPOITEM", "Inventory")',
+                method: 'GET',
+                data: { id: DocNum },
+                success: function (response) {
+                    $("#grpoTbody").empty();
+                    if (response && response.length > 0) {
+                        // Populate table with GRPO items
+                        response.forEach(function (item, index) {
+                            var row = `
+                            <tr data-entry="${item.DocEntry}">
+                                <td class="text-center">
+                                    <input type="checkbox" class="row-checkbox">
+                                </td>
+                                <td>
+                                    <input class="form-control form-control-sm item-code-input"
+                                           value="${item.ItemCode || ''}"
+                                           placeholder="Item code" readonly>
+                                </td>
+                                <td>
+                                    <input class="form-control form-control-sm item-name-input"
+                                           value="${item.ItemName || ''}"
+                                           placeholder="Item name" readonly>
+                                </td>
+                                <td>
+                                    <input class="form-control form-control-sm group-qty-input"
+                                           type="number"
+                                           value="${parseInt(item.Quantity) || 1}"
+                                           min="1">
+                                </td>
+                                <td>
+                                    <input class="form-control form-control-sm sales-employee-input"
+                                           value=""
+                                           placeholder="Enter sales employee">
+                                </td>
+                            </tr>`;
+                            $("#grpoTbody").append(row);
+                        });
+                    } else {
+                        // If no data returned, show empty table
+                        $("#grpoTbody").html('<tr><td colspan="5" class="text-center">No items found for this GRPO</td></tr>');
+                        Notify('warning', 'No Data', `No items found for GRPO: ${DocNum}`);
                     }
-                    else if (QRSalesEmp1 === "-1") {
-                        Swal.fire(
-                            "Please select a Sales Employee for Item No " + ItemCode1,
-                            "",
-                            "warning"
-                        );
-                        return;
-                    }
+                },
+                error: function(xhr) {
+                    console.error("Error loading GRPO items:", xhr);
+                    Notify('error', 'Error', xhr.responseText || 'Error loading GRPO items');
+                }
+            });
+        }
+        //Load SalesEmp
+        {
+            var GrpoSalesEmployeeData = [];
+             loadEmployeeDropdown()
+             function loadEmployeeDropdown() {
+                 $.ajax({
+                     url: '@Url.Action("GETEMPLOYEEDROPDOWN", "Inventory")',
+                     type: 'GET',
+                     success: function (response) {
+                         GrpoSalesEmployeeData = response;
+                         const $ddl = $("#itemSalesEmployee,#boxSalesEmployee");
+                         $ddl.empty().append('<option value="">Select Employee</option>');
+                         response.forEach(function (emp) {
+                             $ddl.append(`
+                                 <option value="${emp.EmployeeID}" data-code="${emp.EmployeeCode}">
+                                     ${emp.FirstName} ${emp.LastName}
+                                 </option>
+                             `);
+                         });
+                     },
+                     error: function (xhr) {
+                         Notify('error', 'Error', xhr.responseText);
+                     }
+                 });
+             }
+            // 🔹 Input typing
+            $(document).on('input', '.sales-employee-input', function () {
 
-                    try {
+                const $input = $(this);
+                $activeGrpoSalesEmployeeInput = $input;
+
+                const search = $input.val().toLowerCase();
+                const rowIndex = $input.closest('tr').index();
+                const suggestionId = 'GrpoSalesEmployeeSuggestions-' + rowIndex;
+
+                if (!$('#' + suggestionId).length) {
+                    $('<div>', {
+                        id: suggestionId,
+                        class: 'suggestions-container'
+                    }).appendTo('body');
+                }
+
+                const $container = $('#' + suggestionId).empty();
+
+                if (!search || GrpoSalesEmployeeData.length === 0) {
+                    $container.hide();
+                    return;
+                }
+
+                // 🔍 Search by Code, FirstName, LastName
+                const matches = GrpoSalesEmployeeData.filter(emp => {
+                    const fullName = `${emp.FirstName} ${emp.LastName}`.toLowerCase();
+                    return (
+
+                        emp.EmployeeCode.toLowerCase().includes(search) ||
+                        emp.EmployeeID.toLowerCase().includes(search) ||
+                        emp.FirstName.toLowerCase().includes(search) ||
+                        emp.LastName.toLowerCase().includes(search) ||
+                        fullName.includes(search)
+                    );
+                }).slice(0, 10);
+
+                if (matches.length === 0) {
+                    $container.hide();
+                    return;
+                }
+
+                // 📌 Build suggestion list
+                matches.forEach(emp => {
+                    const fullName = `${emp.FirstName} ${emp.LastName}`;
+                    const EmpID = `${emp.EmployeeID}`
+
+                    $container.append(`
+                        <div class="suggestion-item GrpoSalesEmployee-item"
+                                   data-code="${emp.EmployeeCode}"
+                                   data-empid="${emp.EmployeeID.toString()}"
+                                   data-name="${fullName}">
+                        <strong>${emp.EmployeeCode}</strong> - ${fullName}
+                        </div>
+                           `);
+                });
+
+                const offset = $input.offset();
+                $container.css({
+                    top: offset.top + $input.outerHeight(),
+                    left: offset.left,
+                    width: $input.outerWidth(),
+                    position: 'absolute',
+                    zIndex: 1050
+                }).show();
+            });
 
 
+            // 🔹 Click suggestion → bind to same row
+            $(document).on('click', '.GrpoSalesEmployee-item', function () {
 
-                        var tempDiv = document.createElement("div");
+                const empName = $(this).data('name');      // John Doe
+                const empCode = $(this).data('code');      // EMP001
+                const empId = $(this).data('empid');     // 123
 
-                        var qrCode = new QRCode(tempDiv, {
-                            text: ItemCode1,
-                            width: 48,
-                            height: 48,
-                            correctLevel: QRCode.CorrectLevel.H
+                if (!$activeGrpoSalesEmployeeInput) return;
+
+                // ✅ Show name/code in input
+                $activeGrpoSalesEmployeeInput
+                    .val(empName)
+                    .attr('data-empid', empId.toString())   // ⭐ STORE EmployeeID HERE
+                    .attr('data-code', empCode); // optional
+
+                // Hide suggestions
+                $('.suggestions-container').hide();
+            });
+
+
+            // 🔹 Hide on outside click
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('.GrpoSalesEmployee, .suggestions-container').length) {
+                    $('.suggestions-container').hide();
+                }
+            });
+
+
+            // 🔹 Click suggestion → bind to same row
+            $(document).on('click', '.GrpoSalesEmployee-item', function () {
+
+                const empName = $(this).data('name');      // John Doe
+                const empCode = $(this).data('code');      // EMP001
+                const empId = $(this).data('empid');     // 123
+
+                if (!$activeGrpoSalesEmployeeInput) return;
+
+                // ✅ Show name/code in input
+                $activeGrpoSalesEmployeeInput
+                    .val(empName)
+                    .attr('data-empid', empId.toString())   // ⭐ STORE EmployeeID HERE
+                    .attr('data-code', empCode); // optional
+
+                // Hide suggestions
+                $('.suggestions-container').hide();
+            });
+
+
+            // 🔹 Hide on outside click
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('.GrpoSalesEmployee, .GrpoSalesEmployee-suggestions').length) {
+                    $('.suggestion-item').hide();
+                }
+            })
+        }
+        // Logs
+        {
+            $("#btnPrintingLog").click(function () {
+                $("#frefno,#rrefno").val("");
+                $('.datepicker').val(new Date().toISOString().split('T')[0]);
+                Findmode();
+            });
+
+            $("#FindBtnSearch").click(function () {
+                Findmode();
+            });
+
+            $("#FindBtnReset").click(function () {
+                $("#frefno,#rrefno").val("");
+                $("#ffromdate,#ftodate,#flogtype").val("");
+            });
+
+            function Findmode() {
+                var obj = {
+                    type: $("#flogtype").val() || '',
+                    fromdate: $("#ffromdate").val() || '',
+                    todate: $("#ftodate").val() || ''
+                };
+
+                $.ajax({
+                    url: '@Url.Action("GETSTIKERPRINTLOG", "Inventory")',
+                    method: 'GET',
+                    data: obj,
+                    success: function (response) {
+
+                        const table = $('#logtable');
+
+                        // Destroy existing DataTable safely
+                        if ($.fn.DataTable.isDataTable(table)) {
+                            table.DataTable().clear().destroy();
+                        }
+
+                        const tableBody = table.find('tbody');
+                        tableBody.empty();
+
+                        if (!response || response.length === 0) {
+                            return;
+                        }
+
+                        response.forEach(function (receipt) {
+                            const row = `
+                                <tr data-docentry="${receipt.GRPO_DocEntry || ''}">
+                                    <td>${receipt.ItemCode || ''}</td>
+                                    <td>${receipt.ItemName || ''}</td>
+                                    <td>${receipt.EmployeeName || ''}</td>
+                                    <td>${receipt.GRPO_NO || ''}</td>
+                                    <td>${parseInt(receipt.GRPO_QTY) || 0}</td>
+                                    <td>${parseInt(receipt.Printed_QTY) || 0}</td>
+                                    <td>${receipt.TabType || ''}</td>
+                                    <td>${receipt.CreateDateFormatted || receipt.CreateDate || ''}</td>
+                                    <td>${receipt.CretedByUName || ''}</td>
+                                </tr>
+                            `;
+                            tableBody.append(row);
                         });
 
-                        setTimeout(function () {
-
-                            var qrCodeHTML = tempDiv.innerHTML;
-                            var printhtml = "";
-
-                            for (var i = 0; i < Copies; i++) {
-
-                                var printhtml = "";
-                                // Prepare the Print HTML
-                                for (var i = 0; i < Copies; i++) {
-                                    printhtml += `
-
-            <style>
-                                            /* Page size for 50mm x 25mm */
-                                                @@page {
-                                                    size: 50mm 25mm;
-                                                    margin: 0; /* Remove margins */
-                                                }
-                                                @@media print {
-                                                    body {
-                                                          margin: 0;
-                                                          padding: 0;
-                                                          width: 50mm;
-                                                          height: 25mm;
-                                                          font-family: Arial, sans-serif;
-                                                      }
-                                                      .Main {
-                                                          display: flex;
-                                                          align-items: center;
-                                                          justify-content: space-between;
-                                                          width: 100%;
-                                                          height: 100%;
-                                                          box-sizing: border-box;
-                                                          padding: 5px;
-                                                          margin: 0;
-                                                      }
-                                                      .Qrcode_sec {
-                                                          width: 30%; /* Adjusted to fit */
-                                                          height: 100%;
-                                                          display: flex;
-                                                          align-items: center;
-                                                          justify-content: center;
-                                                      }
-                                                      .Bulkqrcode{
-                                                          text-align:right;
-                                                      }
-                                                      .Discripiton_sec {
-                                                          width: 70%; /* Adjusted to fit */
-                                                          height: 100%;
-                                                          display: flex;
-                                                          flex-direction: column;
-                                                          justify-content: center;
-                                                          padding: 0 5px;
-                                                          text-align:left;
-                                                          box-sizing: border-box;
-                                                      }
-                                                      .Discriptiontext {
-                                                          width: 100%; /* Adjusted to fit */
-                                                          height: 100%;
-                                                          font-size: 12px; /* Adjust font size to fit content */
-                                                          font-weight: bold;
-                                                          line-height: 1.2;
-
-                                                      }
-                                                      .ItemCodelable {
-                                                          font-size: 11px; /* Adjust font size */
-                                                          font-weight: bold;
-                                                          margin: 0;
-                                                          padding: 0;
-                                                          margin-top: -10px;
-                                                      }
-                                                      .Slplable {
-                                                          font-size: 8px; /* Adjust font size */
-                                                          font-weight: bold;
-                                                          margin: 0;
-                                                          padding: 0;
-                                                          margin-top: 0px;
-                                                      }
-                                                }
-
-                                        </style>
-
-            <div class="p-1 Main">
-            <div class="Discripiton_sec">
-            <div class="Discriptiontext"><br>${lineBreakAfter2UnderscoreAndSpace(descrio)}</div>
-            </div>
-            <div class="Qrcode_sec">
-            <div class="Bulkqrcode QRCode">
-                                                ${qrCodeHTML}<br>
-            <h6 class="ItemCodelable">${ItemCode1}</h6>
-            <h6 class="Slplable">S.(${QRSalesEmp1})</h6>
-            </div>
-            </div>
-            </div>
-
-                                `;
-
-                            }
-                            }
-
-                            var printWindow = window.open("", "", "width=1000,height=1000");
-
-                            printWindow.document.open();
-                            printWindow.document.write(printhtml);
-                            printWindow.document.close();
-
-                            printWindow.print();
-                            printWindow.close();
-
-                            var data = [
-                                {
-                                    ItemCode: ItemCode1,
-                                    DisCription: descrio,
-                                    PRINTQTY: Copies,
-                                    GRPOQTY: "0",
-                                    DocEntry: "0",
-                                    DocNum: "0",
-                                    UserId: sessionStorage.getItem("UserID"),
-                                    SaleEmpId: QRSalesEmp1,
-                                    SaleEmpName: QRSalesEmpName1
-                                }
-                            ];
-
-                            printWindow.addEventListener("unload", () => {
-                                $.ajax({
-                                    type: "POST",
-                                    url: '@Url.Action("ADDBARCODEPRINTLOG","Inventory")',
-                                    contentType: "application/json; charset=utf-8",
-                                    data: JSON.stringify(data),
-                                    cache: true,
-                                    success: function () {},
-                                    error: function (xhr) {
-                                        $("#error").text(xhr.responseJSON.error);
-                                    }
-                                });
-                            });
-
-                        }, 500);
-
-                    } catch (error) {
-                        console.error("Printing error:", error);
+                        // Reinitialize DataTable
+                        table.DataTable({
+                            dom: '<"top"lf>rt<"bottom"ip>',
+                            pageLength: 10,
+                            lengthMenu: [5, 10, 25, 50, 100],
+                            responsive: true,
+                            order: [[7, 'desc']], // Create Date
+                            columnDefs: [
+                                { orderable: false, targets: [] }
+                            ]
+                        });
+                    },
+                    error: function () {
+                        Notify('error', 'Failed to load receipt list', '');
                     }
                 });
-
-                $("#printQrButton").click(function () {
-                    var printWindow = window.open("", "", "width=1000,height=1000");
-                    var contentToPrint = $("#printContainer").html();
-
-                    printWindow.document.open();
-                    printWindow.document.write(contentToPrint);
-                    printWindow.document.close();
-
-                    printWindow.print();
-                    printWindow.close();
-                });
+            }
         }
+        //PRIVIEW BAR CODE
+        {
+                // Update QR preview on input change
+                $('#txtItemCode, #txtItemName, #itemSalesEmployee').on('input change', updateQRPreview);
 
-        // Generate Barcode for Box Wise
-             {
-               $('#generateBoxBarcode').click(function () {
-                   const barcodeData = $('#boxTabCode').val();
-                   const Quantity = parseInt($('#boxQuantity').val());
-                   const Copies = parseInt($('#boxCopies').val());
-                   const QRItemName1 = $('#boxTabName').val();
-                   var QRSalesEmp2 = $("#boxSalesEmployee").val();
-                   var QRSalesEmpName2 = $("#boxSalesEmployee option:selected").text();
-                         const description = lineBreakAfter2UnderscoreAndSpace(QRItemName1);
-                         if (!barcodeData || isNaN(Quantity) || isNaN(Copies) || !QRItemName1) {
-                             alert("Please provide valid input values.");
-                             return;
-                         }
-                         else if (QRSalesEmp2 == "-1") {
-                             Swal.fire("Please select a Sales Employee for Item No " + barcodeData, "", "warning");
-                             return;
-                         }
-                         const htmlFragments = [];
-                         const BarcodePromises = [];
-                         const tempContainer = document.createElement("div");
-                         tempContainer.style.display = "none"; // Hidden container
-                         document.body.appendChild(tempContainer);
-                         //if (Quantity > 100) {
-                         //    Swal.fire("Only 100 Copies Are Allow..!","","")
-                         //    return false
-                         //}
-                         for (let j = 0; j < Copies; j++) {
-                             const BarcodeString = `${barcodeData}_${Quantity}`;
-                             BarcodePromises.push(
-                                 new Promise((resolve) => {
-                                     const Barcode = document.createElement("svg");
-                                     tempContainer.appendChild(Barcode);
-                                     JsBarcode(Barcode, BarcodeString, {
-                                         format: "CODE128", // Barcode format
-                                         lineColor: "#000", // Barcode color
-                                         width: 1,          // Width of each bar
-                                         height: 20,       // Height of the barcode
-                                         displayValue: true, // Show the text below the barcode
-                                         fontSize: 11
-                                     });
+                // Update Barcode preview on input change
+                $('#boxTabCode, #boxTabName, #boxSalesEmployee, #boxQuantity, #boxCopies').on('input change', updateBarcodePreview);
 
-                                     // Wait for barcode to render
-                                     setTimeout(() => {
-                                         const svgHTML = Barcode.outerHTML; // Get generated SVG HTML
-                                            htmlFragments.push(`
-                                               <div class="Main">
-                                               <div class="Description_sec">
-                                               <div class="DescriptionText">
-                                                                                       ${description}
-                                               </div>
-                                               </div>
-                                               <div class="Barcode_sec">
-                                                                                      ${svgHTML}</br>
-                                               </div>
-                                               <div class="slplable">
-                                               <small class=""> S.(${QRSalesEmp2})</small>
-                                               </div>
-                                               </div>
-                                            `);
-                                         resolve();
-                                     }, 100);
-                                 })
-                             );
-                         }
-                         Promise.all(BarcodePromises).then(() => {
-                             document.body.removeChild(tempContainer);
-                                const printhtml = `
+                // Update QR Preview function
+                function updateQRPreview() {
+                    const itemCode = $('#txtItemCode').val().trim();
+                    const itemName = $('#txtItemName').val().trim();
+                    const salesEmployee = $('#itemSalesEmployee').val();
 
-                                   <style type="text/css">
-                                                             @@page {
-                                                                 size: 50mm 25mm;
-                                                                 margin: 0;
-                                                             }
-                                                             @@media print {
-                                                                 body {
-                                                                     margin: 0;
-                                                                     padding: 0;
-                                                                     width: 50mm;
-                                                                     height: 25mm;
-                                                                     font-family: Arial, sans-serif;
-                                                                 }
-                                                                 .Main {
-                                                                     display: flex;
-                                                                     flex-direction: column;
+                    // Update preview details
+                    $('#previewItemCode').text(itemCode || 'Not set');
+                    $('#previewItemName').text(itemName || 'Not set');
+                    $('#previewSalesEmployee').text(salesEmployee === '-No Sales Employee-' ? 'Not set' : salesEmployee);
 
-                                                                     width: 100%;
-                                                                     height: 100%;
-                                                                     box-sizing: border-box;
-                                                                     padding: 5px;
-                                                                     margin: 0;
-                                                                 }
-                                                                 .Barcode_sec {
-                                                                     width: 100%;
-                                                                     text-align: center;
-                                                                      padding: 0;
-                                                                      margin: 0;
+                    // If all required fields are filled, generate preview
+                    if (itemCode && itemName && salesEmployee !== '-No Sales Employee-') {
+                        generateQRCodePreview(itemCode, itemName, salesEmployee);
+                    } else {
+                        // Show placeholder if not all fields are filled
+                        $('#qrPreviewPlaceholder').removeClass('d-none');
+                        $('#qrPreviewCanvas').addClass('d-none');
+                        $('#qrPreviewImage').addClass('d-none');
+                        $('#downloadQrCode').prop('disabled', true);
+                    }
+                }
 
-                                                                 }
-                                                                 .Description_sec {
-                                                                     width: 100%;
-                                                                     text-align: center;
-                                                                     font-size: 8px;
-                                                                 }
-                                                                 .DescriptionText {
-                                                                     font-size: 8px!important;
-                                                                     font-weight:bolder;
-                                                                 }
-                                                                 .slplable {
-                                                                     font-size:9px!important;
-                                                                     font-weight:bolder;
-                                                                     text-align:center
-                                                                 }
-                                                             }
-                                   </style>
+               // Generate QR Code preview
+            function generateQRCodePreview(code, name, employee) {
 
-                                                         ${htmlFragments.join('')}
+                $('#qrPreviewPlaceholder').addClass('d-none');
+                function lineBreakAfter2UnderscoreAndSpace(text, maxLength = 17) {
+                    text = text.replace(/_/g, ' ');
+                    const words = text.split(' ');
+                    let result = '';
+                    let line = '';
 
-                                 `;
+                    for (let word of words) {
+                        if ((line + ' ' + word).trim().length <= maxLength) {
+                            line += (line ? ' ' : '') + word;
+                        } else {
+                            result += line + '<br>';
+                            line = word;
+                        }
+                    }
+                    if (line) result += line;
+                    return result;
+                }
 
-                             const printWindow = window.open("", "", "width=1000,height=1000");
-                             printWindow.document.open();
-                             printWindow.document.write(printhtml);
-                             printWindow.document.close();
-                             printWindow.print();
-                             printWindow.close();
-                             var data = [
-                                 {
-                                 ItemCode: barcodeData,
-                                 DisCription: QRItemName1,
-                                 PRINTQTY: Copies, // Use jQuery to find the input element
-                                 GRPOQTY: "0",
-                                 DocEntry: "0",
-                                 DocNum: "0",
-                                 UserId: sessionStorage.getItem("UserID"),
-                                 SaleEmpId: QRSalesEmp2,
-                                 SaleEmpName: QRSalesEmpName2,
-                              }];
-                                 printWindow.addEventListener("unload", () => {
-                                 $.ajax({
-                                      type: "POST",
-                                      url: '@Url.Action("ADDBARCODEPRINTLOG","Inventory")',
-                                      contentType: "application/json; charset=utf-8",
-                                      data: JSON.stringify(data),
-                                      cache: true,
-                                      success: function (data) {
+                // Clear preview first
+                const container = $('#qrmainpriview');
 
-                                      },
-                                      error: function (xhr, status, error) {
-                                          // handle error here
-                                          var errorMessage = xhr.responseJSON.error;
-                                          $("#error").text(errorMessage);
-                                      }
-                                  });
-                             });
-                         }).catch((error) => {
-                             console.error("Error generating barcodes:", error);
-                         });
-               });
-             }
+                // Hide placeholder & show preview
+                $('#qrPreviewPlaceholder').addClass('d-none');
+                container.empty().removeClass('d-none');
+
+                // Create centered preview card
+                const row = $(`
+<div class=" rounded d-flex justify-content-center align-items-center w-100 h-100">
+    <div class="row w-100 shadow-sm bg-white border rounded p-2 align-items-center"
+         style="min-height:120px">
+
+        <!-- LEFT TEXT -->
+        <div class="col-8 fw-bold text-start">
+            ${lineBreakAfter2UnderscoreAndSpace(name)}
+        </div>
+
+        <!-- RIGHT QR -->
+        <div class="col-4 d-flex flex-column align-items-end text-end">
+            <div id="qrBox" class="mb-1"></div>
+            <div class="fw-bold">${code}</div>
+            <div class="small">S. (${employee})</div>
+        </div>
+
+    </div>
+</div>
+`);
+                container.append(row);
+                new QRCode(row.find('#qrBox')[0], {
+                    text: code,
+                    width: 60,
+                    height: 60,
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                $("#generateItemQR,#downloadQrCode").prop("disabled", false);
+            }
 
 
-        function lineBreakAfter2UnderscoreAndSpace(text, maxLength = 17) {
-            text = text.replace(/_/g, ' ');
-            const words = text.split(' ');
-            let result = '';
-            let line = '';
 
-            for (let word of words) {
-                if ((line + ' ' + word).trim().length <= maxLength) {
-                    line += (line ? ' ' : '') + word;
-                } else {
-                    result += line + '\n';
-                    line = word;
+                // Update Barcode Preview function
+                function updateBarcodePreview() {
+                    const itemCode = $('#boxTabCode').val().trim();
+                    const itemName = $('#boxTabName').val().trim();
+                    const salesEmployee = $('#boxSalesEmployee').val();
+                    const quantity = $('#boxQuantity').val();
+                    const copies = $('#boxCopies').val();
+
+                    // Update preview details
+                    $('#previewBoxCode').text(itemCode || 'Not set');
+                    $('#previewBoxName').text(itemName || 'Not set');
+                    $('#previewBoxSalesEmployee').text(salesEmployee === '-No Sales Employee-' ? 'Not set' : salesEmployee);
+                    $('#previewBoxQuantity').text(quantity || '-');
+                    $('#previewBoxCopies').text(copies || '1');
+
+                    // If item code is filled, generate barcode preview
+                    if (itemCode) {
+                        generateBarcodePreview(itemCode, itemName, salesEmployee, quantity, copies);
+                    } else {
+                        // Show placeholder if no item code
+                        $('#barcodePreviewPlaceholder').removeClass('d-none');
+                        $('#barcodePreviewCanvas').addClass('d-none');
+                        $('#barcodePreviewImage').addClass('d-none');
+                        $('#downloadBarcode').prop('disabled', true);
+                        $('#printBarcode').prop('disabled', true);
+                    }
+                }
+                // Generate Barcode preview
+            // Generate Barcode preview
+            function generateBarcodePreview(code, name, employee, quantity, copies) {
+
+                const container = $('#BarcodePreviewImage');
+
+                // Show preview container, hide placeholder
+                $('#barcodePreviewPlaceholder').addClass('d-none');
+                container.removeClass('d-none').empty();
+
+                try {
+                    // Create SVG for barcode
+                    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+
+                    JsBarcode(svg, code, {
+                        format: "CODE128",
+                        width: 1.5,
+                        height: 40,
+                        displayValue: true,
+                        fontSize: 12
+                    });
+
+                    // Build preview HTML
+                    const html = `
+        <div class="d-flex justify-content-center align-items-center">
+            <div class="bg-white rounded p-2 text-center w-100 shadow-sm">
+
+                <div class="fw-bold mb-1">
+                    ${name || ''}
+                </div>
+
+                <div class="mb-1">
+                    ${svg.outerHTML}
+                </div>
+
+                <div class="fw-bold">
+                    ${code}_${quantity}
+                </div>
+
+                <div class="small">
+                    S. (${employee})
+                </div>
+
+            </div>
+        </div>`;
+
+                    container.html(html);
+
+                    // Enable actions
+                    $('#downloadBarcode, #generateBoxBarcode').prop('disabled', false);
+
+                } catch (error) {
+                    console.error('Barcode generation error:', error);
+
+                    // Restore placeholder on error
+                    container.addClass('d-none');
+                    $('#barcodePreviewPlaceholder').removeClass('d-none');
+                    $('#downloadBarcode, #generateBoxBarcode').prop('disabled', true);
                 }
             }
 
-            if (line) {
-                result += line;
-            }
+                // Download QR Code
+                $('#downloadQrCode').on('click', function () {
+                    const itemCode = $('#txtItemCode').val().trim() || 'item';
+                    const element = document.getElementById('qrmainpriview');
 
-            return result.trim();
+                    html2canvas(element, {
+                        backgroundColor: '#ffffff', // ensures white background
+                        scale: 2 // better image quality
+                    }).then(canvas => {
+                        const link = document.createElement('a');
+                        link.download = `qr-code-${itemCode}-${Date.now()}.png`;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                    });
+                });
+
+
+                // Download Barcode
+            // Download Barcode as Image
+            $('#downloadBarcode').on('click', function () {
+
+                const itemCode = $('#boxTabCode').val().trim() || 'barcode';
+                const element = document.getElementById('BarcodePreviewImage');
+
+                if (!element || element.classList.contains('d-none')) {
+                    alert('Barcode preview not available');
+                    return;
+                }
+
+                html2canvas(element, {
+                    backgroundColor: '#ffffff',
+                    scale: 2   // High quality image
+                }).then(canvas => {
+
+                    const link = document.createElement('a');
+                    link.download = `barcode-${itemCode}-${Date.now()}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+
+                }).catch(err => {
+                    console.error('Barcode download failed:', err);
+                });
+            });
+
+
+                // Print Barcode
+                $('#printBarcode').on('click', function () {
+                    const itemCode = $('#boxTabCode').val().trim();
+                    const itemName = $('#boxTabName').val().trim();
+                    const quantity = $('#boxQuantity').val();
+                    const printWindow = window.open('', '_blank');
+                    printWindow.document.write(`
+
+                                <style>
+                                    body { text-align: center; padding: 20px; }
+                                    img { max-width: 100%; height: auto; }
+                                    .details { text-align: left; margin-top: 20px; font-family: Arial, sans-serif; }
+                                </style>
+
+                                <h3>Barcode - ${itemName || itemCode || 'Item'}</h3>
+                                <img src="${$('#barcodePreviewImage').attr('src')}">
+                                <div class="details">
+                                    <p><strong>Item Code:</strong> ${itemCode || 'N/A'}</p>
+                                    <p><strong>Item Name:</strong> ${itemName || 'N/A'}</p>
+                                    <p><strong>Quantity:</strong> ${quantity || 'N/A'}</p>
+                                    <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+                                </div>
+                                <script>
+                                    window.onload = function() { window.print(); }
+                                <\/script>
+
+                    `);
+                    printWindow.document.close();
+                });
+
+                // Generate QR Code button click
+                $('#generateItemQR').on('click', updateQRPreview);
+
+                // Generate Barcode button click
+                $('#generateBoxBarcode').on('click', updateBarcodePreview);
+
+                // Initialize previews
+                updateQRPreview();
+                updateBarcodePreview();
         }
-
-
-
-
-
-
     });
     </script>
 }

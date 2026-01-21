@@ -1,522 +1,1076 @@
-﻿<style>
+﻿<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<style>
+    :root {
+        --theme-color: #343a40;
+        --primary-color: #4285f4;
+        --surface-color: #ffffff;
+        --background-color: #f8f9fa;
+        --border-color: #e9ecef;
+    }
+
+    .compact-card {
+        box-sizing: border-box;
+        background: var(--surface-color);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        border: 1px solid var(--border-color);
+        max-width: 380px;
+        margin: 0 auto;
+    }
+
+    .compact-card {
+        max-width: 100%;
+        width: 100%;
+        margin: 0;
+    }
+
+    .right-panel-gap {
+        padding-left: 13px;
+        padding-right: 2px;
+    }
+
+    /* Compact Header */
+    .compact-header {
+        background: linear-gradient(135deg, var(--theme-color), #2c3338);
+        padding: 1rem 1.25rem;
+        position: relative;
+    }
+
+        .compact-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), #34a853);
+        }
+
+    .compact-chip {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 20px;
+        padding: 0.3rem 0.75rem;
+        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* Image Section */
+    .image-section {
+        background: var(--background-color);
+        padding: 1rem;
+        text-align: center;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .product-image {
+        max-height: 100px;
+        object-fit: contain;
+        margin: 0 auto;
+    }
+
+    /* Compact Stats */
+    .compact-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+        padding: 1rem;
+        background: var(--background-color);
+    }
+
+    .compact-stat {
+        background: var(--surface-color);
+        border-radius: 8px;
+        padding: 0.75rem 0.5rem;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border: 1px solid var(--border-color);
+    }
+
+    .stat-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), #3367d6);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.4rem;
+        font-size: 0.8rem;
+    }
+
+    .stat-value {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--theme-color);
+        line-height: 1.1;
+    }
+
+    .stat-label {
+        font-size: 1rem;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-top: 0.2rem;
+    }
+
+    /* Two Column Details */
+    .details-compact {
+        padding: 1rem;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .detail-box {
+        background: var(--background-color);
+        border-radius: 8px;
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .detail-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #495057;
+        font-size: 1.10rem;
+        font-weight: 500;
+        margin-bottom: 0.3rem;
+    }
+
+    .detail-icon-small {
+        width: 20px;
+        height: 20px;
+        border-radius: 5px;
+        background: rgba(66, 133, 244, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-color);
+        font-size: 0.7rem;
+    }
+
+    .detail-value {
+        font-weight: 600;
+        color: var(--theme-color);
+        font-size: 1rem;
+        padding-left: 1.75rem;
+    }
+
+    /* Pricing Sections */
+    .pricing-sections {
+        padding: 0 1rem;
+    }
+
+    .pricing-section {
+        margin-bottom: 1rem;
+    }
+
+    .section-title-small {
+        font-size: 0.8rem;
+        color: var(--theme-color);
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.3rem;
+        border-bottom: 2px solid #f1f3f5;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Material Total */
+    .material-total {
+        background: linear-gradient(135deg, var(--theme-color), #2c3338);
+        padding: 1rem;
+        color: white;
+        text-align: center;
+        border-radius: 0 0 12px 12px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .total-display {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0.3rem 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .total-label {
+        font-size: 0.75rem;
+        opacity: 0.9;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Color Variations */
+    .price-stat .stat-icon {
+        background: linear-gradient(135deg, #4285f4, #3367d6);
+    }
+
+    .weight-stat .stat-icon {
+        background: linear-gradient(135deg, #fbbc05, #f9ab00);
+    }
+
+    .stock-stat .stat-icon {
+        background: linear-gradient(135deg, #34a853, #2e8b47);
+    }
+
+    .quantity-stat .stat-icon {
+        background: linear-gradient(135deg, #ea4335, #d23d31);
+    }
+
+    /* Left border colors */
+    .detail-box:nth-child(1) {
+        border-left: 3px solid #4285f4;
+    }
+
+    .detail-box:nth-child(2) {
+        border-left: 3px solid #34a853;
+    }
+
+    .detail-box:nth-child(3) {
+        border-left: 3px solid #fbbc05;
+    }
+
+    .detail-box:nth-child(4) {
+        border-left: 3px solid #ea4335;
+    }
+
+    .detail-box:nth-child(5) {
+        border-left: 3px solid #9c27b0;
+    }
+
+    .detail-box:nth-child(6) {
+        border-left: 3px solid #00bcd4;
+    }
+
+    .detail-box:nth-child(7) {
+        border-left: 3px solid #ff9800;
+    }
+
+    .detail-box:nth-child(8) {
+        border-left: 3px solid #8bc34a;
+    }
+
+    /* Responsive */
+    @@media (max-width: 400px) {
+        .compact-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .carousel-image-slide {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+        .carousel-image-slide.active-slide {
+            opacity: 1;
+        }
+
+    .carousel-image-slide {
+        position: absolute;
+        inset: 0;
+    }
+
+
+    .carousel-dot {
+        width: 4px;
+        height: 4px;
+        background: #cbd5e0;
+        transition: all 0.3s ease;
+    }
+
+        .carousel-dot.active-dot {
+            background: #4a5568;
+            width: 12px;
+            border-radius: 2px;
+        }
+
+    .carousel-nav-button {
+        width: 20px;
+        height: 20px;
+        background: rgba(255,255,255,0.9);
+    }
+
+    .carousel-nav-button {
+        z-index: 10;
+        cursor: pointer;
+        pointer-events: auto;
+    }
+
+    .carousel-image-slide {
+        pointer-events: none;
+    }
 </style>
 <div class="container-fluid">
-    <div class="row mt-2">
-        <div class="col-12">
-            <div class="card p-2 rounded shadow-sm">
-                <div class="row">
-                    <div class="col-md-6 d-flex align-items-center">
-                        <h3 id="doctitle"><b>Delivery Note</b></h3>
-                    </div>
-                    <div class="col-md-6 d-flex justify-content-end align-items-center flex-wrap">
-                        @if (ViewBag.BtnAuth != null)
-                        {
-
-                            <!-- Button Rendering Logic -->
-                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+    <div class="row mt-2  gx-0">
+        <div class="col-sm-12 col-md-12 col-lg-9">
+            <div class="col-12">
+                <div class="card p-2 rounded shadow-sm">
+                    <div class="row">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <h3 id="doctitle"><b>Delivery Note</b></h3>
+                        </div>
+                        <div class="col-md-6 d-flex justify-content-end align-items-center flex-wrap">
+                            @if (ViewBag.BtnAuth != null)
                             {
-                                var btnName = item["BtnName"]?.ToString().Trim();
-                                var btnauth = item["Auth"]?.ToString();
-                                var icon = item["Icon"]?.ToString();
-                                var ColorClass = item["ColorClass"]?.ToString();
-                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
-                                {
-                                    switch (btnName)
-                                    {
-                                        @*   case "Bulk Upload":
-                                            <button id="btnBulkUpload" data-bs-toggle="modal" data-bs-target="#bulkUploadModal" class="btn @ColorClass mb-1  me-2 mb-1">
-                                                <i class="@icon"></i> @btnName
-                                            </button>
-                                            break; *@
-                                        case "Find":
-                                            <button id="btnFind" data-bs-toggle="modal" data-bs-target="#receiptListModal" class="btn @ColorClass mb-1  me-2 mb-1">
-                                                <i class="@icon"></i> @btnName
-                                            </button>
-                                            break;
-                                        case "Attachments":
-                                            <button id="Attachments" data-bs-toggle="modal" data-bs-target="#Attachment" class="btn @ColorClass mb-1   me-2 mb-1">
-                                                <i class="@icon"></i> @btnName
-                                            </button>
-                                            break;
-                                        case "Export":
-                                            <button id="btnPdf" class="btn btn-outline-danger me-2 mb-1">
-                                                <i class="bi bi-file-pdf me-1"></i> PDF
-                                            </button>
-                                            <button id="btnExcel" class="btn btn-outline-success me-2 mb-1">
-                                                <i class="bi bi-file-earmark-excel me-1"></i> EXCEL
-                                            </button>
-                                            <button id="btnCSV" class="btn btn-outline-success me-2 mb-1">
-                                                <i class="bi bi-file-earmark-excel me-1"></i> CSV
-                                            </button>
-                                            break;
-                                        case "Copy From":
-                                            <div class="dropdown">
-                                                <button id="btnCopyFrom" class="btn @ColorClass mb-1  dropdown-toggle me-2 mb-1" type="button" disabled data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="@icon"></i> @btnName
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li class='copyfrombtn' data-flag="SQ" data-bs-toggle="modal"><a class="dropdown-item" href="#">Sales Quotation</a></li>
-                                                    <li class='copyfrombtn' data-flag="SO" data-bs-toggle="modal"><a class="dropdown-item" href="#">Sales Order</a></li>
-                                                </ul>
-                                            </div>
-                                            break;
-                                        case "Copy To":
-                                            <div class="dropdown">
-                                                <button id="btnCopyTo" class="btn @ColorClass mb-1  dropdown-toggle me-2 mb-1" type="button" disabled data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="@icon"></i> @btnName
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li class='copytobtn' data-flag="SR"><a class="dropdown-item" href="#">Return</a></li>
-                                                    <li class='copytobtn' data-flag="STI"><a class="dropdown-item" href="#">Sales Tax Invoice</a></li>
-                                                </ul>
-                                            </div>
-                                            break;
-                                        default:
 
-                                            break;
+                                <!-- Button Rendering Logic -->
+                                @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                                {
+                                    var btnName = item["BtnName"]?.ToString().Trim();
+                                    var btnauth = item["Auth"]?.ToString();
+                                    var icon = item["Icon"]?.ToString();
+                                    var ColorClass = item["ColorClass"]?.ToString();
+                                    if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                    {
+                                        switch (btnName)
+                                        {
+                                            @*   case "Bulk Upload":
+                                                <button id="btnBulkUpload" data-bs-toggle="modal" data-bs-target="#bulkUploadModal" class="btn @ColorClass mb-1  me-2 mb-1">
+                                                    <i class="@icon"></i> @btnName
+                                                </button>
+                                                break; *@
+                                            case "Find":
+                                                <button id="btnFind" data-bs-toggle="modal" data-bs-target="#receiptListModal" class="btn @ColorClass mb-1  me-2 mb-1">
+                                                    <i class="@icon"></i> @btnName
+                                                </button>
+                                                break;
+                                            case "Attachments":
+                                                <button id="Attachments" data-bs-toggle="modal" data-bs-target="#Attachment" class="btn @ColorClass mb-1   me-2 mb-1">
+                                                    <i class="@icon"></i> @btnName
+                                                </button>
+                                                break;
+                                            case "Export":
+                                                <button id="btnPdf" class="btn btn-outline-danger me-2 mb-1">
+                                                    <i class="bi bi-file-pdf me-1"></i> PDF
+                                                </button>
+                                                <button id="btnExcel" class="btn btn-outline-success me-2 mb-1">
+                                                    <i class="bi bi-file-earmark-excel me-1"></i> EXCEL
+                                                </button>
+                                                <button id="btnCSV" class="btn btn-outline-success me-2 mb-1">
+                                                    <i class="bi bi-file-earmark-excel me-1"></i> CSV
+                                                </button>
+                                                break;
+                                            case "Copy From":
+                                                <div class="dropdown">
+                                                    <button id="btnCopyFrom" class="btn @ColorClass mb-1  dropdown-toggle me-2 mb-1" type="button" disabled data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="@icon"></i> @btnName
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li class='copyfrombtn' data-flag="SQ" data-bs-toggle="modal"><a class="dropdown-item" href="#">Sales Quotation</a></li>
+                                                        <li class='copyfrombtn' data-flag="SO" data-bs-toggle="modal"><a class="dropdown-item" href="#">Sales Order</a></li>
+                                                    </ul>
+                                                </div>
+                                                break;
+                                            case "Copy To":
+                                                <div class="dropdown">
+                                                    <button id="btnCopyTo" class="btn @ColorClass mb-1  dropdown-toggle me-2 mb-1" type="button" disabled data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="@icon"></i> @btnName
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li class='copytobtn' data-flag="SR"><a class="dropdown-item" href="#">Return</a></li>
+                                                        <li class='copytobtn' data-flag="STI"><a class="dropdown-item" href="#">Sales Tax Invoice</a></li>
+                                                    </ul>
+                                                </div>
+                                                break;
+                                            default:
+
+                                                break;
+                                        }
                                     }
                                 }
                             }
-                        }
-                        else
-                        {
-                            <div class="alert alert-primary" role="alert">
+                            else
+                            {
+                                <div class="alert alert-primary" role="alert">
 
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mt-3">
+                <div class="card p-3 rounded shadow-sm">
+
+                    <!-- Action Buttons -->
+                    <div class="row mb-3">
+                        <!-- Left Section (Details) -->
+                        <div class="col-12 col-md-7 mb-3">
+                            <div class="d-flex flex-wrap align-items-center">
+                                <h6 data-bs-toggle="modal" data-bs-target="#createCustomerModal" class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
+                                    style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301; cursor:pointer">
+                                    <i class="bi bi-person-plus-fill me-1 fs-6"></i>
+                                    <span class="addbtn">Add</span>
+                                </h6>
+                                <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
+                                    style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
+                                    <i class="bi bi-person-circle me-2 fs-6"></i>
+                                    <span class="ledgername"></span>
+                                </h6>
+                                <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
+                                    style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
+                                    <i class="bi bi-telephone-fill me-1 fs-6"></i>
+                                    <span class="ledger_mobileno"></span>
+                                </h6>
+                                <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
+                                    style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
+                                    <span class=" me-1 fs-6">Gst:</span>
+                                    <span class="ledger_gstno"></span>
+                                </h6>
+                                <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
+                                    style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
+                                    <span class=" me-1 fs-6">Bal:</span>
+                                    <span class="ledger_balance">0.00</span>
+                                </h6>
+                                <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
+                                    style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
+                                    <span class=" me-1 fs-6">Cr Limit:</span>
+                                    <span class="ledger_creditLimit">0.00</span>
+                                </h6>
+                                <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
+                                    style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
+                                    <span class=" me-1 fs-6">Cr Days:</span>
+                                    <span class="ledger_credit">0.00</span>
+                                </h6>
+                                <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
+                                    style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
+                                    <span class=" me-1 fs-6">Address:</span>
+                                    <span class="ledger_add"></span>
+                                </h6>
                             </div>
-                        }
+                        </div>
+                        <!-- Right Section (Buttons) -->
+                        <div class="col-12 col-md-5 text-end justify-content-md-end justify-content-start flex-wrap">
+                            @if (ViewBag.BtnAuth != null)
+                            {
+                                @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                                {
+                                    var btnName = item["BtnName"]?.ToString().Trim();
+                                    var btnauth = item["Auth"]?.ToString();
+                                    var icon = item["Icon"]?.ToString();
+                                    var ColorClass = item["ColorClass"]?.ToString();
+
+                                    if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                    {
+                                        switch (btnName)
+                                        {
+                                            case "Save":
+                                                <button id="btnSave" data-action="create" class="btn @ColorClass mb-2 me-2">
+                                                    <i class="@icon"></i> @btnName
+                                                </button>
+                                                break;
+                                            case "Park":
+                                                <button id="btnPark" class="btn @ColorClass mb-2 me-2">
+                                                    <i class="@icon"></i> @btnName
+                                                </button>
+                                                break;
+                                            case "Resume":
+                                                <button id="btnResume" data-bs-toggle="modal" data-bs-target="#ResumeModal" class="btn @ColorClass mb-2 me-2">
+                                                    <i class="@icon"></i> @btnName
+                                                </button>
+                                                break;
+                                            case "Print":
+                                                <button id="btnPrint" data-bs-toggle="modal" data-bs-target="#PrintModal" class="btn @ColorClass mb-2 me-2" disabled>
+                                                    <i class="@icon"></i> @btnName
+                                                </button>
+                                                break;
+                                            case "Delete":
+                                                <button id="btnDelete" data-action="delete" class="btn @ColorClass mb-2 me-2" disabled>
+                                                    <i class="@icon"></i> @btnName
+                                                </button>
+                                                break;
+                                            case "Reset":
+                                                <button id="btnReset" class="btn @ColorClass mb-2 me-2">
+                                                    <i class="@icon"></i> Reset
+                                                </button>
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <div class="alert alert-primary w-100" role="alert">
+                                    No actions available
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Header Information -->
+                    <div class="row">
+                        <div class="col-md-2 col-6 mb-2" hidden>
+                            <input id="DocumentEntry" hidden class="form-control" type="text" readonly />
+                            <input data-obj="" id="BaseEntry" hidden class="form-control" type="text" readonly />
+
+                            <input id="doctype" type="text" hidden value="SD" class="form-control" />
+                        </div>
+                        <div class="col-md-2 col-6 mb-2">
+                            <label for="Docnum" class="form-label">Document Number</label>
+                            <input id="Docnum" class="form-control" type="text" readonly />
+                        </div>
+                        <div class="col-md-3 col-6 mb-2">
+                            <label for="LedgerCode" class="form-label">Customer</label>
+                            <div class="input-group">
+                                <input id="LedgerCode" class="form-control" type="text" data-id="" data-code="" />
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ledgerListModal">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 mb-2">
+                            <label for="DocumentDate" class="form-label">Document Date</label>
+                            <input id="DocumentDate" class="form-control datepicker" type="date" />
+                        </div>
+                        <div class="col-md-3 col-6 mb-2">
+                            <label for="Remarks" class="form-label">Remarks</label>
+                            <textarea id="Remarks" class="form-control" rows="1"></textarea>
+                        </div>
+                        <div class="col-md-1 col-6 mb-1 d-flex justify-content-center align-items-center">
+                            <button class="btn btn-light mt-4"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#myCollapse">
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                        </div>
+                        <!-- Collapse Content -->
+
+                        <div class="collapse mt-3 row" id="myCollapse">
+
+
+                            <div class="col-md-2 col-6 mb-2">
+                                <label for="DocStatus" class="form-label">Status</label>
+                                <select id="DocStatus" class="form-select" disabled>
+                                    <option value="O">Open</option>
+                                    <option value="C">Close</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-2 col-6 mb-2">
+                                <label for="PostingDate" class="form-label">Posting Date</label>
+                                <input id="PostingDate" class="form-control datepicker" type="date" />
+                            </div>
+
+
+
+                            <div class="col-md-2 col-6 mb-2">
+                                <label for="DueDate" class="form-label">Due Date</label>
+                                <input id="DueDate" class="form-control datepicker" type="date" />
+                            </div>
+                            <div class="col-md-2 col-6 mb-2">
+                                <label for="DeliveryDate" class="form-label">Delivery Date</label>
+                                <input id="DeliveryDate" class="form-control datepicker" type="date" />
+                            </div>
+
+
+                            <div class="col-md-2 col-6 mb-2">
+                                <label for="AddID" class="form-label">Ship To Address</label>
+                                <select id="AddID" class="form-select">
+                                    <option value="">Select</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 col-6 mb-2">
+                                <label for="RefNo" class="form-label">Reference No</label>
+                                <input id="RefNo" class="form-control" type="text" />
+                            </div>
+
+                            <div class="col-md-2 col-6 mb-2">
+                                <label for="TotalWeight" class="form-label">Total Weight (kg)</label>
+                                <input id="TotalWeight" class="form-control" type="number" step="1" readonly />
+                            </div>
+                            <div class="col-md-2 col-6 mb-2">
+                                <label for="FYearId" class="form-label">Fiscal Year</label>
+                                <select id="FYearId" class="form-select">
+                                    <option value="">Select Fiscal Year</option>
+                                    <!-- Will be populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Line Items -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="table-responsive">
+                                    <table class="table  table-hover" id="mainitemtable">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th nowrap>Sr No</th>
+                                                <th nowrap>Delete</th>
+                                                <th nowrap>Remark</th>
+                                                <th hidden nowrap>EAN Code</th>
+                                                <th nowrap>Item Code</th>
+                                                <th nowrap>Item Name</th>
+                                                <th nowrap>Quantity</th>
+                                                <th hidden nowrap>Open Quantity</th>
+                                                <th hidden nowrap>Base Quantity</th>
+
+                                                <th nowrap>UOM</th>
+                                                <th hidden nowrap>Warehouse</th>
+                                                <th hidden nowrap>In Stock</th>
+                                                <th nowrap>MRP</th>
+                                                <th nowrap>Unit Price</th>
+                                                <th nowrap>Net Amt</th>
+                                                <th nowrap>Dis%</th>
+                                                <th hidden nowrap>Dis Amt</th>
+                                                <th hidden nowrap>Taxeble Amt</th>
+                                                <th hidden nowrap>After Bill Disc</th>
+                                                <th nowrap>GST%</th>
+                                                <th hidden nowrap>GST Amt</th>
+
+                                                <th hidden nowrap>Status</th>
+                                                <th hidden nowrap>BaseLine</th>
+                                                <th hidden nowrap>BaseDocEntry</th>
+                                                <th hidden nowrap>BaseObjType</th>
+
+                                                <th hidden nowrap>CGST%</th>
+                                                <th hidden nowrap>CGST Amt</th>
+                                                <th hidden nowrap>SGST%</th>
+                                                <th hidden nowrap>SGST Amt</th>
+                                                <th hidden nowrap>IGST%</th>
+                                                <th hidden nowrap>IGST Amt</th>
+                                                <th hidden nowrap>UTGST%</th>
+                                                <th hidden nowrap>UTGST Amt</th>
+
+                                                <th hidden nowrap>Total Amt</th>
+                                                <th hidden nowrap>Weight</th>
+                                                <th hidden nowrap>HSN</th>
+                                                <th hidden nowrap>ItemCost</th>
+                                                <th nowrap hidden>Account</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr data-id='' class="line-item">
+                                                <td>1</td>
+                                                <td class="text-center">
+                                                    <button class="btn btn-sm btn-outline-danger remove-line" disabled>
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                                <td><textarea style='width:150px!important; height:9px;' type="text" class="form-control form-control-sm text-end Remarks" value=""></textarea></td>
+                                                <td hidden><input style='width:100px!important;' type="text" class="form-control form-control-sm ItemEan"></td>
+                                                <td>
+                                                    <div class="input-group" style='width:200px!important;'>
+                                                        <input data-id='' type="text" class="form-control form-control-sm ItemCode" placeholder="Item Code">
+                                                        <button class="btn btn-sm btn-outline-secondary openmodal" type="button" data-bs-toggle="modal" data-bs-target="#itemSearchModal">
+                                                            <i class="bi bi-search"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td><input style='width:250px!important;' type="text" class="form-control form-control-sm ItemName"></td>
+
+                                                <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Quantity" min="0" value="1" step="1"></td>
+                                                <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end OpenQuantity" readonly min="0" value="" step="1"></td>
+                                                <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end BaseQuantity" readonly min="0" value="" step="1"></td>
+                                                <td>
+                                                    <select style='width:100px!important;' class="form-select form-select-sm ItemUOM">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                </td>
+                                                <td hidden>
+                                                    <select style='width:100px!important;' class="form-select form-select-sm WhsCode">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                </td>
+                                                <td hidden><input type="number" style='width:100px!important;' class="text-info form-control form-control-sm text-end StockInWhs" readonly value=""></td>
+                                                <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Mrp" min="0" step="1"></td>
+                                                <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Price" readonly min="0" step="1"></td>
+                                                <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end NetAmt" min="0" step="1"></td>
+                                                <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end DisPer" min="0" max="100" step="1" value=""></td>
+                                                <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end DisAmount" readonly></td>
+                                                <td hidden> <input style='width:100px!important;' type="number" class="form-control form-control-sm text-end TaxableAmt" readonly></td>
+                                                <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end AftBillDisc" readonly></td>
+                                                <td>
+                                                    <select style='width:100px!important;' class="form-select form-select-sm TaxCode">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                </td>
+                                                <td hidden>
+                                                    <div class="input-group" style='width:200px!important;'>
+                                                        <input type="number" class="form-control form-control-sm text-end TaxAmount" readonly>
+                                                        <button class="btn btn-sm btn-primary opentaxeblemodal"><i class="bi bi-eye"></i></button>
+                                                    </div>
+                                                </td>
+                                                <td hidden><input style='width:100px!important;' type="text" value='O' class="form-control form-control-sm text-end Status" readonly></td>
+                                                <td hidden><input style='width:100px!important;' type="text" value='' class="form-control form-control-sm text-end BaseLine" readonly></td>
+                                                <td hidden><input style='width:100px!important;' type="text" value='' class="form-control form-control-sm text-end BaseDocEntry" readonly></td>
+                                                <td hidden><input style='width:100px!important;' type="text" value='' class="form-control form-control-sm text-end BaseObjType" readonly></td>
+                                                <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end CGSTRate" readonly></td>
+                                                <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end CGSTAmt" readonly></td>
+                                                <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end SGSTRate" readonly></td>
+                                                <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end SGSTAmt" readonly></td>
+                                                <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end IGSTRate" readonly></td>
+                                                <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end IGSTAmt" readonly></td>
+                                                <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end UTGSTRate" readonly></td>
+                                                <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end UTGSTAmt" readonly></td>
+
+                                                <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end TotalAmount" readonly></td>
+                                                <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Weight1" min="0" step="1"></td>
+                                                <td hidden><input style='width:100px!important;' data-id='' type="text" class="form-control form-control-sm ItemHSN" readonly></td>
+                                                <td hidden><input style='width:100px!important;' data-id='' type="text" class="form-control form-control-sm ItemCost" readonly></td>
+                                                <td hidden>
+                                                    <input type="text" style='width:80px!important;' class="form-control form-control-sm AcctCode">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-12 text-end mt-3">
+                                @if (ViewBag.BtnAuth != null)
+                                {
+                                    <!-- Button Rendering Logic -->
+                                    @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
+                                    {
+                                        var btnName = item["BtnName"]?.ToString().Trim();
+                                        var btnauth = item["Auth"]?.ToString();
+                                        var icon = item["Icon"]?.ToString();
+                                        var ColorClass = item["ColorClass"]?.ToString();
+
+                                        if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
+                                        {
+                                            switch (btnName)
+                                            {
+                                                case "Add New Line":
+                                                    <button class="btn @ColorClass mb-1 " id="btnAddLine"><i class="@icon"></i> @btnName</button>
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="alert alert-primary" role="alert">
+
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <!-- ERP-Style Footer Summary - Optimized -->
+                        <div class="container-fluid mt-4 border-top pt-3 small">
+                            <div class="row g-2">
+                                <div class="col-md-2  col-lg-4 col-xl-7">
+
+                                </div>
+                                <!-- Tax Summary with Modal Trigger -->
+                                <div class="col-md-10 col-lg-8 col-xl-5">
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold text-dark small">
+                                                <i class="bi bi-calculator text-primary"></i> Gross
+                                            </label>
+                                            <input id="GrossTotal" class="form-control form-control-sm text-end  bg-info text-white" type="text" readonly value="0.00">
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold text-dark small">
+                                                <i class="bi bi-percent text-warning"></i> <i class="bi bi-rup text-warning"></i> Discount
+                                            </label>
+                                            <style>
+                                                /* Change placeholder color for all inputs */
+                                                ::placeholder { /* Standard syntax */
+                                                    color: white !important; /* Light gray color */
+                                                    opacity: 1; /* Firefox reduces opacity by default */
+                                                }
+                                            </style>
+                                            <div class="input-group input-group-sm">
+                                                <input id="TotalDiscount" class="form-control form-control-sm text-end bg-success  text-white" placeholder="(%)" type="text" value="">
+                                                <input id="TotalDiscountAmt" class="form-control form-control-sm text-end bg-danger text-white" placeholder="(₹)" type="text" readonly value="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold text-dark small">
+                                                <i class="bi bi-cash text-info"></i> After Bill Discount Amt
+                                            </label>
+                                            <input id="aftBillDisc" class="form-control form-control-sm text-end bg-warning" type="text" readonly value="0.00">
+                                        </div>
+                                    </div>
+                                    <div class="row g-2">
+
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-bold text-dark small">
+                                                <i class="bi bi-calculator text-primary"></i> Freight
+                                            </label>
+                                            <div class="input-group input-group-sm">
+                                                <input id="FreightTotal" class="form-control form-control-sm text-end  bg-dark text-white" type="text" readonly value="0.00">
+                                                <button class="btn btn-primary" id="ResetFreightCalc" data-bs-target="#FreighModal" data-bs-toggle="modal"><i class="bi bi-plus"></i></button>
+                                            </div>
+                                            <input id="FreightTax" type="number" hidden value="0.00" />
+                                            <input id="FreightCGSTTax" type="number" hidden value="0.00" />
+                                            <input id="FreightSGSTTax" type="number" hidden value="0.00" />
+                                            <input id="FreightIGSTTax" type="number" hidden value="0.00" />
+                                            <input id="FreightUTGSTTax" type="number" hidden value="0.00" />
+
+
+
+
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-bold text-dark small">
+                                                <i class="bi bi-receipt text-danger"></i> GST
+                                            </label>
+                                            <div class="input-group input-group-sm">
+                                                <input id="GSTTotal" class="form-control form-control-sm text-end bg-secondary text-white" type="text" readonly value="0.00">
+                                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#taxDetailsModal">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-bold text-dark small">
+                                                <i class="bi bi-arrow-repeat text-secondary"></i> Rounding
+                                            </label>
+                                            <input id="Rounding" class="form-control form-control-sm text-end bg-primary text-white" type="number" step="1" value="0.00">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-bold text-dark small">
+                                                <i class="bi bi-currency-rupee text-success"></i> Net Total
+                                            </label>
+                                            <input id="NETTotal" class="form-control form-control-sm fw-bold text-end bg-success bg-opacity-0 text-white" type="text" readonly value="0.00">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 mt-3">
-            <div class="card p-3 rounded shadow-sm">
-               
-                <!-- Action Buttons -->
-                <div class="row mb-3">
-                    <!-- Left Section (Details) -->
-                    <div class="col-12 col-md-7 mb-3">
-                        <div class="d-flex flex-wrap align-items-center">
-                            <h6 data-bs-toggle="modal" data-bs-target="#createCustomerModal" class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
-                                style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301; cursor:pointer">
-                                <i class="bi bi-person-plus-fill me-1 fs-6"></i>
-                                <span class="addbtn">Add</span>
-                            </h6>
-                            <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
-                                style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
-                                <i class="bi bi-person-circle me-2 fs-6"></i>
-                                <span class="ledgername"></span>
-                            </h6>
-                            <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
-                                style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
-                                <i class="bi bi-telephone-fill me-1 fs-6"></i>
-                                <span class="ledger_mobileno"></span>
-                            </h6>
-                            <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
-                                style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
-                                <span class=" me-1 fs-6">Gst:</span>
-                                <span class="ledger_gstno"></span>
-                            </h6>
-                            <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
-                                style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
-                                <span class=" me-1 fs-6">Bal:</span>
-                                <span class="ledger_balance">0.00</span>
-                            </h6>
-                            <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
-                                style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
-                                <span class=" me-1 fs-6">Cr Limit:</span>
-                                <span class="ledger_creditLimit">0.00</span>
-                            </h6>
-                            <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
-                                style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
-                                <span class=" me-1 fs-6">Cr Days:</span>
-                                <span class="ledger_credit">0.00</span>
-                            </h6>
-                            <h6 class="mb-2 d-flex align-items-center shadow-sm px-2 py-1 rounded me-2"
-                                style="color: white; font-weight: 600; font-size: 14px; background-color: #FF3301;">
-                                <span class=" me-1 fs-6">Address:</span>
-                                <span class="ledger_add"></span>
-                            </h6>
+
+        <!-- Item Card Widget (col-4 on desktop, full width on mobile) -->
+
+        <div class="col-lg-3 col-md-6 right-panel-gap">
+            <!-- Compact Material Card -->
+            <div class="compact-card" id="itemCardWidget">
+
+                <!-- Header -->
+                <div class="compact-header text-white">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="compact-chip">
+                            <i class="fas fa-barcode fa-xs"></i>
+                            <span class="item-code-badge">ITM-Code</span>
+                        </div>
+                        <div class="compact-chip" style="background: rgba(52, 168, 83, 0.15);">
+                            <i class="fas fa-check-circle fa-xs"></i>
+                            <spn class="">Stock</spn>
+                            <span class="Item-Card-Stock">00</span>
                         </div>
                     </div>
-                    <!-- Right Section (Buttons) -->
-                    <div class="col-12 col-md-5 text-end justify-content-md-end justify-content-start flex-wrap">
-                        @if (ViewBag.BtnAuth != null)
-                        {
-                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
-                            {
-                                var btnName = item["BtnName"]?.ToString().Trim();
-                                var btnauth = item["Auth"]?.ToString();
-                                var icon = item["Icon"]?.ToString();
-                                var ColorClass = item["ColorClass"]?.ToString();
+                    <h5 class="mb-1 fw-semibold card-title mb-2" style="font-size: 1.1rem;">Product Name</h5>
+                    <p class="mb-4 opacity-85" style="font-size: 0.8rem;">
+                    </p>
+                </div>
 
-                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
-                                {
-                                    switch (btnName)
-                                    {
-                                        case "Save":
-                                            <button id="btnSave" data-action="create" class="btn @ColorClass mb-2 me-2">
-                                                <i class="@icon"></i> @btnName
-                                            </button>
-                                            break;
-                                        case "Park":
-                                            <button id="btnPark" class="btn @ColorClass mb-2 me-2">
-                                                <i class="@icon"></i> @btnName
-                                            </button>
-                                            break;
-                                        case "Resume":
-                                            <button id="btnResume" data-bs-toggle="modal" data-bs-target="#ResumeModal" class="btn @ColorClass mb-2 me-2">
-                                                <i class="@icon"></i> @btnName
-                                            </button>
-                                            break;
-                                        case "Print":
-                                            <button id="btnPrint" data-bs-toggle="modal" data-bs-target="#PrintModal" class="btn @ColorClass mb-2 me-2" disabled>
-                                                <i class="@icon"></i> @btnName
-                                            </button>
-                                            break;
-                                        case "Delete":
-                                            <button id="btnDelete" data-action="delete" class="btn @ColorClass mb-2 me-2" disabled>
-                                                <i class="@icon"></i> @btnName
-                                            </button>
-                                            break;
-                                        case "Reset":
-                                            <button id="btnReset" class="btn @ColorClass mb-2 me-2">
-                                                <i class="@icon"></i> Reset
-                                            </button>
-                                            break;
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            <div class="alert alert-primary w-100" role="alert">
-                                No actions available
-                            </div>
-                        }
+                <!-- Image Section -->
+                <!-- Mini Image Carousel -->
+                <div class="bg-light ">
+                    <div class="position-relative rounded overflow-hidden bg-white shadow-sm" style="height: 200px;">
+                        <div class="carousel-image-slide active-slide position-absolute w-100 h-100 d-flex align-items-center justify-content-center">
+                            <img class="img-fluid Card" src="https://ito-group.com/wp-content/uploads/2025/04/no-image.jpg" alt="Product Front">
+                        </div>
+
+                        <button type="button"
+                                class="carousel-nav-button carousel-prev-btn position-absolute top-50 start-0 translate-middle-y rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center"
+                                id="carouselPrevBtn">
+                            <i class="fas fa-chevron-left fa-xs"></i>
+                        </button>
+
+                        <button type="button"
+                                class="carousel-nav-button carousel-next-btn position-absolute top-50 end-0 translate-middle-y rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center"
+                                id="carouselNextBtn">
+                            <i class="fas fa-chevron-right fa-xs"></i>
+                        </button>
+
+                    </div>
+                    <div class="carousel-indicator-dots d-flex justify-content-center gap-1 mt-2">
+                        <div class="carousel-dot active-dot rounded-circle" data-slide-index="0"></div>
+                        <div class="carousel-dot rounded-circle" data-slide-index="1"></div>
+                        <div class="carousel-dot rounded-circle" data-slide-index="2"></div>
                     </div>
                 </div>
 
-                <!-- Header Information -->
-                <div class="row">
-                    <div class="col-md-2 col-6 mb-2" hidden>
-                        <input id="DocumentEntry" hidden class="form-control" type="text" readonly />
-                        <input data-obj="" id="BaseEntry" hidden class="form-control" type="text" readonly />
-
-                        <input id="doctype" type="text" hidden value="SD" class="form-control" />
-                    </div>
-                    <div class="col-md-2 col-6 mb-2">
-                        <label for="Docnum" class="form-label">Document Number</label>
-                        <input id="Docnum" class="form-control" type="text" readonly />
-                    </div>
-
-                    <div class="col-md-2 col-6 mb-2">
-                        <label for="DocStatus" class="form-label">Status</label>
-                        <select id="DocStatus" class="form-select" disabled>
-                            <option value="O">Open</option>
-                            <option value="C">Close</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-2 col-6 mb-2">
-                        <label for="PostingDate" class="form-label">Posting Date</label>
-                        <input id="PostingDate" class="form-control datepicker" type="date" />
-                    </div>
-
-
-                    <div class="col-md-2 col-6 mb-2">
-                        <label for="DocumentDate" class="form-label">Document Date</label>
-                        <input id="DocumentDate" class="form-control datepicker" type="date" />
-                    </div>
-                    <div class="col-md-2 col-6 mb-2">
-                        <label for="DueDate" class="form-label">Due Date</label>
-                        <input id="DueDate" class="form-control datepicker" type="date" />
-                    </div>
-                    <div class="col-md-2 col-6 mb-2">
-                        <label for="DeliveryDate" class="form-label">Delivery Date</label>
-                        <input id="DeliveryDate" class="form-control datepicker" type="date" />
-                    </div>
-
-                    <div class="col-md-2 col-6 mb-2">
-                        <label for="LedgerCode" class="form-label">Customer</label>
-                        <div class="input-group">
-                            <input id="LedgerCode" class="form-control" type="text" data-id="" data-code="" />
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ledgerListModal">
-                                <i class="bi bi-search"></i>
-                            </button>
+                <!-- Compact Stats -->
+                <div class="compact-stats">
+                    <div class="compact-stat price-stat">
+                        <div class="stat-icon">
+                            <i class="fas fa-tag"></i>
                         </div>
-                    </div>
-                    <div class="col-md-2 col-6 mb-2">
-                        <label for="AddID" class="form-label">Ship To Address</label>
-                        <select id="AddID" class="form-select">
-                            <option value="">Select</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2 col-6 mb-2">
-                        <label for="RefNo" class="form-label">Reference No</label>
-                        <input id="RefNo" class="form-control" type="text" />
+                        <div class="stat-value price-color">
+                            ₹<span class="Item-Card-Price">00</span>
+                        </div>
+                        <div class="stat-label">Price</div>
                     </div>
 
-                    <div class="col-md-2 col-6 mb-2">
-                        <label for="Remarks" class="form-label">Remarks</label>
-                        <textarea id="Remarks" class="form-control" rows="1"></textarea>
+                    <div class="compact-stat weight-stat">
+                        <div class="stat-icon">
+                            <i class="fas fa-weight"></i>
+                        </div>
+                        <div class="stat-value">
+                            <span class="Item-Card-Weight">00</span>
+                        </div>
+                        <div class="stat-label">Weight</div>
                     </div>
-                    <div class="col-md-2 col-6 mb-2">
-                        <label for="TotalWeight" class="form-label">Total Weight (kg)</label>
-                        <input id="TotalWeight" class="form-control" type="number" step="1" readonly />
+
+                    <div class="compact-stat">
+                        <div class="stat-icon">
+                            <i class="fas fa-cube"></i>
+                        </div>
+                        <div class="stat-value">
+                            <span class="Item-Card-Uom">UOM</span>
+                        </div>
+                        <div class="stat-label">UOM</div>
                     </div>
-                    <div class="col-md-2 col-6 mb-2">
-                        <label for="FYearId" class="form-label">Fiscal Year</label>
-                        <select id="FYearId" class="form-select">
-                            <option value="">Select Fiscal Year</option>
-                            <!-- Will be populated dynamically -->
-                        </select>
+
+                    <div class="compact-stat quantity-stat">
+                        <div class="stat-icon">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div class="stat-value">
+                            <span class="Card-Quantity">00</span>
+                        </div>
+                        <div class="stat-label">Quantity</div>
                     </div>
                 </div>
-                <!-- Line Items -->
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="table-responsive">
-                            <table class="table  table-hover" id="mainitemtable">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th nowrap>Sr No</th>
-                                        <th nowrap>Delete</th>
-                                        <th nowrap>Remark</th>
-                                        <th hidden nowrap>EAN Code</th>
-                                        <th nowrap>Item Code</th>
-                                        <th nowrap>Item Name</th>
-                                        <th nowrap>Quantity</th>
-                                        <th nowrap>Open Quantity</th>
-                                        <th hidden nowrap>Base Quantity</th>
 
-                                        <th nowrap>UOM</th>
-                                        <th hidden nowrap>Warehouse</th>
-                                        <th nowrap>In Stock</th>
-                                        <th nowrap>MRP</th>
-                                        <th nowrap>Unit Price</th>
-                                        <th nowrap>Net Amt</th>
-                                        <th nowrap>Dis%</th>
-                                        <th nowrap>Dis Amt</th>
-                                        <th nowrap>Taxeble Amt</th>
-                                        <th hidden nowrap>After Bill Disc</th>
-                                        <th nowrap>GST%</th>
-                                        <th nowrap>GST Amt</th>
-
-                                        <th hidden nowrap>Status</th>
-                                        <th hidden nowrap>BaseLine</th>
-                                        <th hidden nowrap>BaseDocEntry</th>
-                                        <th hidden nowrap>BaseObjType</th>
-
-                                        <th hidden nowrap>CGST%</th>
-                                        <th hidden nowrap>CGST Amt</th>
-                                        <th hidden nowrap>SGST%</th>
-                                        <th hidden nowrap>SGST Amt</th>
-                                        <th hidden nowrap>IGST%</th>
-                                        <th hidden nowrap>IGST Amt</th>
-                                        <th hidden nowrap>UTGST%</th>
-                                        <th hidden nowrap>UTGST Amt</th>
-
-                                        <th nowrap>Total Amt</th>
-                                        <th nowrap>Weight</th>
-                                        <th nowrap>HSN</th>
-                                        <th nowrap>ItemCost</th>
-                                        <th nowrap hidden>Account</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr data-id='' class="line-item">
-                                        <td>1</td>
-                                        <td class="text-center">
-                                            <button class="btn btn-sm btn-outline-danger remove-line" disabled>
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </td>
-                                        <td><textarea style='width:150px!important; height:9px;' type="text" class="form-control form-control-sm text-end Remarks" value=""></textarea></td>
-                                        <td hidden><input style='width:100px!important;' type="text" class="form-control form-control-sm ItemEan"></td>
-                                        <td>
-                                            <div class="input-group" style='width:200px!important;'>
-                                                <input data-id='' type="text" class="form-control form-control-sm ItemCode" placeholder="Item Code">
-                                                <button class="btn btn-sm btn-outline-secondary openmodal" type="button" data-bs-toggle="modal" data-bs-target="#itemSearchModal">
-                                                    <i class="bi bi-search"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                        <td><input style='width:250px!important;' type="text" class="form-control form-control-sm ItemName"></td>
-
-                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Quantity" min="0" value="1" step="1"></td>
-                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end OpenQuantity" readonly min="0" value="" step="1"></td>
-                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end BaseQuantity" readonly min="0" value="" step="1"></td>
-                                        <td>
-                                            <select style='width:100px!important;' class="form-select form-select-sm ItemUOM">
-                                                <option value="">Select</option>
-                                            </select>
-                                        </td>
-                                        <td hidden>
-                                            <select style='width:100px!important;' class="form-select form-select-sm WhsCode">
-                                                <option value="">Select</option>
-                                            </select>
-                                        </td>
-                                        <td><input type="number" style='width:100px!important;' class="text-info form-control form-control-sm text-end StockInWhs" readonly value=""></td>
-                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Mrp" min="0" step="1"></td>
-                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Price" readonly min="0" step="1"></td>
-                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end NetAmt" min="0" step="1"></td>
-                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end DisPer" min="0" max="100" step="1" value=""></td>
-                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end DisAmount" readonly></td>
-                                        <td> <input style='width:100px!important;' type="number" class="form-control form-control-sm text-end TaxableAmt" readonly></td>
-                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end AftBillDisc" readonly></td>
-                                        <td>
-                                            <select style='width:100px!important;' class="form-select form-select-sm TaxCode">
-                                                <option value="">Select</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <div class="input-group" style='width:200px!important;'>
-                                                <input type="number" class="form-control form-control-sm text-end TaxAmount" readonly>
-                                                <button class="btn btn-sm btn-primary opentaxeblemodal"><i class="bi bi-eye"></i></button>
-                                            </div>
-                                        </td>
-                                        <td hidden><input style='width:100px!important;' type="text" value='O' class="form-control form-control-sm text-end Status" readonly></td>
-                                        <td hidden><input style='width:100px!important;' type="text" value='' class="form-control form-control-sm text-end BaseLine" readonly></td>
-                                        <td hidden><input style='width:100px!important;' type="text" value='' class="form-control form-control-sm text-end BaseDocEntry" readonly></td>
-                                        <td hidden><input style='width:100px!important;' type="text" value='' class="form-control form-control-sm text-end BaseObjType" readonly></td>
-                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end CGSTRate" readonly></td>
-                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end CGSTAmt" readonly></td>
-                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end SGSTRate" readonly></td>
-                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end SGSTAmt" readonly></td>
-                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end IGSTRate" readonly></td>
-                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end IGSTAmt" readonly></td>
-                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end UTGSTRate" readonly></td>
-                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end UTGSTAmt" readonly></td>
-
-                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end TotalAmount" readonly></td>
-                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Weight1" min="0" step="1"></td>
-                                        <td><input style='width:100px!important;' data-id='' type="text" class="form-control form-control-sm ItemHSN" readonly></td>
-                                        <td><input style='width:100px!important;' data-id='' type="text" class="form-control form-control-sm ItemCost" readonly></td>
-                                        <td hidden>
-                                            <input type="text" style='width:80px!important;' class="form-control form-control-sm AcctCode">
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col-12 text-end mt-3">
-                        @if (ViewBag.BtnAuth != null)
-                        {
-                            <!-- Button Rendering Logic -->
-                            @foreach (var item in (List<Dictionary<string, object>>)ViewBag.BtnAuth)
-                            {
-                                var btnName = item["BtnName"]?.ToString().Trim();
-                                var btnauth = item["Auth"]?.ToString();
-                                var icon = item["Icon"]?.ToString();
-                                var ColorClass = item["ColorClass"]?.ToString();
-
-                                if (btnauth == "Y" && !string.IsNullOrEmpty(btnName))
-                                {
-                                    switch (btnName)
-                                    {
-                                        case "Add New Line":
-                                            <button class="btn @ColorClass mb-1 " id="btnAddLine"><i class="@icon"></i> @btnName</button>
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            <div class="alert alert-primary" role="alert">
-
+                <!-- Two Column Details -->
+                <div class="details-compact">
+                    <div class="details-grid">
+                        <!-- Column 1 -->
+                        <div class="detail-box">
+                            <div class="detail-label">
+                                <div class="detail-icon-small">
+                                    <i class="fas fa-box-open"></i>
+                                </div>
+                                <span>Stock</span>
                             </div>
-                        }
+                            <div class="detail-value">
+                                <span class="Item-Card-Stock">00</span>
+                            </div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">
+                                <div class="detail-icon-small">
+                                    <i class="fas fa-box-open"></i>
+                                </div>
+                                <span>Open Qty</span>
+                            </div>
+                            <div class="detail-value">
+                                <span class="Card-Open-Qty">00</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-box">
+                            <div class="detail-label">
+                                <div class="detail-icon-small">
+                                    <i class="fas fa-hashtag"></i>
+                                </div>
+                                <span>HSN Code</span>
+                            </div>
+                            <div class="detail-value">
+                                <span class="Card-Hsn-Code">00</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-box">
+                            <div class="detail-label">
+                                <div class="detail-icon-small">
+                                    <i class="fas fa-percentage"></i>
+                                </div>
+                                <span>GST Rate</span>
+                            </div>
+                            <div class="detail-value">
+                                <span class="Card-GST-Rate">00</span>%
+                            </div>
+                        </div>
+
+                        <div class="detail-box">
+                            <div class="detail-label">
+                                <div class="detail-icon-small">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                                <span>GST Amount</span>
+                            </div>
+                            <div class="detail-value">
+                                ₹<span class="Card-GST-Amount">00</span>
+                            </div>
+                        </div>
+
+                        <!-- Column 2 -->
+                        <div class="detail-box">
+                            <div class="detail-label">
+                                <div class="detail-icon-small">
+                                    <i class="fas fa-money-bill-alt"></i>
+                                </div>
+                                <span>Item Cost</span>
+                            </div>
+                            <div class="detail-value">
+                                ₹<span class="Card-Item-Cost">00</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-box">
+                            <div class="detail-label">
+                                <div class="detail-icon-small">
+                                    <i class="fas fa-tag"></i>
+                                </div>
+                                <span>Discount %</span>
+                            </div>
+                            <div class="detail-value">
+                                <span class="Item-Card-Discount">00</span>%
+                            </div>
+                        </div>
+
+                        <div class="detail-box">
+                            <div class="detail-label">
+                                <div class="detail-icon-small">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <span>Discount Amt</span>
+                            </div>
+                            <div class="detail-value">
+                                ₹<span class="Item-Card-DiscountAmt">00</span>
+                            </div>
+                        </div>
+
+
                     </div>
                 </div>
-                <!-- ERP-Style Footer Summary - Optimized -->
-                <div class="container-fluid mt-4 border-top pt-3 small">
-                    <div class="row g-2">
-                        <div class="col-md-2  col-lg-4 col-xl-7">
 
-                        </div>
-                        <!-- Tax Summary with Modal Trigger -->
-                        <div class="col-md-10 col-lg-8 col-xl-5">
-                            <div class="row g-2 mb-3">
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold text-dark small">
-                                        <i class="bi bi-calculator text-primary"></i> Gross
-                                    </label>
-                                    <input id="GrossTotal" class="form-control form-control-sm text-end  bg-info text-white" type="text" readonly value="0.00">
-                                </div>
-
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold text-dark small">
-                                        <i class="bi bi-percent text-warning"></i> <i class="bi bi-rup text-warning"></i> Discount
-                                    </label>
-                                    <style>
-                                        /* Change placeholder color for all inputs */
-                                        ::placeholder { /* Standard syntax */
-                                            color: white !important; /* Light gray color */
-                                            opacity: 1; /* Firefox reduces opacity by default */
-                                        }
-                                    </style>
-                                    <div class="input-group input-group-sm">
-                                        <input id="TotalDiscount" class="form-control form-control-sm text-end bg-success  text-white" placeholder="(%)" type="text" value="">
-                                        <input id="TotalDiscountAmt" class="form-control form-control-sm text-end bg-danger text-white" placeholder="(₹)" type="text" readonly value="">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold text-dark small">
-                                        <i class="bi bi-cash text-info"></i> After Bill Discount Amt
-                                    </label>
-                                    <input id="aftBillDisc" class="form-control form-control-sm text-end bg-warning" type="text" readonly value="0.00">
-                                </div>
-                            </div>
-                            <div class="row g-2">
-
-                                <div class="col-md-3">
-                                    <label class="form-label fw-bold text-dark small">
-                                        <i class="bi bi-calculator text-primary"></i> Freight
-                                    </label>
-                                    <div class="input-group input-group-sm">
-                                        <input id="FreightTotal" class="form-control form-control-sm text-end  bg-dark text-white" type="text" readonly value="0.00">
-                                        <button class="btn btn-primary" id="ResetFreightCalc" data-bs-target="#FreighModal" data-bs-toggle="modal"><i class="bi bi-plus"></i></button>
-                                    </div>
-                                    <input id="FreightTax" type="number" hidden value="0.00" />
-                                    <input id="FreightCGSTTax" type="number" hidden value="0.00" />
-                                    <input id="FreightSGSTTax" type="number" hidden value="0.00" />
-                                    <input id="FreightIGSTTax" type="number" hidden value="0.00" />
-                                    <input id="FreightUTGSTTax" type="number" hidden value="0.00" />
-
-
-
-
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label fw-bold text-dark small">
-                                        <i class="bi bi-receipt text-danger"></i> GST
-                                    </label>
-                                    <div class="input-group input-group-sm">
-                                        <input id="GSTTotal" class="form-control form-control-sm text-end bg-secondary text-white" type="text" readonly value="0.00">
-                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#taxDetailsModal">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label fw-bold text-dark small">
-                                        <i class="bi bi-arrow-repeat text-secondary"></i> Rounding
-                                    </label>
-                                    <input id="Rounding" class="form-control form-control-sm text-end bg-primary text-white" type="number" step="1" value="0.00">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label fw-bold text-dark small">
-                                        <i class="bi bi-currency-rupee text-success"></i> Net Total
-                                    </label>
-                                    <input id="NETTotal" class="form-control form-control-sm fw-bold text-end bg-success bg-opacity-0 text-white" type="text" readonly value="0.00">
-                                </div>
-                            </div>
-                        </div>
+                <!-- Material Total -->
+                <div class="material-total">
+                    <div class="total-label">Total Amount</div>
+                    <div class="total-display">
+                        ₹<span class="Summery-Card-TotalAmount">00</span>
+                    </div>
+                    <div style="opacity: 0.8; font-size: 0.75rem; margin-top: 0.3rem;">
+                        <i class="fas fa-info-circle me-1"></i>
+                        All taxes included
                     </div>
                 </div>
             </div>
@@ -526,7 +1080,7 @@
 
 <!-- Modals -->
 <!-- Freigh Details Modal -->
-<div class="modal fade" id="FreighModal" tabindex="-1" aria-labelledby="FreighModalLabel" aria-hidden="true" data-bs-backdrop="static"  data-bs-keyboard="false">
+<div class="modal fade" id="FreighModal" tabindex="-1" aria-labelledby="FreighModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-light py-3">
@@ -569,7 +1123,7 @@
                 </div>
                 <div class="modal-footer py-2">
                     <button type="button" class="btn btn-sm btn-outline-dark" id="ResetFreight">Reset</button>
-                    <button type="button" class="btn btn-sm btn-outline-primary" id="AddFreight" >Add</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="AddFreight">Add</button>
                 </div>
             </div>
         </div>
@@ -809,6 +1363,9 @@
 </div>
 <script>
     $(document).ready(function() {
+                let itemCardAutoSlideTimer = null;
+        const ITEM_CARD_SLIDE_INTERVAL = 2000; // 3 seconds
+
         // Initialize variables
         let selectedRowIndex = null;
         $('.datepicker').val(new Date().toISOString().split('T')[0]);
@@ -910,7 +1467,7 @@
                                         </td>
                                         <td><input style='width:250px!important;' type="text" class="form-control form-control-sm ItemName"></td>
                                         <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Quantity" min="0" value="1" step="1"></td>
-                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end OpenQuantity" readonly min="0" value="" step="1"></td>
+                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end OpenQuantity" readonly min="0" value="" step="1"></td>
                                         <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end BaseQuantity" readonly min="0" value="" step="1"></td>
                                         <td>
                                             <select style='width:100px!important;' class="form-select form-select-sm ItemUOM">
@@ -922,20 +1479,20 @@
                                                 <option value="">Select</option>
                                             </select>
                                         </td>
-                                        <td><input type="number" style='width:100px!important;' class="text-info form-control form-control-sm text-end StockInWhs" readonly value=""></td>
+                                        <td hidden><input type="number" style='width:100px!important;' class="text-info form-control form-control-sm text-end StockInWhs" readonly value=""></td>
                                         <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Mrp" min="0" step="1"></td>
                                         <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Price" readonly min="0" step="1"></td>
                                         <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end NetAmt" min="0" step="1"></td>
                                         <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end DisPer" min="0" max="100" step="1" value=""></td>
-                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end DisAmount" readonly></td>
-                                        <td > <input style='width:100px!important;' type="number" class="form-control form-control-sm text-end TaxableAmt" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end DisAmount" readonly></td>
+                                        <td hidden> <input style='width:100px!important;' type="number" class="form-control form-control-sm text-end TaxableAmt" readonly></td>
                                         <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end AftBillDisc" readonly></td>
                                         <td>
                                             <select style='width:100px!important;' class="form-select form-select-sm TaxCode">
                                                 <option value="">Select</option>
                                             </select>
                                         </td>
-                                        <td>
+                                        <td hidden>
                                             <div class="input-group" style='width:200px!important;'>
                                                 <input  type="number" class="form-control form-control-sm text-end TaxAmount" readonly>
                                                 <button class="btn btn-sm btn-primary opentaxeblemodal"><i class="bi bi-eye"></i></button>
@@ -956,10 +1513,10 @@
                                         <td hidden ><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end UTGSTRate" readonly></td>
                                         <td hidden ><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end UTGSTAmt" readonly></td>
 
-                                        <td ><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end TotalAmount" readonly></td>
-                                        <td><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Weight1" min="0" step="1"></td>
-                                        <td><input style='width:100px!important;' data-id='' type="text" class="form-control form-control-sm ItemHSN" readonly></td>
-                                        <td><input style='width:100px!important;' data-id='' type="text" class="form-control form-control-sm ItemCost" readonly></td>
+                                        <td hidden ><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end TotalAmount" readonly></td>
+                                        <td hidden><input style='width:100px!important;' type="number" class="form-control form-control-sm text-end Weight1" min="0" step="1"></td>
+                                        <td hidden><input style='width:100px!important;' data-id='' type="text" class="form-control form-control-sm ItemHSN" readonly></td>
+                                        <td hidden><input style='width:100px!important;' data-id='' type="text" class="form-control form-control-sm ItemCost" readonly></td>
                                         <td hidden>
                                             <input type="text" style='width:80px!important;' class="form-control form-control-sm AcctCode">
                                         </td>
@@ -1220,6 +1777,7 @@
                 $('#Rounding').val(fmt(roundingAmount));
                 calculateTotalWeight()
                 calculatelinetotal()
+                rendarCard(triggerRow);
             }
             function calculatelinetotal() {
                 $('#mainitemtable tbody tr').each(function () {
@@ -3424,6 +3982,200 @@
                   }
               });
         }
+
+
+        async function rendarCard(row) {
+
+            if (!row || row.length === 0) return;
+
+            var cardItemCode = row.find('.ItemCode').attr('data-id');
+
+
+            if (!cardItemCode) return;
+
+            $(".item-code-badge").text(row.find(".ItemCode").val());
+            $(".card-title").text(row.find(".ItemName").val() || 0) ;
+            $(".Item-Card-Stock").text(row.find(".StockInWhs").val() ||0);
+            $(".Item-Card-Price").text(row.find(".Mrp").val() || 0);
+            $(".Item-Card-Weight").text(row.find(".Weight1").val() || 0);
+            $(".Item-Card-Uom").text(
+                row.find(".ItemUOM option:selected").text()
+            );
+            $(".Card-Quantity").text(row.find(".Quantity").val() || 0);
+            $(".Card-Open-Qty").text(row.find(".OpenQuantity").val() || 0);
+            $(".Card-Hsn-Code").text(row.find(".ItemHSN").val());
+            $(".Card-GST-Rate").text(
+                row.find(".TaxCode option:selected").text()
+            );
+            $(".Card-GST-Amount").text(row.find(".TaxAmount").val());
+            $(".Card-Item-Cost").text(row.find(".ItemCost").val());
+            $(".Item-Card-Discount").text(row.find(".DisPer").val());
+            $(".Item-Card-DiscountAmt").text(row.find(".DisAmount").val());
+            $(".Summery-Card-TotalAmount").text(row.find(".TotalAmount").val());
+
+            await loadCardImage(cardItemCode);
+        }
+        async function loadCardImage(cardItemCode) {
+
+        return $.ajax({
+            url: '@Url.Action("GETATTACHMENTS", "Attachment")',
+            type: 'POST',
+            data: {
+                docId: cardItemCode,
+                ObjType: 'ITM'
+            }
+        }).done(function (res) {
+            console.log("Attachment",res);
+
+            const $carousel = $('#itemCardWidget');
+            const $imageContainer = $carousel.find('.position-relative.rounded.overflow-hidden');
+            const $dots = $carousel.find('.carousel-indicator-dots');
+
+            // CLEAR OLD
+            $imageContainer.find('.carousel-image-slide').remove();
+            $dots.empty();
+
+            // 🔴 IF NO IMAGE FROM API → ADD PLACEHOLDER
+            if (!res || res.length === 0) {
+
+                $imageContainer.append(`
+                    <div class="carousel-image-slide active-slide position-absolute w-100 h-100
+                        d-flex align-items-center justify-content-center">
+                        <img class="img-fluid Card"
+                             src="https://ito-group.com/wp-content/uploads/2025/04/no-image.jpg"
+                             alt="No Image">
+                    </div>
+                `);
+
+                $dots.append(`
+                    <div class="carousel-dot active-dot rounded-circle" data-slide-index="0"></div>
+                `);
+
+                initItemCardCarousel(); // 🔥 INIT
+                return;
+            }
+
+            // ADD API IMAGES
+            res.forEach((img, index) => {
+
+                const imgSrc = `data:image/${img.Extension};base64,${img.base64data}`;
+
+                $imageContainer.append(`
+                    <div class="carousel-image-slide position-absolute w-100 h-100
+                        d-flex align-items-center justify-content-center
+                        ${index === 0 ? 'active-slide' : ''}">
+                        <img class="img-fluid Card" src="${imgSrc}" alt="${img.FileName}">
+                    </div>
+                `);
+
+                $dots.append(`
+                    <div class="carousel-dot rounded-circle
+                        ${index === 0 ? 'active-dot' : ''}"
+                        data-slide-index="${index}">
+                    </div>
+                `);
+            });
+
+            initItemCardCarousel(); // 🔥 RE-INIT AFTER DOM UPDATE
+        });
+    }
+        function initItemCardCarousel() {
+
+            const $card = $('#itemCardWidget');
+            const $slides = $card.find('.carousel-image-slide');
+            const $dots = $card.find('.carousel-dot');
+            const $nextBtn = $card.find('#carouselNextBtn');
+            const $prevBtn = $card.find('#carouselPrevBtn');
+
+            if ($slides.length === 0) return;
+
+            // Hide arrows if single image
+            if ($slides.length <= 1) {
+                $nextBtn.hide();
+                $prevBtn.hide();
+                stopAutoSlide();
+                return;
+            } else {
+                $nextBtn.show();
+                $prevBtn.show();
+            }
+
+            let currentIndex = $slides.index($slides.filter('.active-slide'));
+            if (currentIndex < 0) currentIndex = 0;
+
+            function showSlide(index) {
+                $slides.removeClass('active-slide');
+                $dots.removeClass('active-dot');
+
+                $slides.eq(index).addClass('active-slide');
+                $dots.eq(index).addClass('active-dot');
+
+                currentIndex = index;
+            }
+
+            // Initial render
+            showSlide(currentIndex);
+
+            // ▶ NEXT
+            $nextBtn.off('click').on('click', function () {
+                showSlide((currentIndex + 1) % $slides.length);
+            });
+
+            // ◀ PREV
+            $prevBtn.off('click').on('click', function () {
+                showSlide((currentIndex - 1 + $slides.length) % $slides.length);
+            });
+
+            // ● DOT
+            $dots.off('click').on('click', function () {
+                showSlide($(this).data('slide-index'));
+            });
+
+            // 🔥 AUTO SLIDE
+            startAutoSlide(() => {
+                showSlide((currentIndex + 1) % $slides.length);
+            });
+
+            // ⏸ Pause on hover
+            $card.off('mouseenter').on('mouseenter', stopAutoSlide);
+            $card.off('mouseleave').on('mouseleave', () => {
+                startAutoSlide(() => {
+                    showSlide((currentIndex + 1) % $slides.length);
+                });
+            });
+        }
+        function startAutoSlide(callback) {
+            stopAutoSlide();
+            itemCardAutoSlideTimer = setInterval(callback, ITEM_CARD_SLIDE_INTERVAL);
+        }
+        function stopAutoSlide() {
+            if (itemCardAutoSlideTimer) {
+                clearInterval(itemCardAutoSlideTimer);
+                itemCardAutoSlideTimer = null;
+            }
+        }
+
+        // 🔥 Load card when row is clicked or focused
+        $(document).on(
+            'click focusin',
+            '#mainitemtable tbody tr',
+            function () {
+
+                const $row = $(this);
+
+                // Ignore empty rows
+                const itemId = $row.find('.ItemCode').attr('data-id');
+                if (!itemId) return;
+
+                // Highlight selected row (optional UX)
+                $('#mainitemtable tbody tr').removeClass('table-active');
+                $row.addClass('table-active');
+
+                // ✅ LOAD CARD DATA FOR THIS ROW
+                rendarCard($row);
+            }
+        );
+
 
     });
 

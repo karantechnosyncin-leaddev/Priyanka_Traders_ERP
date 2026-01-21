@@ -674,6 +674,27 @@
         public DateTime? UpdatedDate { get; set; }
     }
 
+    public class INVENTORYQRCODEPRINTING
+    {
+        public string ID { get; set; }
+        public string ItemCode { get; set; }
+        public string ItemName { get; set; }
+        public string EmployeeID { get; set; }
+        public string EmployeeName { get; set; }
+        public string GRPO_DocEntry { get; set; }
+        public string GRPO_NO { get; set; }
+        public decimal? GRPO_QTY { get; set; }
+        public decimal? Printed_QTY { get; set; }
+        public string TabType { get; set; }
+        public string? CretedByUId { get; set; }
+        public string? CretedByUName { get; set; }
+        public DateTime? CreateDate { get; set; }
+    }
+    //public class QRCODEPRINTINGLINE
+    //{
+       
+    //}
+
 
 
     public class INVENTORYPOSTING

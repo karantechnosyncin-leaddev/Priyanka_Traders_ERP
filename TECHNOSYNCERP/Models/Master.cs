@@ -82,7 +82,7 @@ namespace TECHNOSYNCERP.Models
         public string Stat_Id { get; set; }
         public string CretedByUId { get; set; }
         public string CretedByUName { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
         public string UpdatedByUId { get; set; }
         public string UpdatedByUName { get; set; }
         public DateTime? UpdatedDate { get; set; }
@@ -102,24 +102,24 @@ namespace TECHNOSYNCERP.Models
         public DateTime? UpdatedDate { get; set; }
 
     }
-    public class LinkUser
-    {
-        public string UserID { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string FullName { get; set; }
-        public string Email { get; set; }
-        public string Mobile { get; set; }
-        public string Role { get; set; }
-        public string LicenseValidFrom { get; set; }
-        public string LicenseValidTo { get; set; }
-        public string Licencekey { get; set; }
-        public string LicenseStatus { get; set; }
-        public string LicenseGenDate { get; set; }
-        public string CreatedBy { get; set; }
-        public string LastLogin { get; set; }
-        public string IsActive { get; set; }
-    }
+    //public class LinkUser
+    //{
+    //    public string UserID { get; set; }
+    //    public string Username { get; set; }
+    //    public string Password { get; set; }
+    //    public string FullName { get; set; }
+    //    public string Email { get; set; }
+    //    public string Mobile { get; set; }
+    //    public string Role { get; set; }
+    //    public string LicenseValidFrom { get; set; }
+    //    public string LicenseValidTo { get; set; }
+    //    public string Licencekey { get; set; }
+    //    public string LicenseStatus { get; set; }
+    //    public string LicenseGenDate { get; set; }
+    //    public string CreatedBy { get; set; }
+    //    public string LastLogin { get; set; }
+    //    public string IsActive { get; set; }
+    //}
     public class BAKNS
     {
         public string BankID { get; set; }

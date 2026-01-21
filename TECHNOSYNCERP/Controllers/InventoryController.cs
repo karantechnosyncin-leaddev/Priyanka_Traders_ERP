@@ -1870,7 +1870,7 @@ namespace TECHNOSYNCERP.Controllers
                 return StatusCode(500, new { error = ex.Message });
             }
         }
-        public async Task<IActionResult> GETGRPOITEM(string DocNum)
+        public async Task<IActionResult> GETGRPOITEM(string id)
         {
             var connStr = _configuration.GetConnectionString("ErpConnection");
             var list = new List<Dictionary<string, string>>();
@@ -1892,7 +1892,7 @@ namespace TECHNOSYNCERP.Controllers
             WHERE T1.DocNum = @DocNum";
 
                 await using var cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@DocNum", DocNum);
+                cmd.Parameters.AddWithValue("@DocNum", id);
 
                 await con.OpenAsync();
 
@@ -3577,8 +3577,59 @@ namespace TECHNOSYNCERP.Controllers
             }
         }
 
-        
 
+
+        #endregion
+        #region QRCode Print
+        public async Task<IActionResult> ADDBARCODEPRINTLOG([FromBody] INVENTORYQRCODEPRINTING[] data)
+        {
+            string connectionString = _configuration.GetConnectionString("ErpConnection");
+            SqlTransaction transaction = null;
+
+            await using var con = new SqlConnection(connectionString);
+            await con.OpenAsync();
+            try
+            {
+                transaction = con.BeginTransaction();
+                Genrate_Query generator = new Genrate_Query();
+                string query;
+
+                for (int i = 0; i < data.Length; i++)
+                {
+                    var item = data[i];
+                    item.CreateDate = DateTime.Now;
+                    item.CretedByUId = HttpContext.Session.GetString("UserID");
+                    item.CretedByUName = HttpContext.Session.GetString("UserName");
+                    if (string.IsNullOrEmpty(item.ID))
+                    {
+                        item.ID = null;
+                        query = generator.GenerateInsertQuery(item, "[QRCodePrintLog]", "ID");
+                        await using (var cmd = new SqlCommand(query, con, transaction))
+                        {
+                            cmd.CommandTimeout = 300;
+                            await cmd.ExecuteNonQueryAsync();
+                        }
+                    }
+                }
+                await transaction.CommitAsync();
+                return Json(new { Success = true, Message = "Log saved successfully." });
+            }
+            catch (SqlException ex) when (ex.Number == 2627 || ex.Number == 2601)
+            {
+                if (transaction != null) await transaction.RollbackAsync();
+                return Conflict("A record with the same value already exists.");
+            }
+            catch (Exception ex)
+            {
+                if (transaction != null) await transaction.RollbackAsync();
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+            finally
+            {
+                if (transaction != null) await transaction.DisposeAsync();
+                await con.CloseAsync();
+            }
+        }
         #endregion
 
 
