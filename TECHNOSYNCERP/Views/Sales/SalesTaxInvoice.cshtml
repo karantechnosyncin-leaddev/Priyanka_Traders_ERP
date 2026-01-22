@@ -107,7 +107,7 @@
     }
 
     .stat-value {
-        font-size: 1.05rem;
+        font-size: 1.50rem;
         font-weight: 700;
         color: var(--theme-color);
         line-height: 1.1;
@@ -210,7 +210,7 @@
     }
 
     .total-label {
-        font-size: 0.75rem;
+        font-size: 1.5rem;
         opacity: 0.9;
         font-weight: 500;
         text-transform: uppercase;
@@ -323,6 +323,42 @@
     .carousel-image-slide {
         pointer-events: none;
     }
+
+    /*    image INSPACT*/
+    .zoom-container {
+        overflow: hidden;
+        cursor: grab;
+    }
+
+        .zoom-container img {
+            transition: transform 0.15s ease;
+            transform-origin: center center;
+            user-select: none;
+        }
+
+        .zoom-container.grabbing {
+            cursor: grabbing;
+        }
+
+    .carousel-image-slide img {
+        pointer-events: auto;
+        cursor: zoom-in;
+    }
+
+    /*    table Scroll*/
+    .mainitem-table-scroll {
+        max-height: 300px; /* ≈ 4–5 rows */
+        overflow-y: auto;
+        overflow-x: auto;
+    }
+
+        /* Sticky header */
+        .mainitem-table-scroll thead th {
+            position: sticky;
+            top: 0;
+            background: #f8f9fa;
+            z-index: 3;
+        }
 </style>
 <div class="container-fluid">
     <div class="row  mt-2  gx-0">
@@ -349,10 +385,10 @@
                                         switch (btnName)
                                         {
                                             @*   case "Bulk Upload":
-                                                <button id="btnBulkUpload" data-bs-toggle="modal" data-bs-target="#bulkUploadModal" class="btn @ColorClass mb-1  me-2 mb-1">
-                                                    <i class="@icon"></i> @btnName
-                                                </button>
-                                                break; *@
+                                            <button id="btnBulkUpload" data-bs-toggle="modal" data-bs-target="#bulkUploadModal" class="btn @ColorClass mb-1  me-2 mb-1">
+                                                <i class="@icon"></i> @btnName
+                                            </button>
+                                            break; *@
                                             case "Find":
                                                 <button id="btnFind" data-bs-toggle="modal" data-bs-target="#receiptListModal" class="btn @ColorClass mb-1  me-2 mb-1">
                                                     <i class="@icon"></i> @btnName
@@ -387,15 +423,15 @@
                                                 </div>
                                                 break;
                                             @*case "Copy To":
-                                                <div class="dropdown">
-                                                    <button id="btnCopyTo" class="btn @ColorClass mb-1  dropdown-toggle me-2 mb-1" type="button" disabled data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i class="@icon"></i> @btnName
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li class='copytobtn' data-flag="MO"><a class="dropdown-item" href="#"></a></li>
-                                                    </ul>
-                                                </div>
-                                                break;*@
+                                            <div class="dropdown">
+                                                <button id="btnCopyTo" class="btn @ColorClass mb-1  dropdown-toggle me-2 mb-1" type="button" disabled data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="@icon"></i> @btnName
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li class='copytobtn' data-flag="MO"><a class="dropdown-item" href="#"></a></li>
+                                                </ul>
+                                            </div>
+                                            break;*@
                                             default:
 
                                                 break;
@@ -615,7 +651,7 @@
                     <!-- Line Items -->
                     <div class="row mt-4">
                         <div class="col-12">
-                            <div class="table-responsive">
+                            <div class="table-responsive mainitem-table-scroll">
                                 <table class="table  table-hover" id="mainitemtable">
                                     <thead class="table-light">
                                         <tr>
@@ -775,11 +811,11 @@
                     <!-- ERP-Style Footer Summary - Optimized -->
                     <div class="container-fluid mt-4 border-top pt-3 small">
                         <div class="row g-2">
-                            <div class="col-md-2  col-lg-4 col-xl-7">
+                            <div class="col-md-2  col-lg-4 col-xl-5">
 
                             </div>
                             <!-- Tax Summary with Modal Trigger -->
-                            <div class="col-md-10 col-lg-8 col-xl-5">
+                            <div class="col-md-10 col-lg-8 col-xl-7">
                                 <div class="row g-2 mb-3">
                                     <div class="col-md-4">
                                         <label class="form-label fw-bold text-dark small">
@@ -864,18 +900,8 @@
 
                 <!-- Header -->
                 <div class="compact-header text-white">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div class="compact-chip">
-                            <i class="fas fa-barcode fa-xs"></i>
-                            <span class="item-code-badge">ITM-Code</span>
-                        </div>
-                        <div class="compact-chip" style="background: rgba(52, 168, 83, 0.15);">
-                            <i class="fas fa-check-circle fa-xs"></i>
-                            <spn class="">Stock</spn>
-                            <span class="Item-Card-Stock">00</span>
-                        </div>
-                    </div>
-                    <h5 class="mb-1 fw-semibold card-title mb-2" style="font-size: 1.1rem;">Product Name</h5>
+
+                    <h5 class="mb-1 fw-semibold card-title mb-2 text-center" style="font-size: 1.1rem;">Product Name</h5>
                     <p class="mb-4 opacity-85" style="font-size: 0.8rem;">
                     </p>
                 </div>
@@ -885,7 +911,7 @@
                 <div class="bg-light ">
                     <div class="position-relative rounded overflow-hidden bg-white shadow-sm" style="height: 200px;">
                         <div class="carousel-image-slide active-slide position-absolute w-100 h-100 d-flex align-items-center justify-content-center">
-                            <img class="img-fluid Card" src="https://ito-group.com/wp-content/uploads/2025/04/no-image.jpg" alt="Product Front">
+                            <img class="img-fluid Card img-fluid  object-fit-containimg-fluid w-100 h-100 object-fit-contain" src="https://ito-group.com/wp-content/uploads/2025/04/no-image.jpg" alt="Product Front">
                         </div>
 
                         <button type="button"
@@ -914,40 +940,40 @@
                         <div class="stat-icon">
                             <i class="fas fa-tag"></i>
                         </div>
+                        <div class="stat-label">Price</div>
                         <div class="stat-value price-color">
                             ₹<span class="Item-Card-Price">00</span>
                         </div>
-                        <div class="stat-label">Price</div>
                     </div>
 
                     <div class="compact-stat weight-stat">
                         <div class="stat-icon">
                             <i class="fas fa-weight"></i>
                         </div>
+                        <div class="stat-label">Weight</div>
                         <div class="stat-value">
                             <span class="Item-Card-Weight">00</span>
                         </div>
-                        <div class="stat-label">Weight</div>
                     </div>
 
                     <div class="compact-stat">
                         <div class="stat-icon">
                             <i class="fas fa-cube"></i>
                         </div>
+                        <div class="stat-label">UOM</div>
                         <div class="stat-value">
                             <span class="Item-Card-Uom">UOM</span>
                         </div>
-                        <div class="stat-label">UOM</div>
                     </div>
 
                     <div class="compact-stat quantity-stat">
                         <div class="stat-icon">
                             <i class="fas fa-boxes"></i>
                         </div>
+                        <div class="stat-label">Quantity</div>
                         <div class="stat-value">
                             <span class="Card-Quantity">00</span>
                         </div>
-                        <div class="stat-label">Quantity</div>
                     </div>
                 </div>
 
@@ -1057,14 +1083,11 @@
 
                 <!-- Material Total -->
                 <div class="material-total">
-                    <div class="total-label">Total Amount</div>
                     <div class="total-display">
-                        ₹<span class="Summery-Card-TotalAmount">00</span>
+                        <span class="total-label">Total Amount: </span>
+                        <span class="Summery-Card-TotalAmount">00 </span> ₹
                     </div>
-                    <div style="opacity: 0.8; font-size: 0.75rem; margin-top: 0.3rem;">
-                        <i class="fas fa-info-circle me-1"></i>
-                        All taxes included
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -1483,6 +1506,35 @@
         </div>
     </div>
 </div>
+
+<!-- Image Preview Modal -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-white">Product Images</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body p-0">
+                <div id="previewCarousel" class="carousel slide" data-bs-ride="false">
+                    <div class="carousel-inner" id="previewCarouselInner">
+                        <!-- Images injected dynamically -->
+                    </div>
+
+                    <button class="carousel-control-prev" type="button" data-bs-target="#previewCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+
+                    <button class="carousel-control-next" type="button" data-bs-target="#previewCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     $(document).ready(function () {
 
@@ -4531,7 +4583,7 @@
                 $imageContainer.append(`
                     <div class="carousel-image-slide active-slide position-absolute w-100 h-100
                         d-flex align-items-center justify-content-center">
-                        <img class="img-fluid Card"
+                        <img class="Card img-fluid  object-fit-containimg-fluid w-100 h-100 object-fit-contain"
                              src="https://ito-group.com/wp-content/uploads/2025/04/no-image.jpg"
                              alt="No Image">
                     </div>
@@ -4554,7 +4606,7 @@
                     <div class="carousel-image-slide position-absolute w-100 h-100
                         d-flex align-items-center justify-content-center
                         ${index === 0 ? 'active-slide' : ''}">
-                        <img class="img-fluid Card" src="${imgSrc}" alt="${img.FileName}">
+                        <img class="Card img-fluid  object-fit-containimg-fluid w-100 h-100 object-fit-contain" src="${imgSrc}" alt="${img.FileName}">
                     </div>
                 `);
 
@@ -4666,5 +4718,106 @@
             }
         );
     });
+
+$(document).on('click', '.carousel-image-slide img', function () {
+
+    let clickedSrc = $(this).attr('src');
+    let html = '';
+    let activeIndex = 0;
+
+    $('.carousel-image-slide img').each(function (i) {
+        let src = $(this).attr('src');
+        let active = src === clickedSrc ? 'active' : '';
+        if (active) activeIndex = i;
+
+        html += `
+        <div class="carousel-item ${active}">
+            <div class="zoom-wrapper d-flex align-items-center justify-content-center">
+                <img src="${src}" class="zoom-img Card img-fluid  object-fit-containimg-fluid w-100 h-100 object-fit-contain">
+            </div>
+        </div>`;
+    });
+
+    $('#previewCarouselInner').html(html);
+
+    let modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+    modal.show();
+
+    setTimeout(() => {
+        bootstrap.Carousel.getOrCreateInstance('#previewCarousel')
+            .to(activeIndex);
+    }, 150);
+});
+
+let scale = 1, posX = 0, posY = 0;
+let dragging = false, startX = 0, startY = 0;
+
+function applyTransform(img) {
+    img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+}
+
+function resetZoom(img) {
+    scale = 1;
+    posX = posY = 0;
+    applyTransform(img);
+}
+
+/* Mouse wheel zoom */
+$(document).on('wheel', '.zoom-wrapper', function (e) {
+    e.preventDefault();
+
+    const img = $(this).find('img')[0];
+    const delta = e.originalEvent.deltaY > 0 ? -0.15 : 0.15;
+
+    scale = Math.min(Math.max(1, scale + delta), 5);
+    applyTransform(img);
+});
+
+/* Drag image */
+$(document).on('mousedown', '.zoom-wrapper', function (e) {
+    if (scale <= 1) return;
+
+    dragging = true;
+    startX = e.clientX - posX;
+    startY = e.clientY - posY;
+    $(this).addClass('grabbing');
+});
+
+$(document).on('mousemove', function (e) {
+    if (!dragging) return;
+
+    posX = e.clientX - startX;
+    posY = e.clientY - startY;
+
+    $('.carousel-item.active img').each(function () {
+        applyTransform(this);
+    });
+});
+
+$(document).on('mouseup', function () {
+    dragging = false;
+    $('.zoom-wrapper').removeClass('grabbing');
+});
+
+/* Double click reset */
+$(document).on('dblclick', '.zoom-wrapper', function () {
+    resetZoom($(this).find('img')[0]);
+});
+
+/* Reset zoom on slide change */
+$('#previewCarousel').on('slid.bs.carousel', function () {
+    $('.carousel-item.active img').each(function () {
+        resetZoom(this);
+    });
+});
+
+/* Reset on modal close */
+$('#imagePreviewModal').on('hidden.bs.modal', function () {
+    scale = 1;
+    posX = posY = 0;
+});
+
+
+
 
 </script>

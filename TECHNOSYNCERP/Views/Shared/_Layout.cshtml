@@ -378,60 +378,77 @@
             background-color: purple !important;
             font-weight: bold !important;
         }
-    </style>
 
-    @*Style for Stock Check Model*@
-    <style>
-        /* Custom modal that takes 80% of screen - START FROM TOP */
-        .modal-80 {
-            max-width: 75%;
+
+      /* ===============================
+           STOCK CHECK MODAL STYLES
+        ================================ */
+
+        .stock-check-modal {
+            max-width: 70%;
             width: 95%;
             margin-top: 2%;
-            margin-left: 16%;
+            margin-left: 15%;
             top: 0;
         }
 
-            .modal-80 .modal-content {
-                height: auto;
-                border-radius: 0;
-                border: none;
-            }
+        .stock-check-modal .modal-content {
+            height: auto;
+            border-radius: 0;
+            border: none;
+        }
 
-            .modal-80 .modal-body {
-                overflow-y: auto;
-                max-height: calc(100vh - 120px); /* Account for header and footer */
-            }
+        .stock-check-body {
+            overflow-y: auto;
+            max-height: calc(100vh - 120px);
+        }
 
-        /* Remove modal backdrop padding */
+        /* Remove modal padding */
         .modal {
             padding: 0 !important;
         }
 
-        /* Remove vertical centering */
+        /* Top aligned modal */
         .modal-dialog-centered {
             align-items: flex-start !important;
         }
 
-        /* Responsive adjustments */
-        @@media (max-width: 992px) {
-            .modal-80 {
-                max-width: 100%;
-                width: 100%;
-            }
+        /* Header */
+        .stock-check-header {
+            background-color: #0d6efd;
+            color: #fff;
         }
 
+        /* QR Section */
+        .stock-check-qr i {
+            font-size: 50px;
+            color: #0d6efd;
+        }
+
+        /* Table */
+        .stock-check-table-wrapper {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .stock-check-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        /* Responsive */
         @@media (max-width: 768px) {
-            .modal-80 {
-                max-width: 100%;
+            .stock-check-modal {
                 width: 100%;
                 margin: 0;
             }
-
-                .modal-80 .modal-content {
-                    height: 100vh;
-                }
+            .stock-check-modal .modal-content {
+                height: 100vh;
+            }
         }
     </style>
+
 
 </head>
 <body class="layout-fixed sidebar-expand-lg sidebar-mini bg-body-tertiary">
@@ -1105,67 +1122,62 @@
 
         @*Model For Stock Check*@
         <section>
-            <!-- Inventory Check Modal - 80% of screen -->
             <div class="modal fade" id="inventoryCheckModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-80 modal-dialog-centered">
+                <div class="modal-dialog stock-check-modal modal-dialog-centered">
                     <div class="modal-content">
 
-                        <!-- Header -->
-                        <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title">Item Stock - By Warehouse</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <!-- HEADER -->
+                        <div class="modal-header stock-check-header">
+                            <h5 class="modal-title">Item Stock – By Warehouse</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                         </div>
 
-                        <!-- Body -->
-                        <div class="modal-body">
+                        <!-- BODY -->
+                        <div class="modal-body stock-check-body">
 
-                            <!-- QR Code Section -->
-                            <div class="row mb-4 justify-content-center">
-                                <div class="col-12 text-center">
-                                    <i class="bi bi-qr-code-scan" style="font-size:50px;"></i>
-                                </div>
-                            </div>
+                            <!-- FORM -->
+                            <div class="container-fluid mb-4 stock-check-form">
 
-                            <!-- Form Section -->
-                            <div class="container-fluid mb-4">
                                 <div class="row mb-3 align-items-center">
                                     <div class="col-md-3 col-lg-2 text-md-end">
-                                        <label class="form-label fw-bold" for="BarCode">Bar Code</label>
+                                        <label class="form-label fw-bold">Item Code</label>
                                     </div>
                                     <div class="col-md-9 col-lg-8">
-                                        <input type="text" class="form-control" id="BarCode" placeholder="Scan or enter barcode">
+                                        <input type="text" class="form-control" placeholder="Scan or enter barcode">
                                     </div>
                                 </div>
 
                                 <div class="row mb-3 align-items-center">
                                     <div class="col-md-3 col-lg-2 text-md-end">
-                                        <label class="form-label fw-bold" for="ItemName">Item Name</label>
+                                        <label class="form-label fw-bold">Item Name</label>
                                     </div>
                                     <div class="col-md-9 col-lg-8">
-                                        <input type="text" class="form-control" id="ItemName">
+                                        <input type="text" class="form-control" >
                                     </div>
                                 </div>
 
                                 <div class="row mb-4 align-items-center">
                                     <div class="col-md-3 col-lg-2 text-md-end">
-                                        <label class="form-label fw-bold" for="InventoryUoM">Inventory UoM</label>
+                                        <label class="form-label fw-bold">Inventory UoM</label>
                                     </div>
                                     <div class="col-md-9 col-lg-8">
-                                        <input type="text" class="form-control" id="InventoryUoM">
+                                        <input type="text" class="form-control" readonly>
                                     </div>
                                 </div>
+
                             </div>
 
-                            <!-- Table Section -->
+                            <!-- TABLE -->
                             <div class="container-fluid">
                                 <h6 class="mb-3">Warehouse Stock Details</h6>
-                                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-                                    <table class="table table-bordered table-striped table-hover mb-0" id="StockCheckModel">
+
+                                <div class="table-responsive stock-check-table-wrapper">
+                                    <table class="table table-bordered table-striped table-hover mb-0 stock-check-table">
                                         <thead class="table-primary">
                                             <tr>
                                                 <th>Sr No</th>
                                                 <th>Whs Code</th>
-                                                <th>Avil. Qty.</th>
+                                                <th>Avail. Qty</th>
                                                 <th>MRP</th>
                                                 <th>Discount (%)</th>
                                                 <th>Disc Amt</th>
@@ -1173,9 +1185,37 @@
                                                 <th>Whs Name</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="inventoryTableBody">
-
-                                            <!-- Add more rows as needed -->
+                                        <tbody>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>WH001</td>
+                                                <td>150</td>
+                                                <td>₹100.00</td>
+                                                <td>10%</td>
+                                                <td>₹10.00</td>
+                                                <td>₹90.00</td>
+                                                <td>Main Warehouse</td>
+                                            </tr>
+                                            <tr>
+                                                <td>2</td>
+                                                <td>WH002</td>
+                                                <td>75</td>
+                                                <td>₹120.00</td>
+                                                <td>5%</td>
+                                                <td>₹6.00</td>
+                                                <td>₹114.00</td>
+                                                <td>North Branch</td>
+                                            </tr>
+                                            <tr>
+                                                <td>3</td>
+                                                <td>WH003</td>
+                                                <td>200</td>
+                                                <td>₹100.00</td>
+                                                <td>15%</td>
+                                                <td>₹15.00</td>
+                                                <td>₹85.00</td>
+                                                <td>South Branch</td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -1183,8 +1223,8 @@
 
                         </div>
 
-                        <!-- Footer -->
-                        <div class="modal-footer">
+                        <!-- FOOTER -->
+                        <div class="modal-footer stock-check-footer">
                             <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button class="btn btn-primary">Print Report</button>
                         </div>
@@ -1192,15 +1232,6 @@
                     </div>
                 </div>
             </div>
-
-            <script>
-                // Auto-focus on barcode input when modal opens
-                $(document).ready(function () {
-                    $('#inventoryCheckModal').on('shown.bs.modal', function () {
-                        $(this).find('input[type="text"]').first().focus();
-                    });
-                });
-            </script>
         </section>
 
 
@@ -1738,7 +1769,7 @@
                     }
 
                     var ObjType = $('#doctype').val()
-                    if (ObjType == "SQ" || ObjType == "SO" || ObjType == "STI" || ObjType == "SDN" || ObjType == "SR" || ObjType == "SCN") {
+                    if (ObjType == "SQ" || ObjType == "SO" || ObjType == "STI" || ObjType == "SD" || ObjType == "SR" || ObjType == "SCN") {
                         $("#QType").val("C");
                         GetNextCardcode1("C");
                     } else {
@@ -2750,6 +2781,16 @@
         }
 
 
+    </script>
+
+    @*Stock Check Modal*@
+    <script>
+        /* Auto-focus barcode field */
+        $(document).ready(function () {
+            $('#inventoryCheckModal').on('shown.bs.modal', function () {
+                $(this).find('input[type="text"]').first().focus();
+            });
+        });
     </script>
 
     @RenderSection("Scripts", required: false)
