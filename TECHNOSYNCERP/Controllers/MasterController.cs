@@ -2477,6 +2477,221 @@ namespace TECHNOSYNCERP.Controllers
             }
         }
 
+        public async Task<IActionResult> GETBRAND()
+        {
+            try
+            {
+                string connectionString = _configuration.GetConnectionString("ErpConnection");
+                string query = @"
+           SELECT BrandName  FROM [ItemMaster]
+             ";
+
+                var dataList = new List<Dictionary<string, object>>();
+
+                await using (var con = new SqlConnection(connectionString))
+                {
+                    await using (var cmd = new SqlCommand(query, con))
+                    {
+                        cmd.CommandTimeout = 300;
+                        await con.OpenAsync();
+
+                        await using (var rdr = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await rdr.ReadAsync())
+                            {
+                                var row = new Dictionary<string, object>();
+
+                                for (int i = 0; i < rdr.FieldCount; i++)
+                                {
+                                    string columnName = rdr.GetName(i);
+                                    object value = rdr.IsDBNull(i) ? "" : rdr.GetValue(i);
+
+                                    // Convert DATE values to string format without time
+                                    if (value is DateTime dateValue && dateValue.TimeOfDay == TimeSpan.Zero)
+                                    {
+                                        row[columnName] = dateValue.ToString("dd/MM/yyyy");
+                                    }
+                                    else
+                                    {
+                                        row[columnName] = value;
+                                    }
+                                }
+
+                                dataList.Add(row);
+                            }
+                        }
+                    }
+                }
+
+                return Json(dataList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        public async Task<IActionResult> GETSIZE()
+        {
+            try
+            {
+                string connectionString = _configuration.GetConnectionString("ErpConnection");
+                string query = @"
+           SELECT Size  FROM [ItemMaster]
+             ";
+
+                var dataList = new List<Dictionary<string, object>>();
+
+                await using (var con = new SqlConnection(connectionString))
+                {
+                    await using (var cmd = new SqlCommand(query, con))
+                    {
+                        cmd.CommandTimeout = 300;
+                        await con.OpenAsync();
+
+                        await using (var rdr = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await rdr.ReadAsync())
+                            {
+                                var row = new Dictionary<string, object>();
+
+                                for (int i = 0; i < rdr.FieldCount; i++)
+                                {
+                                    string columnName = rdr.GetName(i);
+                                    object value = rdr.IsDBNull(i) ? "" : rdr.GetValue(i);
+
+                                    // Convert DATE values to string format without time
+                                    if (value is DateTime dateValue && dateValue.TimeOfDay == TimeSpan.Zero)
+                                    {
+                                        row[columnName] = dateValue.ToString("dd/MM/yyyy");
+                                    }
+                                    else
+                                    {
+                                        row[columnName] = value;
+                                    }
+                                }
+
+                                dataList.Add(row);
+                            }
+                        }
+                    }
+                }
+
+                return Json(dataList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        public async Task<IActionResult> GETPRODUCTS()
+        {
+            try
+            {
+                string connectionString = _configuration.GetConnectionString("ErpConnection");
+                string query = @"
+           SELECT Product  FROM [ItemMaster]
+             ";
+
+                var dataList = new List<Dictionary<string, object>>();
+
+                await using (var con = new SqlConnection(connectionString))
+                {
+                    await using (var cmd = new SqlCommand(query, con))
+                    {
+                        cmd.CommandTimeout = 300;
+                        await con.OpenAsync();
+
+                        await using (var rdr = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await rdr.ReadAsync())
+                            {
+                                var row = new Dictionary<string, object>();
+
+                                for (int i = 0; i < rdr.FieldCount; i++)
+                                {
+                                    string columnName = rdr.GetName(i);
+                                    object value = rdr.IsDBNull(i) ? "" : rdr.GetValue(i);
+
+                                    // Convert DATE values to string format without time
+                                    if (value is DateTime dateValue && dateValue.TimeOfDay == TimeSpan.Zero)
+                                    {
+                                        row[columnName] = dateValue.ToString("dd/MM/yyyy");
+                                    }
+                                    else
+                                    {
+                                        row[columnName] = value;
+                                    }
+                                }
+
+                                dataList.Add(row);
+                            }
+                        }
+                    }
+                }
+
+                return Json(dataList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        public async Task<IActionResult> GETMODAL()
+        {
+            try
+            {
+                string connectionString = _configuration.GetConnectionString("ErpConnection");
+                string query = @"
+           SELECT ModelNameCode  FROM [ItemMaster]
+             ";
+
+                var dataList = new List<Dictionary<string, object>>();
+
+                await using (var con = new SqlConnection(connectionString))
+                {
+                    await using (var cmd = new SqlCommand(query, con))
+                    {
+                        cmd.CommandTimeout = 300;
+                        await con.OpenAsync();
+
+                        await using (var rdr = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await rdr.ReadAsync())
+                            {
+                                var row = new Dictionary<string, object>();
+
+                                for (int i = 0; i < rdr.FieldCount; i++)
+                                {
+                                    string columnName = rdr.GetName(i);
+                                    object value = rdr.IsDBNull(i) ? "" : rdr.GetValue(i);
+
+                                    // Convert DATE values to string format without time
+                                    if (value is DateTime dateValue && dateValue.TimeOfDay == TimeSpan.Zero)
+                                    {
+                                        row[columnName] = dateValue.ToString("dd/MM/yyyy");
+                                    }
+                                    else
+                                    {
+                                        row[columnName] = value;
+                                    }
+                                }
+
+                                dataList.Add(row);
+                            }
+                        }
+                    }
+                }
+
+                return Json(dataList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+
+
 
         [HttpPost]
         public IActionResult Warehouses([FromBody] WhsMaster data)

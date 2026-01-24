@@ -331,6 +331,48 @@ namespace TECHNOSYNCERP.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> GETEMPLOYEEDROPDOWN(string flag)
+        {
+            var connStr = _configuration.GetConnectionString("ErpConnection");
+            var resultList = new List<object>();
+
+            try
+            {
+                await using (var con = new SqlConnection(connStr))
+                {
+                    await con.OpenAsync();
+
+                    await using (var cmd = new SqlCommand("Get_SalesmanWoodan", con))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        // Pass flag safely
+                        cmd.Parameters.Add("@Flag", SqlDbType.Char, 1).Value = flag;
+
+                        await using (var rdr = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await rdr.ReadAsync())
+                            {
+                                resultList.Add(new
+                                {
+                                    EmployeeCode = rdr["EmployeeCode"].ToString(),
+                                    FullName = rdr["FullName"].ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+
+                return Json(resultList);
+            }
+            catch (Exception ex)
+            {
+                // Helpful during debugging
+                return StatusCode(500, ex.ToString());
+            }
+        }
+
         private async Task<List<Dictionary<string, string>>> GetNextDocNumberAsync(string id, string docType)
         {
             var list = new List<Dictionary<string, string>>();
@@ -744,6 +786,7 @@ namespace TECHNOSYNCERP.Controllers
 
             return Json(new { imageUrl });
         }
+
 
         #region SALES QUOTATION
 

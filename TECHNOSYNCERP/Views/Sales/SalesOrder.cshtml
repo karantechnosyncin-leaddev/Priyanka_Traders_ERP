@@ -2,6 +2,11 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 <style>
+    html, body {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
     :root {
         --theme-color: #343a40;
         --primary-color: #4285f4;
@@ -25,6 +30,11 @@
         max-width: 100%;
         width: 100%;
         margin: 0;
+    }
+
+    .compact-card {
+        min-width: 0;
+        overflow: hidden;
     }
 
     .right-panel-gap {
@@ -107,7 +117,7 @@
     }
 
     .stat-value {
-        font-size: 1.50rem;
+        font-size: 1.20rem;
         font-weight: 700;
         color: var(--theme-color);
         line-height: 1.1;
@@ -292,7 +302,11 @@
     .carousel-image-slide {
         position: absolute;
         inset: 0;
+        max-width: 100%;
+        overflow: hidden;
     }
+
+
 
 
     .carousel-dot {
@@ -386,10 +400,10 @@
                                             switch (btnName)
                                             {
                                                 @*   case "Bulk Upload":
-                                                    <button id="btnBulkUpload" data-bs-toggle="modal" data-bs-target="#bulkUploadModal" class="btn @ColorClass mb-1  me-2 mb-1">
-                                                        <i class="@icon"></i> @btnName
-                                                    </button>
-                                                    break; *@
+                                                <button id="btnBulkUpload" data-bs-toggle="modal" data-bs-target="#bulkUploadModal" class="btn @ColorClass mb-1  me-2 mb-1">
+                                                    <i class="@icon"></i> @btnName
+                                                </button>
+                                                break; *@
                                                 case "Find":
                                                     <button id="btnFind" data-bs-toggle="modal" data-bs-target="#receiptListModal" class="btn @ColorClass mb-1  me-2 mb-1">
                                                         <i class="@icon"></i> @btnName
@@ -583,8 +597,28 @@
                                 </div>
                             </div>
                             <div class="col-md-3 col-6 mb-2">
-                                <label for="DocumentDate" class="form-label">Document Date</label>
-                                <input id="DocumentDate" class="form-control datepicker" type="date" />
+                                <label for="PostingDate" class="form-label">Posting Date</label>
+                                <input id="PostingDate" class="form-control datepicker" type="date" />
+                            </div>
+                            <div class="col-md-2 col-6 mb-2">
+                                <label for="SalesEmployee" class="form-label">Sales Employee</label>
+                                <div class="input-group">
+                                    <select id="SalesEmployee"
+                                            class="form-select employee-dropdown"
+                                            data-flag="S">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-6 mb-2">
+                                <label for="WoodenEmployee" class="form-label">Uddan</label>
+                                <div class="input-group">
+                                    <select id="WoodenEmployee"
+                                            class="form-select employee-dropdown"
+                                            data-flag="U">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="col-md-3 col-6 mb-2">
                                 <label for="Remarks" class="form-label">Remarks</label>
@@ -608,9 +642,11 @@
                                     <label for="RefNo" class="form-label">Reference No</label>
                                     <input id="RefNo" class="form-control" type="text" />
                                 </div>
+
+
                                 <div class="col-md-3 col-6 mb-2">
-                                    <label for="PostingDate" class="form-label">Posting Date</label>
-                                    <input id="PostingDate" class="form-control datepicker" type="date" />
+                                    <label for="DocumentDate" class="form-label">Document Date</label>
+                                    <input id="DocumentDate" class="form-control datepicker" type="date" />
                                 </div>
                                 <div class="col-md-2 col-6 mb-2">
                                     <label for="DueDate" class="form-label">Due Date</label>
@@ -898,7 +934,7 @@
 
         <!-- Item Card Widget (col-4 on desktop, full width on mobile) -->
 
-        <div class="col-lg-3 col-md-6 right-panel-gap">
+        <div class="col-lg-3 col-md-6 right-panel-gap  d-none d-lg-block">
             <!-- Compact Material Card -->
             <div class="compact-card" id="itemCardWidget">
 
@@ -940,13 +976,31 @@
 
                 <!-- Compact Stats -->
                 <div class="compact-stats">
+                    <div class="compact-stat quantity-stat">
+                        <div class="stat-icon">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div class="stat-label">Quantity</div>
+                        <div class="stat-value">
+                            <span class="Card-Quantity">00</span>
+                        </div>
+                    </div>
+                    <div class="compact-stat">
+                        <div class="stat-icon">
+                            <i class="fas fa-cube"></i>
+                        </div>
+                        <div class="stat-label">UOM</div>
+                        <div class="stat-value">
+                            <span class="Item-Card-Uom">UOM</span>
+                        </div>
+                    </div>
                     <div class="compact-stat price-stat">
                         <div class="stat-icon">
                             <i class="fas fa-tag"></i>
                         </div>
-                        <div class="stat-label">Price</div>
+                        <div class="stat-label">Amount</div>
                         <div class="stat-value price-color">
-                            ₹<span class="Item-Card-Price">00</span>
+                            ₹<span class="Item-Card-NetAmount">00</span>
                         </div>
                     </div>
 
@@ -960,25 +1014,9 @@
                         </div>
                     </div>
 
-                    <div class="compact-stat">
-                        <div class="stat-icon">
-                            <i class="fas fa-cube"></i>
-                        </div>
-                        <div class="stat-label">UOM</div>
-                        <div class="stat-value">
-                            <span class="Item-Card-Uom">UOM</span>
-                        </div>
-                    </div>
 
-                    <div class="compact-stat quantity-stat">
-                        <div class="stat-icon">
-                            <i class="fas fa-boxes"></i>
-                        </div>
-                        <div class="stat-label">Quantity</div>
-                        <div class="stat-value">
-                            <span class="Card-Quantity">00</span>
-                        </div>
-                    </div>
+
+
                 </div>
 
                 <!-- Two Column Details -->
@@ -1035,7 +1073,7 @@
                         <div class="detail-box">
                             <div class="detail-label">
                                 <div class="detail-icon-small">
-                                    <i class="fas fa-dollar-sign"></i>
+                                    <i class="fas fa-rupee-sign"></i>
                                 </div>
                                 <span>GST Amount</span>
                             </div>
@@ -1088,8 +1126,8 @@
                 <!-- Material Total -->
                 <div class="material-total">
                     <div class="total-display">
-                        <span class="total-label">Total Amount: </span>
-                        <span class="Summery-Card-TotalAmount">00 </span> ₹
+                        <span class="total-label">Total Amount: ₹ </span>
+                        <span class="Summery-Card-TotalAmount">00 </span>
                     </div>
 
                 </div>
@@ -1863,7 +1901,43 @@
                 });
                 $('#TotalWeight').val(totalWeight.toFixed(2));
             }
-        }
+            }
+
+            bindEmployeeDropdowns();
+            function bindEmployeeDropdowns() {
+
+                $('.employee-dropdown').each(function () {
+
+                    const $dropdown = $(this);
+                    const flag = $dropdown.data('flag');   // S or U
+
+                    $.ajax({
+                        url: '@Url.Action("GETEMPLOYEEDROPDOWN", "Sales")',
+                        type: 'GET',
+                        data: { flag: flag },
+                        success: function (response) {
+                            console.log(response);
+
+                            $dropdown
+                                .empty()
+                                .append('<option value="">Select Employee</option>');
+
+                            response.forEach(function (emp) {
+                                $dropdown.append(`
+                                    <option value="${emp.EmployeeID}"
+                                            data-code="${emp.employeeCode}">
+                                        ${emp.fullName}
+                                    </option>
+                                `);
+                            });
+                        },
+                        error: function (xhr) {
+                            Notify('error', 'Error', xhr.responseText);
+                        }
+                    });
+                });
+            }
+       
         function loadFiscalYears() {
             $.ajax({
                  url: '@Url.Action("GETOPENFYEAR", "Inventory")',
@@ -4052,7 +4126,7 @@
             $(".item-code-badge").text(row.find(".ItemCode").val());
             $(".card-title").text(row.find(".ItemName").val() || 0) ;
             $(".Item-Card-Stock").text(row.find(".StockInWhs").val() ||0);
-            $(".Item-Card-Price").text(row.find(".Mrp").val() || 0);
+            $(".Item-Card-NetAmount").text(row.find(".NetAmt").val() || 0);
             $(".Item-Card-Weight").text(row.find(".Weight1").val() || 0);
             $(".Item-Card-Uom").text(
                 row.find(".ItemUOM option:selected").text()

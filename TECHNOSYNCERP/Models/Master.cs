@@ -249,6 +249,11 @@ namespace TECHNOSYNCERP.Models
         public string ItemCode { get; set; }
         public string EanCode { get; set; }
         public string ItemName { get; set; }
+        public string BrandName { get; set; }
+        public string Product { get; set; }
+        public string Size { get; set; }
+        public string ModelNameCode { get; set; }
+
         public string ItemTyp { get; set; }
         public string UomID { get; set; }
         public string ItmGrpID { get; set; }
