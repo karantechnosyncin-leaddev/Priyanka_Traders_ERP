@@ -1140,28 +1140,29 @@
 
                                 <div class="row mb-3 align-items-center">
                                     <div class="col-md-3 col-lg-2 text-md-end">
-                                        <label class="form-label fw-bold">Item Code</label>
+                                        <label for="ModalItemCode" class="form-label fw-bold">Item Code</label>
                                     </div>
                                     <div class="col-md-9 col-lg-8">
-                                        <input type="text" class="form-control" placeholder="Scan or enter barcode">
+                                        <input type="text" class="form-control" id="ModalItemCode">
                                     </div>
                                 </div>
 
                                 <div class="row mb-3 align-items-center">
                                     <div class="col-md-3 col-lg-2 text-md-end">
-                                        <label class="form-label fw-bold">Item Name</label>
+                                        <label class="form-label fw-bold" for="ModalIteName">Item Name</label>
                                     </div>
                                     <div class="col-md-9 col-lg-8">
-                                        <input type="text" class="form-control" >
+                                        <input type="text" class="form-control" id="ModalIteName">
                                     </div>
                                 </div>
-
                                 <div class="row mb-4 align-items-center">
                                     <div class="col-md-3 col-lg-2 text-md-end">
-                                        <label class="form-label fw-bold">Inventory UoM</label>
+                                        <label for="StockUoM" class="form-label fw-bold">Inventory UoM</label>
                                     </div>
                                     <div class="col-md-9 col-lg-8">
-                                        <input type="text" class="form-control" readonly>
+                                        <select id="StockUoM" class="form-select">
+                                            <option value="">Select</option>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -2709,12 +2710,60 @@
             });
         }
 
+            // Stock Check
+                var StockData = [];
+                var $activeStock = null;
 
-        //Load Stock Check
+                loadItemStockCheck();
+                loadStockCheckUom();
 
-        function loadStockCheck() {
+                function loadItemStockCheck() {
+                    $.ajax({
+                        type: "GET",
+                        url: '@Url.Action("GETACTIVEITEMSSTOCKCHECK", "Layout")',
+                        contentType: "application/json; charset=utf-8",
+                        cache: false,
+                        success: function (data) {
+                            console.log(data);
+                            StockData = Array.isArray(data) ? data : [];
+                        },
+                        error: function (xhr) {
+                            Notify('error', 'Error', xhr.responseText || 'Error loading items');
+                        }
+                    });
+                }
 
-        }
+
+
+                // Load UOM
+                function loadStockCheckUom() {
+                    $.ajax({
+                        url: '@Url.Action("GETSTOCKCHECK", "Layout")',
+                        method: 'GET',
+                        success: function (response) {
+
+                            const select = $('#StockUoM');
+                            select.empty();
+                            select.append('<option value="">Select</option>');
+
+                            response.forEach(function (UOM) {
+                                select.append(`
+                                    <option value="${UOM.UomID}"
+                                            data-name="${UOM.Name}"
+                                            data-code="${UOM.Code}">
+                                        ${UOM.Name}
+                                    </option>
+                                `);
+                            });
+                        },
+                        error: function (xhr) {
+                            Notify('error', 'Error', xhr.responseText);
+                        }
+                    });
+                }
+            
+
+
 
     </script>
     <script src="~/js/alert.js"></script>
@@ -2742,6 +2791,7 @@
         });
     </script>
 
+   
 
 
 

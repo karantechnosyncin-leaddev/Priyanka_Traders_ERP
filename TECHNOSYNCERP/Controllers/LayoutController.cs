@@ -303,7 +303,7 @@ namespace TECHNOSYNCERP.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GETStockCheck(string itemId)
+        public async Task<IActionResult> GETACTIVEITEMSSTOCKCHECK()
         {
             var connStr = _configuration.GetConnectionString("ErpConnection");
             var list = new List<Dictionary<string, string>>();
@@ -311,11 +311,39 @@ namespace TECHNOSYNCERP.Controllers
             try
             {
                 await using var con = new SqlConnection(connStr);
-                string query = "EXEC GET_ITEMSTOCK @ItemID";
+                string query = " select*from Inventory_Stock"; // keep your query as is
 
                 await using var cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@ItemID", itemId);
+                await con.OpenAsync();
 
+                await using var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess); // helps with large data
+                while (await reader.ReadAsync())
+                {
+                    var obj = new Dictionary<string, string>();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        obj[reader.GetName(i)] = reader.GetValue(i)?.ToString();
+                    }
+                    list.Add(obj);
+                }
+
+                return Json(list);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+        public async Task<IActionResult> GETStockCheck()
+        {
+            var connStr = _configuration.GetConnectionString("ErpConnection");
+            var list = new List<Dictionary<string, string>>();
+
+            try
+            {
+                await using var con = new SqlConnection(connStr);
+                string query = @"select* from UomTyp";
+                await using var cmd = new SqlCommand(query, con);
                 await con.OpenAsync();
 
                 await using var reader = await cmd.ExecuteReaderAsync();
@@ -336,6 +364,39 @@ namespace TECHNOSYNCERP.Controllers
                 return StatusCode(500, new { error = ex.Message });
             }
         }
+        //public async Task<IActionResult> GETStockCheck(string itemId)
+        //{
+        //    var connStr = _configuration.GetConnectionString("ErpConnection");
+        //    var list = new List<Dictionary<string, string>>();
+
+        //    try
+        //    {
+        //        await using var con = new SqlConnection(connStr);
+        //        string query = "EXEC GET_ITEMSTOCK @ItemID";
+
+        //        await using var cmd = new SqlCommand(query, con);
+        //        cmd.Parameters.AddWithValue("@ItemID", itemId);
+
+        //        await con.OpenAsync();
+
+        //        await using var reader = await cmd.ExecuteReaderAsync();
+        //        while (await reader.ReadAsync())
+        //        {
+        //            var obj = new Dictionary<string, string>();
+        //            for (int i = 0; i < reader.FieldCount; i++)
+        //            {
+        //                obj[reader.GetName(i)] = reader.GetValue(i)?.ToString();
+        //            }
+        //            list.Add(obj);
+        //        }
+
+        //        return Json(list);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new { error = ex.Message });
+        //    }
+        //}
 
 
 

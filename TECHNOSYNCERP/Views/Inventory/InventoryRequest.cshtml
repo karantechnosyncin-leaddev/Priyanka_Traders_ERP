@@ -401,7 +401,7 @@
 
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         // Initialize variables
         let currentDocEntry = null;
         let isEditMode = false;
@@ -620,7 +620,7 @@
                   FromWhs: $("#FromWarehouse").val()
               },
                  success: function (response) {
-                     console.log(responsse)
+                     console.log(response)
                      if (response.length >0) {
                          const stock = parseFloat(response[0].Stock) || 0;
                          if (stock <= 0) {
@@ -994,7 +994,7 @@
         });
     }
       loadItemMasterTable();
-      function bindtable(response){
+              function bindtable(response){
                       if ($.fn.DataTable.isDataTable('#itemSearchTable')) {
                           $('#itemSearchTable').DataTable().destroy();
                           $('#itemSearchTable thead th').not(':first').find('input').remove();

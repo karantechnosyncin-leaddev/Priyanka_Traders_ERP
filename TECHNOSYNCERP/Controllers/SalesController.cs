@@ -331,7 +331,6 @@ namespace TECHNOSYNCERP.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
-        [HttpGet]
         public async Task<IActionResult> GETEMPLOYEEDROPDOWN(string flag)
         {
             var connStr = _configuration.GetConnectionString("ErpConnection");
